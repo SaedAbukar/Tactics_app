@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+  background-color: #222;
+  font-family: Arial, sans-serif;
+}
+button {
+  padding: 6px 12px;
+  font-size: 16px;
+}
