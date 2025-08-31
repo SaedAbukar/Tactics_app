@@ -1,5 +1,6 @@
 export type Player = {
   id: number;
+  number: number;
   x: number;
   y: number;
   color: string;
@@ -38,6 +39,18 @@ export type Team = {
 export type DragItem = {
   type: "player" | "ball" | "goal" | "cone";
   id: number;
+};
+
+export type Position = { x: number; y: number }; // x,y as percentages (0–1)
+
+export type TeamFormation = {
+  teamId: number;
+  positions: Position[];
+};
+
+export type Formation = {
+  name: string;
+  teams: TeamFormation[];
 };
 
 export type EntityType = "player" | "ball" | "goal" | "cone";

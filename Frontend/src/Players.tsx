@@ -31,7 +31,7 @@ const Players: React.FC<PlayersProps> = ({ players, dragRef, setPlayers }) => {
             fill="white"
             textAnchor="middle"
           >
-            {p.id}
+            {p.number}
           </text>
         </React.Fragment>
       ))}

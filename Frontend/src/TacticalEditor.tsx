@@ -11,8 +11,26 @@ import type {
 } from "./types";
 import { Pitch } from "./Pitch";
 import { Controls } from "./Controls";
+import { FormationSelector } from "./FormationSelector";
+import { formations } from "./formation";
 
-let nextId = 1;
+// ID generator for numeric IDs
+let lastTime = 0;
+let counter = 0;
+
+function generateId(): number {
+  const now = Date.now(); // milliseconds
+  if (now === lastTime) {
+    counter++;
+  } else {
+    lastTime = now;
+    counter = 0;
+  }
+  // now * 1000 ensures room for counter up to 999 per millisecond
+  return now * 1000 + counter;
+}
+
+let playerNumber = 1;
 
 export const TacticalEditor: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -22,6 +40,8 @@ export const TacticalEditor: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [savedSteps, setSavedSteps] = useState<Step[]>([]);
   const [playing, setPlaying] = useState(false);
+  const [pitchWidth] = useState(700);
+  const [pitchHeight] = useState(900);
 
   const dragRef = useRef<DragItem | null>(null);
   const colors = [
@@ -47,7 +67,8 @@ export const TacticalEditor: React.FC = () => {
       const newPlayers: Player[] = [];
       for (let i = 0; i < count; i++) {
         newPlayers.push({
-          id: nextId++,
+          id: generateId(),
+          number: playerNumber++,
           x: 50 + players.length * 50 + i * 20,
           y: 100 + players.length * 30 + i * 10,
           color: teamId
@@ -61,7 +82,7 @@ export const TacticalEditor: React.FC = () => {
       const newBalls: Ball[] = [];
       for (let i = 0; i < count; i++) {
         newBalls.push({
-          id: nextId++,
+          id: generateId(),
           x: 100 + balls.length * 50 + i * 20,
           y: 200,
           color: color || "white",
@@ -72,7 +93,7 @@ export const TacticalEditor: React.FC = () => {
       const newGoals: Goal[] = [];
       for (let i = 0; i < count; i++) {
         newGoals.push({
-          id: nextId++,
+          id: generateId(),
           x: 50 + goals.length * 60 + i * 10,
           y: 350,
           width: 70,
@@ -85,7 +106,7 @@ export const TacticalEditor: React.FC = () => {
       const newCones: Cone[] = [];
       for (let i = 0; i < count; i++) {
         newCones.push({
-          id: nextId++,
+          id: generateId(),
           x: 50 + cones.length * 40 + i * 10,
           y: 100 + cones.length * 20 + i * 5,
           color: color || "orange",
@@ -97,7 +118,7 @@ export const TacticalEditor: React.FC = () => {
 
   // ===== Add Team =====
   const addTeam = (name: string, color: string) => {
-    setTeams((prev) => [...prev, { id: nextId++, name, color }]);
+    setTeams((prev) => [...prev, { id: generateId(), name, color }]);
   };
 
   // ===== Save Step =====
@@ -224,8 +245,20 @@ export const TacticalEditor: React.FC = () => {
         playing={playing}
         stepsCount={savedSteps.length}
       />
+      <FormationSelector
+        formations={formations}
+        teams={teams}
+        pitchWidth={700} // or dynamic
+        pitchHeight={900} // or dynamic
+        currentPlayersCount={players.length}
+        onAddFormation={(newPlayers) =>
+          setPlayers((prev) => [...prev, ...newPlayers])
+        }
+      />
 
       <Pitch
+        width={pitchWidth}
+        height={pitchHeight}
         players={players}
         balls={balls}
         goals={goals}
