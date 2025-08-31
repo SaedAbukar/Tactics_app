@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import type { Team } from "./types";
 
 interface ControlsProps {
+  colors: string[];
   teams: Team[];
-  onAddPlayers: (count: number, teamId?: number) => void;
-  onAddBalls: (count: number) => void;
-  onAddGoals: (count: number) => void;
+  onAddPlayers: (count: number, color?: string, teamId?: number) => void;
+  onAddBalls: (count: number, color?: string) => void;
+  onAddGoals: (count: number, color?: string) => void;
+  onAddCones: (count: number, color?: string) => void;
   onSaveStep: () => void;
   onPlay: () => void;
   playing: boolean;
@@ -13,10 +15,12 @@ interface ControlsProps {
 }
 
 export const Controls: React.FC<ControlsProps> = ({
+  colors,
   teams,
   onAddPlayers,
   onAddBalls,
   onAddGoals,
+  onAddCones,
   onSaveStep,
   onPlay,
   playing,
@@ -25,7 +29,13 @@ export const Controls: React.FC<ControlsProps> = ({
   const [playerCount, setPlayerCount] = useState(3);
   const [ballCount, setBallCount] = useState(1);
   const [goalCount, setGoalCount] = useState(1);
-  const [selectedTeam, setSelectedTeam] = useState<number | undefined>(
+  const [coneCount, setConeCount] = useState(1);
+
+  const [playerColor, setPlayerColor] = useState<string>(colors[0]);
+  const [ballColor, setBallColor] = useState<string>(colors[0]);
+  const [goalColor, setGoalColor] = useState<string>(colors[0]);
+  const [coneColor, setConeColor] = useState<string>("orange");
+  const [selectedTeamId, setSelectedTeamId] = useState<number | undefined>(
     undefined
   );
 
@@ -42,19 +52,30 @@ export const Controls: React.FC<ControlsProps> = ({
           onChange={(e) => setPlayerCount(Number(e.target.value))}
         />
         <select
-          value={selectedTeam ?? ""}
-          onChange={(e) => setSelectedTeam(Number(e.target.value))}
-          style={{ marginLeft: 5 }}
+          value={playerColor}
+          onChange={(e) => setPlayerColor(e.target.value)}
+        >
+          {colors.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <select
+          value={selectedTeamId}
+          onChange={(e) =>
+            setSelectedTeamId(Number(e.target.value) || undefined)
+          }
         >
           <option value="">No Team</option>
-          {teams.map((team) => (
-            <option key={team.id} value={team.id}>
-              {team.name}
+          {teams.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
             </option>
           ))}
         </select>
         <button
-          onClick={() => onAddPlayers(playerCount, selectedTeam)}
+          onClick={() => onAddPlayers(playerCount, playerColor, selectedTeamId)}
           disabled={playing}
           style={{ marginLeft: 5 }}
         >
@@ -72,8 +93,18 @@ export const Controls: React.FC<ControlsProps> = ({
           value={ballCount}
           onChange={(e) => setBallCount(Number(e.target.value))}
         />
+        <select
+          value={ballColor}
+          onChange={(e) => setBallColor(e.target.value)}
+        >
+          {colors.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
         <button
-          onClick={() => onAddBalls(ballCount)}
+          onClick={() => onAddBalls(ballCount, ballColor)}
           disabled={playing}
           style={{ marginLeft: 5 }}
         >
@@ -91,12 +122,51 @@ export const Controls: React.FC<ControlsProps> = ({
           value={goalCount}
           onChange={(e) => setGoalCount(Number(e.target.value))}
         />
+        <select
+          value={goalColor}
+          onChange={(e) => setGoalColor(e.target.value)}
+        >
+          {colors.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
         <button
-          onClick={() => onAddGoals(goalCount)}
+          onClick={() => onAddGoals(goalCount, goalColor)}
           disabled={playing}
           style={{ marginLeft: 5 }}
         >
           Add Goals
+        </button>
+      </div>
+
+      {/* Cones */}
+      <div style={{ marginBottom: 10 }}>
+        <label style={{ color: "white", marginRight: 5 }}>Cones:</label>
+        <input
+          type="number"
+          min={1}
+          max={10}
+          value={coneCount}
+          onChange={(e) => setConeCount(Number(e.target.value))}
+        />
+        <select
+          value={coneColor}
+          onChange={(e) => setConeColor(e.target.value)}
+        >
+          {colors.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={() => onAddCones(coneCount, coneColor)}
+          disabled={playing}
+          style={{ marginLeft: 5 }}
+        >
+          Add Cones
         </button>
       </div>
 

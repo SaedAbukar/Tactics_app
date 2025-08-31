@@ -1,19 +1,22 @@
 import React from "react";
-import type { Player, Ball, Goal, Team, DragItem } from "./types";
+import type { Player, Ball, Goal, Cone, DragItem, Team } from "./types";
 import PitchField from "./PitchField";
 import Players from "./Players";
 import Balls from "./Balls";
 import GoalComponent from "./Goal";
+import ConeComponent from "./Cone";
 
 interface PitchProps {
   players: Player[];
   balls: Ball[];
   goals: Goal[];
-  teams: Team[];
+  cones: Cone[];
+  teams?: Team[];
   dragRef: React.RefObject<DragItem | null>;
   setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
   setBalls: React.Dispatch<React.SetStateAction<Ball[]>>;
   setGoals: React.Dispatch<React.SetStateAction<Goal[]>>;
+  setCones: React.Dispatch<React.SetStateAction<Cone[]>>;
   width?: number;
   height?: number;
 }
@@ -22,11 +25,12 @@ export const Pitch: React.FC<PitchProps> = ({
   players,
   balls,
   goals,
-  teams,
+  cones,
   dragRef,
   setPlayers,
   setBalls,
   setGoals,
+  setCones,
   width = 700,
   height = 900,
 }) => {
@@ -40,26 +44,37 @@ export const Pitch: React.FC<PitchProps> = ({
     pt.y = e.clientY;
     const cursor = pt.matrixTransform(svg.getScreenCTM()!.inverse());
 
-    if (currentDrag.type === "player" && currentDrag.id !== undefined) {
-      setPlayers((prev) =>
-        prev.map((p) =>
-          p.id === currentDrag.id ? { ...p, x: cursor.x, y: cursor.y } : p
-        )
-      );
-    } else if (currentDrag.type === "ball" && currentDrag.id !== undefined) {
-      setBalls((prev) =>
-        prev.map((b) =>
-          b.id === currentDrag.id ? { ...b, x: cursor.x, y: cursor.y } : b
-        )
-      );
-    } else if (currentDrag.type === "goal" && currentDrag.id !== undefined) {
-      setGoals((prev) =>
-        prev.map((g) =>
-          g.id === currentDrag.id
-            ? { ...g, x: cursor.x - g.width / 2, y: cursor.y - g.depth / 2 }
-            : g
-        )
-      );
+    switch (currentDrag.type) {
+      case "player":
+        setPlayers((prev) =>
+          prev.map((p) =>
+            p.id === currentDrag.id ? { ...p, x: cursor.x, y: cursor.y } : p
+          )
+        );
+        break;
+      case "ball":
+        setBalls((prev) =>
+          prev.map((b) =>
+            b.id === currentDrag.id ? { ...b, x: cursor.x, y: cursor.y } : b
+          )
+        );
+        break;
+      case "goal":
+        setGoals((prev) =>
+          prev.map((g) =>
+            g.id === currentDrag.id
+              ? { ...g, x: cursor.x - g.width / 2, y: cursor.y - g.depth / 2 }
+              : g
+          )
+        );
+        break;
+      case "cone":
+        setCones((prev) =>
+          prev.map((c) =>
+            c.id === currentDrag.id ? { ...c, x: cursor.x, y: cursor.y } : c
+          )
+        );
+        break;
     }
   };
 
@@ -80,6 +95,7 @@ export const Pitch: React.FC<PitchProps> = ({
       <Players players={players} dragRef={dragRef} setPlayers={setPlayers} />
       <Balls balls={balls} dragRef={dragRef} setBalls={setBalls} />
       <GoalComponent goals={goals} dragRef={dragRef} setGoals={setGoals} />
+      <ConeComponent cones={cones} dragRef={dragRef} setCones={setCones} />
     </svg>
   );
 };

@@ -3,6 +3,7 @@ import type {
   Player,
   Ball,
   Goal,
+  Cone,
   Step,
   DragItem,
   EntityType,
@@ -11,21 +12,37 @@ import type {
 import { Pitch } from "./Pitch";
 import { Controls } from "./Controls";
 
-let nextId = 1; // global counter for unique numeric IDs
+let nextId = 1;
 
 export const TacticalEditor: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [balls, setBalls] = useState<Ball[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [cones, setCones] = useState<Cone[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [savedSteps, setSavedSteps] = useState<Step[]>([]);
   const [playing, setPlaying] = useState(false);
 
   const dragRef = useRef<DragItem | null>(null);
-  const colors = ["blue", "red", "yellow", "purple", "orange", "cyan", "pink"];
+  const colors = [
+    "white",
+    "black",
+    "blue",
+    "red",
+    "yellow",
+    "purple",
+    "orange",
+    "cyan",
+    "pink",
+  ];
 
   // ===== Generic Add Entity =====
-  const addEntity = (type: EntityType, count: number = 1, teamId?: number) => {
+  const addEntity = (
+    type: EntityType,
+    count: number = 1,
+    color?: string,
+    teamId?: number
+  ) => {
     if (type === "player") {
       const newPlayers: Player[] = [];
       for (let i = 0; i < count; i++) {
@@ -35,7 +52,7 @@ export const TacticalEditor: React.FC = () => {
           y: 100 + players.length * 30 + i * 10,
           color: teamId
             ? teams.find((t) => t.id === teamId)?.color || "white"
-            : colors[(players.length + i) % colors.length],
+            : color || "white",
           teamId: teamId,
         });
       }
@@ -47,6 +64,7 @@ export const TacticalEditor: React.FC = () => {
           id: nextId++,
           x: 100 + balls.length * 50 + i * 20,
           y: 200,
+          color: color || "white",
         });
       }
       setBalls((prev) => [...prev, ...newBalls]);
@@ -57,11 +75,23 @@ export const TacticalEditor: React.FC = () => {
           id: nextId++,
           x: 50 + goals.length * 60 + i * 10,
           y: 350,
-          width: 50,
-          depth: 10,
+          width: 70,
+          depth: 30,
+          color: color || "white",
         });
       }
       setGoals((prev) => [...prev, ...newGoals]);
+    } else if (type === "cone") {
+      const newCones: Cone[] = [];
+      for (let i = 0; i < count; i++) {
+        newCones.push({
+          id: nextId++,
+          x: 50 + cones.length * 40 + i * 10,
+          y: 100 + cones.length * 20 + i * 5,
+          color: color || "orange",
+        });
+      }
+      setCones((prev) => [...prev, ...newCones]);
     }
   };
 
@@ -78,6 +108,7 @@ export const TacticalEditor: React.FC = () => {
         players: players.map((p) => ({ ...p })),
         balls: balls.map((b) => ({ ...b })),
         goals: goals.map((g) => ({ ...g })),
+        cones: cones.map((c) => ({ ...c })),
         teams: teams.map((t) => ({ ...t })),
       },
     ]);
@@ -98,7 +129,6 @@ export const TacticalEditor: React.FC = () => {
         const current = savedSteps[stepIdx];
         const next = savedSteps[stepIdx + 1] ?? current;
 
-        // Interpolate players
         setPlayers(
           current.players.map((p, i) => {
             const target = next.players[i];
@@ -109,8 +139,6 @@ export const TacticalEditor: React.FC = () => {
             };
           })
         );
-
-        // Interpolate balls
         setBalls(
           current.balls.map((b, i) => {
             const target = next.balls[i];
@@ -121,8 +149,6 @@ export const TacticalEditor: React.FC = () => {
             };
           })
         );
-
-        // Interpolate goals
         setGoals(
           current.goals.map((g, i) => {
             const target = next.goals[i];
@@ -130,6 +156,16 @@ export const TacticalEditor: React.FC = () => {
               ...g,
               x: g.x + (target.x - g.x) * t,
               y: g.y + (target.y - g.y) * t,
+            };
+          })
+        );
+        setCones(
+          current.cones.map((c, i) => {
+            const target = next.cones[i];
+            return {
+              ...c,
+              x: c.x + (target.x - c.x) * t,
+              y: c.y + (target.y - c.y) * t,
             };
           })
         );
@@ -175,10 +211,14 @@ export const TacticalEditor: React.FC = () => {
       </div>
 
       <Controls
-        teams={teams} // pass teams to Controls for selection
-        onAddPlayers={(count, teamId) => addEntity("player", count, teamId)}
-        onAddBalls={(count) => addEntity("ball", count)}
-        onAddGoals={(count) => addEntity("goal", count)}
+        colors={colors}
+        teams={teams}
+        onAddPlayers={(count, color, teamId) =>
+          addEntity("player", count, color, teamId)
+        }
+        onAddBalls={(count, color) => addEntity("ball", count, color)}
+        onAddGoals={(count, color) => addEntity("goal", count, color)}
+        onAddCones={(count, color) => addEntity("cone", count, color)}
         onSaveStep={handleSaveStep}
         onPlay={handlePlay}
         playing={playing}
@@ -189,11 +229,13 @@ export const TacticalEditor: React.FC = () => {
         players={players}
         balls={balls}
         goals={goals}
+        cones={cones}
         teams={teams}
         dragRef={dragRef}
         setPlayers={setPlayers}
         setBalls={setBalls}
         setGoals={setGoals}
+        setCones={setCones}
       />
     </div>
   );

@@ -20,7 +20,7 @@ const Balls: React.FC<BallsProps> = ({ balls, dragRef, setBalls }) => {
           cx={b.x}
           cy={b.y}
           r={10}
-          fill="white"
+          fill={b.color || "white"}
           stroke="black"
           onMouseDown={handleMouseDown(b.id)}
           style={{ cursor: "grab" }}

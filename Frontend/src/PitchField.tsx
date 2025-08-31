@@ -7,13 +7,10 @@ interface PitchFieldProps {
 
 const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
   // ===== Scaling constants =====
-  const penaltyWidth = (width * 18) / 120; // 18-yard box width
-  const penaltyDepth = (height * 18) / 80;
-  const fiveYardWidth = (width * 5) / 120;
+  const penaltyWidth = (width * 70) / 120; // 18-yard box width
+  const penaltyDepth = (height * 16) / 80;
+  const fiveYardWidth = (width * 40) / 120;
   const fiveYardDepth = (height * 5) / 80;
-
-  const goalWidth = (width * 8) / 120;
-  const goalDepth = (height * 2) / 80;
 
   const centerX = width / 2;
   const centerY = height / 2;
@@ -28,12 +25,9 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
   const fiveStartX = (width - fiveYardWidth) / 2;
   const fiveEndY = fiveYardDepth;
 
-  // Goal positions
-  const goalStartX = (width - goalWidth) / 2;
-  const goalEndY = goalDepth;
-
-  // Penalty arc
-  const arcRadius = (height * 10) / 80;
+  // Penalty spot positions
+  const penaltySpotDistance = (height * 10) / 80; // scale 12 yards to your height
+  const penaltySpotRadius = 4; // small circle
 
   return (
     <>
@@ -47,7 +41,6 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
         stroke="white"
         strokeWidth={2}
       />
-
       {/* Center Line */}
       <line
         x1={0}
@@ -57,7 +50,6 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
         stroke="white"
         strokeWidth={2}
       />
-
       {/* Center Circle */}
       <circle
         cx={centerX}
@@ -67,7 +59,6 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
         stroke="white"
         strokeWidth={2}
       />
-
       {/* Top Penalty Box */}
       <path
         d={`
@@ -80,7 +71,6 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
         strokeWidth={2}
         fill="transparent"
       />
-
       {/* Top Five-Yard Box */}
       <path
         d={`
@@ -93,31 +83,13 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
         strokeWidth={2}
         fill="transparent"
       />
-
-      {/* Top Goal */}
-      <rect
-        x={goalStartX}
-        y={penaltyStartY - goalDepth}
-        width={goalWidth}
-        height={goalDepth}
-        fill="none"
-        stroke="white"
-        strokeWidth={2}
+      {/* Top Penalty Spot*/}
+      <circle
+        cx={centerX}
+        cy={penaltySpotDistance}
+        r={penaltySpotRadius}
+        fill="white"
       />
-
-      {/* Top Penalty Arc */}
-      <path
-        d={`
-          M ${centerX - arcRadius} ${penaltyEndY}
-          A ${arcRadius} ${arcRadius} 0 0 1 ${
-          centerX + arcRadius
-        } ${penaltyEndY}
-        `}
-        stroke="white"
-        strokeWidth={2}
-        fill="transparent"
-      />
-
       {/* Bottom Penalty Box */}
       <path
         d={`
@@ -125,12 +97,12 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
           L ${penaltyStartX} ${height - penaltyStartY}
           L ${penaltyStartX + penaltyWidth} ${height - penaltyStartY}
           L ${penaltyStartX + penaltyWidth} ${height - penaltyEndY}
+          Z
         `}
         stroke="white"
         strokeWidth={2}
         fill="transparent"
       />
-
       {/* Bottom Five-Yard Box */}
       <path
         d={`
@@ -138,35 +110,18 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
           L ${fiveStartX} ${height - penaltyStartY}
           L ${fiveStartX + fiveYardWidth} ${height - penaltyStartY}
           L ${fiveStartX + fiveYardWidth} ${height - fiveEndY}
+          Z
         `}
         stroke="white"
         strokeWidth={2}
         fill="transparent"
       />
-
-      {/* Bottom Goal */}
-      <rect
-        x={goalStartX}
-        y={height}
-        width={goalWidth}
-        height={goalDepth}
-        fill="none"
-        stroke="white"
-        strokeWidth={2}
-        transform={`translate(0, -${goalDepth})`}
-      />
-
-      {/* Bottom Penalty Arc */}
-      <path
-        d={`
-          M ${centerX - arcRadius} ${height - penaltyEndY}
-          A ${arcRadius} ${arcRadius} 0 0 0 ${centerX + arcRadius} ${
-          height - penaltyEndY
-        }
-        `}
-        stroke="white"
-        strokeWidth={2}
-        fill="transparent"
+      {/* Bottom Penalty Spot */}
+      <circle
+        cx={centerX}
+        cy={height - penaltySpotDistance}
+        r={penaltySpotRadius}
+        fill="white"
       />
     </>
   );
