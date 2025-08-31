@@ -1,4 +1,15 @@
 export type Player = { id: number; x: number; y: number; color: string };
 export type Ball = { id: number; x: number; y: number };
-export type Step = { players: Player[]; balls: Ball[] };
-export type DragItem = { type: "player" | "ball"; id: number } | null;
+export type Step = { players: Player[]; balls: Ball[]; goals: Goal[] };
+export type Goal = {
+  id: number;
+  x: number;
+  y: number;
+  width: number;
+  depth: number;
+};
+export type EntityType = "player" | "ball" | "goal";
+export type DragItem = {
+  type: EntityType;
+  id?: number;
+};
