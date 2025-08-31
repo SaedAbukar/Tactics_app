@@ -1,7 +1,8 @@
 body {
-  margin: 0;
-  background-color: #222;
-  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center; /* horizontal centering */
+  align-items: center; /* vertical centering */
+  background-color: #222; /* optional, just for dark background */
 }
 button {
   padding: 6px 12px;

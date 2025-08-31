@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { Formation, Team } from "./types";
+import "./FormationSelector.css";
 
 interface FormationSelectorProps {
   formations: Formation[];
@@ -13,16 +14,13 @@ interface FormationSelectorProps {
 // ID generator for numeric IDs
 let lastTime = 0;
 let counter = 0;
-
 function generateId(): number {
-  const now = Date.now(); // milliseconds
-  if (now === lastTime) {
-    counter++;
-  } else {
+  const now = Date.now();
+  if (now === lastTime) counter++;
+  else {
     lastTime = now;
     counter = 0;
   }
-  // now * 1000 ensures room for counter up to 999 per millisecond
   return now * 1000 + counter;
 }
 
@@ -42,31 +40,20 @@ export const FormationSelector: React.FC<FormationSelectorProps> = ({
   const [selectedFormation, setSelectedFormation] = useState<string>("");
 
   const handleAddFormation = () => {
-    if (!selectedFormation) {
-      alert("Please select a formation.");
-      return;
-    }
+    if (!selectedFormation) return alert("Please select a formation.");
 
     const formation = formations.find((f) => f.name === selectedFormation);
-    if (!formation) {
-      alert("Invalid formation selected.");
-      return;
-    }
+    if (!formation) return alert("Invalid formation selected.");
 
     const teamObj = teams.find((t) => t.id === selectedTeamId);
     const defaultColor = "white";
 
     const scaledPlayers = formation.teams.flatMap(() =>
-      formation.teams[0].positions.map((pos, idx) => {
+      formation.teams[0].positions.map((pos) => {
         let x = pos.x * pitchWidth;
         let y = pos.y * pitchHeight;
 
-        // If there are already players on the pitch for other teams
-        if (currentPlayersCount > 0) {
-          // Reverse formation vertically instead of mirroring horizontally
-          y = pitchHeight - y - 50;
-          x = x; // keep original x
-        }
+        if (currentPlayersCount > 0) y = pitchHeight - y - 50;
 
         return {
           id: generateId(),
@@ -79,45 +66,48 @@ export const FormationSelector: React.FC<FormationSelectorProps> = ({
       })
     );
 
-    if (scaledPlayers.length === 0) {
-      alert("Cannot add formation: no positions available.");
-      return;
-    }
+    if (!scaledPlayers.length)
+      return alert("Cannot add formation: no positions available.");
 
     onAddFormation(scaledPlayers);
   };
 
   return (
-    <div style={{ marginTop: 10, color: "white" }}>
-      <label>Team: </label>
-      <select
-        value={selectedTeamId}
-        onChange={(e) => setSelectedTeamId(Number(e.target.value) || undefined)}
-      >
-        <option value="">No Team</option>
-        {teams.map((t) => (
-          <option key={t.id} value={t.id}>
-            {t.name}
-          </option>
-        ))}
-      </select>
+    <div className="formation-selector-container">
+      <div className="formation-row">
+        <label>Team:</label>
+        <select
+          value={selectedTeamId}
+          onChange={(e) =>
+            setSelectedTeamId(Number(e.target.value) || undefined)
+          }
+        >
+          <option value="">No Team</option>
+          {teams.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <label style={{ marginLeft: 10 }}>Formation: </label>
-      <select
-        value={selectedFormation}
-        onChange={(e) => setSelectedFormation(e.target.value)}
-      >
-        <option value="">Select Formation</option>
-        {formations.map((f) => (
-          <option key={f.name} value={f.name}>
-            {f.name}
-          </option>
-        ))}
-      </select>
-
-      <button style={{ marginLeft: 10 }} onClick={handleAddFormation}>
-        Add Formation
-      </button>
+      <div className="formation-row">
+        <label>Formation:</label>
+        <select
+          value={selectedFormation}
+          onChange={(e) => setSelectedFormation(e.target.value)}
+        >
+          <option value="">Select Formation</option>
+          {formations.map((f) => (
+            <option key={f.name} value={f.name}>
+              {f.name}
+            </option>
+          ))}
+        </select>
+        <button className="light-button" onClick={handleAddFormation}>
+          Add Formation
+        </button>
+      </div>
     </div>
   );
 };

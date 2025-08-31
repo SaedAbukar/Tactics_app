@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import "./TacticalEditor.css";
 import type {
   Player,
   Ball,
@@ -38,8 +39,6 @@ export const TacticalEditor: React.FC = () => {
   const [savedSteps, setSavedSteps] = useState<Step[]>([]);
   const [playing, setPlaying] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [pitchWidth] = useState(700);
-  const [pitchHeight] = useState(900);
   const [speed, setSpeed] = useState(1);
 
   const dragRef = useRef<DragItem | null>(null);
@@ -47,6 +46,31 @@ export const TacticalEditor: React.FC = () => {
   const stepIndexRef = useRef(0);
   const startTimeRef = useRef(0);
   const elapsedBeforePauseRef = useRef(0);
+  const [pitchWidth, setPitchWidth] = useState(700);
+  const [pitchHeight, setPitchHeight] = useState(900);
+
+  // Maintain aspect ratio 7:9
+  useEffect(() => {
+    const handleResize = () => {
+      const maxWidth = window.innerWidth * 0.6; // 60% of screen width
+      const maxHeight = window.innerHeight * 0.8; // 80% of screen height
+      const ratio = 7 / 9;
+      let width = maxWidth;
+      let height = width / ratio;
+
+      if (height > maxHeight) {
+        height = maxHeight;
+        width = height * ratio;
+      }
+
+      setPitchWidth(width);
+      setPitchHeight(height);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const colors = [
     "white",
@@ -222,80 +246,59 @@ export const TacticalEditor: React.FC = () => {
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: 20 }}>
-      <h2 style={{ color: "white" }}>Tactical Editor</h2>
-
-      {/* Team Creation */}
-      <div style={{ marginBottom: 10, color: "white" }}>
-        <input type="text" id="teamName" placeholder="Team Name" />
-        <select id="teamColor">
-          {colors.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={() => {
-            const name = (
-              document.getElementById("teamName") as HTMLInputElement
-            ).value;
-            const color = (
-              document.getElementById("teamColor") as HTMLSelectElement
-            ).value;
-            if (name && color) addTeam(name, color);
-          }}
-        >
-          Add Team
-        </button>
+    <div className="tactical-container">
+      {/* Left: Pitch */}
+      <div className="tactical-left">
+        <Pitch
+          width={pitchWidth}
+          height={pitchHeight}
+          players={players}
+          balls={balls}
+          goals={goals}
+          cones={cones}
+          teams={teams}
+          dragRef={dragRef}
+          setPlayers={setPlayers}
+          setBalls={setBalls}
+          setGoals={setGoals}
+          setCones={setCones}
+        />
       </div>
 
-      <Controls
-        colors={colors}
-        teams={teams}
-        onAddPlayers={(count, color, teamId) =>
-          addEntity("player", count, color, teamId)
-        }
-        onAddBalls={(count, color) => addEntity("ball", count, color)}
-        onAddGoals={(count, color) => addEntity("goal", count, color)}
-        onAddCones={(count, color) => addEntity("cone", count, color)}
-        onSaveStep={handleSaveStep}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onContinue={handleContinue}
-        onStop={handleStop}
-        onSpeedChange={setSpeed}
-        playing={playing}
-        paused={paused}
-        stepsCount={savedSteps.length}
-        speed={speed}
-      />
+      {/* Right: Controls + Formation */}
+      <div className="tactical-right">
+        <Controls
+          colors={colors}
+          teams={teams}
+          onAddPlayers={(count, color, teamId) =>
+            addEntity("player", count, color, teamId)
+          }
+          onAddBalls={(count, color) => addEntity("ball", count, color)}
+          onAddGoals={(count, color) => addEntity("goal", count, color)}
+          onAddCones={(count, color) => addEntity("cone", count, color)}
+          onSaveStep={handleSaveStep}
+          onPlay={handlePlay}
+          onPause={handlePause}
+          onContinue={handleContinue}
+          onStop={handleStop}
+          onSpeedChange={setSpeed}
+          playing={playing}
+          paused={paused}
+          stepsCount={savedSteps.length}
+          speed={speed}
+        />
 
-      <FormationSelector
-        formations={formations}
-        teams={teams}
-        pitchWidth={pitchWidth}
-        pitchHeight={pitchHeight}
-        currentPlayersCount={players.length}
-        onAddFormation={(newPlayers) =>
-          setPlayers((prev) => [...prev, ...newPlayers])
-        }
-      />
-
-      <Pitch
-        width={pitchWidth}
-        height={pitchHeight}
-        players={players}
-        balls={balls}
-        goals={goals}
-        cones={cones}
-        teams={teams}
-        dragRef={dragRef}
-        setPlayers={setPlayers}
-        setBalls={setBalls}
-        setGoals={setGoals}
-        setCones={setCones}
-      />
+        <FormationSelector
+          formations={formations}
+          teams={teams}
+          pitchWidth={pitchWidth}
+          pitchHeight={pitchHeight}
+          currentPlayersCount={players.length}
+          onAddFormation={(newPlayers) =>
+            setPlayers((prev) => [...prev, ...newPlayers])
+          }
+        />
+      </div>
     </div>
   );
 };

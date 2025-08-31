@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { Team } from "./types";
+import "./Controls.css";
 
 interface ControlsProps {
   colors: string[];
@@ -43,19 +44,19 @@ export const Controls: React.FC<ControlsProps> = ({
   const [goalCount, setGoalCount] = useState(1);
   const [coneCount, setConeCount] = useState(1);
 
-  const [playerColor, setPlayerColor] = useState<string>(colors[0]);
-  const [ballColor, setBallColor] = useState<string>(colors[0]);
-  const [goalColor, setGoalColor] = useState<string>(colors[0]);
-  const [coneColor, setConeColor] = useState<string>("orange");
+  const [playerColor, setPlayerColor] = useState(colors[0]);
+  const [ballColor, setBallColor] = useState(colors[0]);
+  const [goalColor, setGoalColor] = useState(colors[0]);
+  const [coneColor, setConeColor] = useState("orange");
   const [selectedTeamId, setSelectedTeamId] = useState<number | undefined>(
     undefined
   );
 
   return (
-    <div style={{ textAlign: "center", marginBottom: 20 }}>
+    <div className="controls-container">
       {/* Players */}
-      <div style={{ marginBottom: 10 }}>
-        <label style={{ color: "white", marginRight: 5 }}>Players:</label>
+      <div className="control-group">
+        <label>Players:</label>
         <input
           type="number"
           min={1}
@@ -87,17 +88,17 @@ export const Controls: React.FC<ControlsProps> = ({
           ))}
         </select>
         <button
+          className="light-button"
           onClick={() => onAddPlayers(playerCount, playerColor, selectedTeamId)}
           disabled={playing}
-          style={{ marginLeft: 5 }}
         >
           Add Players
         </button>
       </div>
 
       {/* Balls */}
-      <div style={{ marginBottom: 10 }}>
-        <label style={{ color: "white", marginRight: 5 }}>Balls:</label>
+      <div className="control-group">
+        <label>Balls:</label>
         <input
           type="number"
           min={1}
@@ -116,17 +117,17 @@ export const Controls: React.FC<ControlsProps> = ({
           ))}
         </select>
         <button
+          className="light-button"
           onClick={() => onAddBalls(ballCount, ballColor)}
           disabled={playing}
-          style={{ marginLeft: 5 }}
         >
           Add Balls
         </button>
       </div>
 
       {/* Goals */}
-      <div style={{ marginBottom: 10 }}>
-        <label style={{ color: "white", marginRight: 5 }}>Goals:</label>
+      <div className="control-group">
+        <label>Goals:</label>
         <input
           type="number"
           min={1}
@@ -145,17 +146,17 @@ export const Controls: React.FC<ControlsProps> = ({
           ))}
         </select>
         <button
+          className="light-button"
           onClick={() => onAddGoals(goalCount, goalColor)}
           disabled={playing}
-          style={{ marginLeft: 5 }}
         >
           Add Goals
         </button>
       </div>
 
       {/* Cones */}
-      <div style={{ marginBottom: 10 }}>
-        <label style={{ color: "white", marginRight: 5 }}>Cones:</label>
+      <div className="control-group">
+        <label>Cones:</label>
         <input
           type="number"
           min={1}
@@ -174,48 +175,52 @@ export const Controls: React.FC<ControlsProps> = ({
           ))}
         </select>
         <button
+          className="light-button"
           onClick={() => onAddCones(coneCount, coneColor)}
           disabled={playing}
-          style={{ marginLeft: 5 }}
         >
           Add Cones
         </button>
       </div>
 
       {/* Save / Play / Pause / Continue / Stop */}
-      <div style={{ marginBottom: 10 }}>
+      <div className="control-group">
         <button
+          className="light-button"
           onClick={onSaveStep}
           disabled={playing}
-          style={{ marginRight: 10 }}
         >
           Save Step
         </button>
-
         {!playing ? (
-          <button onClick={onPlay} disabled={stepsCount === 0}>
-            Play Animation
+          <button
+            className="light-button"
+            onClick={onPlay}
+            disabled={stepsCount === 0}
+          >
+            Play
           </button>
         ) : paused ? (
-          <button onClick={onContinue}>Continue</button>
+          <button className="light-button" onClick={onContinue}>
+            Continue
+          </button>
         ) : (
-          <button onClick={onPause}>Pause</button>
+          <button className="light-button" onClick={onPause}>
+            Pause
+          </button>
         )}
-
         <button
+          className="light-button"
           onClick={onStop}
           disabled={!playing && !paused}
-          style={{ marginLeft: 10 }}
         >
           Stop
         </button>
       </div>
 
-      {/* Speed Control */}
-      <div style={{ marginBottom: 10 }}>
-        <label style={{ color: "white", marginRight: 5 }}>
-          Animation Speed:
-        </label>
+      {/* Speed */}
+      <div className="control-group speed-control">
+        <label>Speed:</label>
         <input
           type="range"
           min={0.1}
@@ -223,14 +228,11 @@ export const Controls: React.FC<ControlsProps> = ({
           step={0.1}
           value={speed}
           onChange={(e) => onSpeedChange(Number(e.target.value))}
-          style={{ width: 200 }}
         />
-        <span style={{ color: "white", marginLeft: 10 }}>
-          {speed.toFixed(1)}x
-        </span>
+        <span style={{ color: "white" }}>{speed.toFixed(1)}x</span>
         <button
+          className="light-button"
           onClick={() => onSpeedChange(1)}
-          style={{ marginLeft: 10 }}
           disabled={speed === 1}
         >
           Reset
