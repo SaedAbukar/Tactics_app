@@ -1,5 +1,5 @@
 import React from "react";
-import type { Player, Ball, Goal, DragItem } from "./types";
+import type { Player, Ball, Goal, Team, DragItem } from "./types";
 import PitchField from "./PitchField";
 import Players from "./Players";
 import Balls from "./Balls";
@@ -9,6 +9,7 @@ interface PitchProps {
   players: Player[];
   balls: Ball[];
   goals: Goal[];
+  teams: Team[];
   dragRef: React.RefObject<DragItem | null>;
   setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
   setBalls: React.Dispatch<React.SetStateAction<Ball[]>>;
@@ -21,12 +22,13 @@ export const Pitch: React.FC<PitchProps> = ({
   players,
   balls,
   goals,
+  teams,
   dragRef,
   setPlayers,
   setBalls,
   setGoals,
-  width = 600,
-  height = 400,
+  width = 700,
+  height = 900,
 }) => {
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     const currentDrag = dragRef.current;

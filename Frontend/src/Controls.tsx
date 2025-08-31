@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import type { Team } from "./types";
 
 interface ControlsProps {
-  onAddPlayers: (count: number) => void;
+  teams: Team[];
+  onAddPlayers: (count: number, teamId?: number) => void;
   onAddBalls: (count: number) => void;
   onAddGoals: (count: number) => void;
   onSaveStep: () => void;
@@ -11,6 +13,7 @@ interface ControlsProps {
 }
 
 export const Controls: React.FC<ControlsProps> = ({
+  teams,
   onAddPlayers,
   onAddBalls,
   onAddGoals,
@@ -22,6 +25,9 @@ export const Controls: React.FC<ControlsProps> = ({
   const [playerCount, setPlayerCount] = useState(3);
   const [ballCount, setBallCount] = useState(1);
   const [goalCount, setGoalCount] = useState(1);
+  const [selectedTeam, setSelectedTeam] = useState<number | undefined>(
+    undefined
+  );
 
   return (
     <div style={{ textAlign: "center", marginBottom: 20 }}>
@@ -35,8 +41,20 @@ export const Controls: React.FC<ControlsProps> = ({
           value={playerCount}
           onChange={(e) => setPlayerCount(Number(e.target.value))}
         />
+        <select
+          value={selectedTeam ?? ""}
+          onChange={(e) => setSelectedTeam(Number(e.target.value))}
+          style={{ marginLeft: 5 }}
+        >
+          <option value="">No Team</option>
+          {teams.map((team) => (
+            <option key={team.id} value={team.id}>
+              {team.name}
+            </option>
+          ))}
+        </select>
         <button
-          onClick={() => onAddPlayers(playerCount)}
+          onClick={() => onAddPlayers(playerCount, selectedTeam)}
           disabled={playing}
           style={{ marginLeft: 5 }}
         >
