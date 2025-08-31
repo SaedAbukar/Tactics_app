@@ -17,16 +17,13 @@ import { formations } from "./formation";
 // ID generator for numeric IDs
 let lastTime = 0;
 let counter = 0;
-
 function generateId(): number {
-  const now = Date.now(); // milliseconds
-  if (now === lastTime) {
-    counter++;
-  } else {
+  const now = Date.now();
+  if (now === lastTime) counter++;
+  else {
     lastTime = now;
     counter = 0;
   }
-  // now * 1000 ensures room for counter up to 999 per millisecond
   return now * 1000 + counter;
 }
 
@@ -40,10 +37,17 @@ export const TacticalEditor: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [savedSteps, setSavedSteps] = useState<Step[]>([]);
   const [playing, setPlaying] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [pitchWidth] = useState(700);
   const [pitchHeight] = useState(900);
+  const [speed, setSpeed] = useState(1);
 
   const dragRef = useRef<DragItem | null>(null);
+  const animRef = useRef<number | null>(null);
+  const stepIndexRef = useRef(0);
+  const startTimeRef = useRef(0);
+  const elapsedBeforePauseRef = useRef(0);
+
   const colors = [
     "white",
     "black",
@@ -116,12 +120,9 @@ export const TacticalEditor: React.FC = () => {
     }
   };
 
-  // ===== Add Team =====
-  const addTeam = (name: string, color: string) => {
+  const addTeam = (name: string, color: string) =>
     setTeams((prev) => [...prev, { id: generateId(), name, color }]);
-  };
 
-  // ===== Save Step =====
   const handleSaveStep = () => {
     setSavedSteps((prev) => [
       ...prev,
@@ -136,70 +137,88 @@ export const TacticalEditor: React.FC = () => {
     alert(`Step saved! Total steps: ${savedSteps.length + 1}`);
   };
 
-  // ===== Play Animation =====
+  // ===== Animation =====
+  const stepDuration = () => 1500 / speed;
+
+  const animateStep = (timestamp: number) => {
+    const currentIdx = stepIndexRef.current;
+    const current = savedSteps[currentIdx];
+    const next = savedSteps[currentIdx + 1] ?? current;
+
+    if (!startTimeRef.current) startTimeRef.current = timestamp;
+
+    const elapsed =
+      timestamp - startTimeRef.current + elapsedBeforePauseRef.current;
+    const t = Math.min(elapsed / stepDuration(), 1);
+
+    const interpolate = (from: any[], to: any[]) =>
+      from.map((item, i) => {
+        const target = to[i];
+        return {
+          ...item,
+          x: item.x + (target.x - item.x) * t,
+          y: item.y + (target.y - item.y) * t,
+        };
+      });
+
+    setPlayers(interpolate(current.players, next.players));
+    setBalls(interpolate(current.balls, next.balls));
+    setGoals(interpolate(current.goals, next.goals));
+    setCones(interpolate(current.cones, next.cones));
+
+    if (t < 1) animRef.current = requestAnimationFrame(animateStep);
+    else if (currentIdx + 1 < savedSteps.length) {
+      stepIndexRef.current++;
+      startTimeRef.current = 0;
+      elapsedBeforePauseRef.current = 0;
+      animRef.current = requestAnimationFrame(animateStep);
+    } else {
+      setPlaying(false);
+      stepIndexRef.current = 0;
+      elapsedBeforePauseRef.current = 0;
+    }
+  };
+
+  // ===== Controls Handlers =====
   const handlePlay = () => {
-    if (savedSteps.length === 0) return;
+    if (!savedSteps.length) return;
     setPlaying(true);
-    const stepDuration = 1500;
+    setPaused(false);
+    stepIndexRef.current = 0;
+    startTimeRef.current = 0;
+    elapsedBeforePauseRef.current = 0;
+    animRef.current = requestAnimationFrame(animateStep);
+  };
 
-    const animateStep = (startTime: number, stepIdx: number) => {
-      const frame = (timestamp: number) => {
-        const elapsed = timestamp - startTime;
-        const t = Math.min(elapsed / stepDuration, 1);
+  const handlePause = () => {
+    if (!playing || paused) return;
+    setPaused(true);
+    if (animRef.current) cancelAnimationFrame(animRef.current);
+    elapsedBeforePauseRef.current += performance.now() - startTimeRef.current;
+  };
 
-        const current = savedSteps[stepIdx];
-        const next = savedSteps[stepIdx + 1] ?? current;
+  const handleContinue = () => {
+    if (!playing || !paused) return;
+    setPaused(false);
+    startTimeRef.current = performance.now();
+    animRef.current = requestAnimationFrame(animateStep);
+  };
 
-        setPlayers(
-          current.players.map((p, i) => {
-            const target = next.players[i];
-            return {
-              ...p,
-              x: p.x + (target.x - p.x) * t,
-              y: p.y + (target.y - p.y) * t,
-            };
-          })
-        );
-        setBalls(
-          current.balls.map((b, i) => {
-            const target = next.balls[i];
-            return {
-              ...b,
-              x: b.x + (target.x - b.x) * t,
-              y: b.y + (target.y - b.y) * t,
-            };
-          })
-        );
-        setGoals(
-          current.goals.map((g, i) => {
-            const target = next.goals[i];
-            return {
-              ...g,
-              x: g.x + (target.x - g.x) * t,
-              y: g.y + (target.y - g.y) * t,
-            };
-          })
-        );
-        setCones(
-          current.cones.map((c, i) => {
-            const target = next.cones[i];
-            return {
-              ...c,
-              x: c.x + (target.x - c.x) * t,
-              y: c.y + (target.y - c.y) * t,
-            };
-          })
-        );
+  const handleStop = () => {
+    if (animRef.current) cancelAnimationFrame(animRef.current);
+    setPlaying(false);
+    setPaused(false);
+    stepIndexRef.current = 0;
+    startTimeRef.current = 0;
+    elapsedBeforePauseRef.current = 0;
 
-        if (t < 1) requestAnimationFrame(frame);
-        else if (stepIdx + 1 < savedSteps.length)
-          animateStep(performance.now(), stepIdx + 1);
-        else setPlaying(false);
-      };
-      requestAnimationFrame(frame);
-    };
-
-    animateStep(performance.now(), 0);
+    if (savedSteps.length > 0) {
+      const first = savedSteps[0];
+      setPlayers(first.players.map((p) => ({ ...p })));
+      setBalls(first.balls.map((b) => ({ ...b })));
+      setGoals(first.goals.map((g) => ({ ...g })));
+      setCones(first.cones.map((c) => ({ ...c })));
+    }
   };
 
   return (
@@ -242,14 +261,21 @@ export const TacticalEditor: React.FC = () => {
         onAddCones={(count, color) => addEntity("cone", count, color)}
         onSaveStep={handleSaveStep}
         onPlay={handlePlay}
+        onPause={handlePause}
+        onContinue={handleContinue}
+        onStop={handleStop}
+        onSpeedChange={setSpeed}
         playing={playing}
+        paused={paused}
         stepsCount={savedSteps.length}
+        speed={speed}
       />
+
       <FormationSelector
         formations={formations}
         teams={teams}
-        pitchWidth={700} // or dynamic
-        pitchHeight={900} // or dynamic
+        pitchWidth={pitchWidth}
+        pitchHeight={pitchHeight}
         currentPlayersCount={players.length}
         onAddFormation={(newPlayers) =>
           setPlayers((prev) => [...prev, ...newPlayers])

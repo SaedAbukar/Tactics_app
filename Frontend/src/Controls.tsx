@@ -10,8 +10,14 @@ interface ControlsProps {
   onAddCones: (count: number, color?: string) => void;
   onSaveStep: () => void;
   onPlay: () => void;
+  onPause: () => void;
+  onContinue: () => void;
+  onStop: () => void;
+  onSpeedChange: (speed: number) => void;
   playing: boolean;
+  paused: boolean;
   stepsCount: number;
+  speed: number;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -23,8 +29,14 @@ export const Controls: React.FC<ControlsProps> = ({
   onAddCones,
   onSaveStep,
   onPlay,
+  onPause,
+  onContinue,
+  onStop,
+  onSpeedChange,
   playing,
+  paused,
   stepsCount,
+  speed,
 }) => {
   const [playerCount, setPlayerCount] = useState(3);
   const [ballCount, setBallCount] = useState(1);
@@ -170,7 +182,7 @@ export const Controls: React.FC<ControlsProps> = ({
         </button>
       </div>
 
-      {/* Save / Play */}
+      {/* Save / Play / Pause / Continue / Stop */}
       <div style={{ marginBottom: 10 }}>
         <button
           onClick={onSaveStep}
@@ -179,8 +191,49 @@ export const Controls: React.FC<ControlsProps> = ({
         >
           Save Step
         </button>
-        <button onClick={onPlay} disabled={playing || stepsCount === 0}>
-          Play Animation
+
+        {!playing ? (
+          <button onClick={onPlay} disabled={stepsCount === 0}>
+            Play Animation
+          </button>
+        ) : paused ? (
+          <button onClick={onContinue}>Continue</button>
+        ) : (
+          <button onClick={onPause}>Pause</button>
+        )}
+
+        <button
+          onClick={onStop}
+          disabled={!playing && !paused}
+          style={{ marginLeft: 10 }}
+        >
+          Stop
+        </button>
+      </div>
+
+      {/* Speed Control */}
+      <div style={{ marginBottom: 10 }}>
+        <label style={{ color: "white", marginRight: 5 }}>
+          Animation Speed:
+        </label>
+        <input
+          type="range"
+          min={0.1}
+          max={5}
+          step={0.1}
+          value={speed}
+          onChange={(e) => onSpeedChange(Number(e.target.value))}
+          style={{ width: 200 }}
+        />
+        <span style={{ color: "white", marginLeft: 10 }}>
+          {speed.toFixed(1)}x
+        </span>
+        <button
+          onClick={() => onSpeedChange(1)}
+          style={{ marginLeft: 10 }}
+          disabled={speed === 1}
+        >
+          Reset
         </button>
       </div>
     </div>
