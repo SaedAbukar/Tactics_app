@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { Step, Session, Practice, GameTactic } from "../../types/types";
+import { useTranslation } from "react-i18next";
 import "./SessionSelector.css";
 
 type ViewType = "sessions" | "practices" | "gameTactics";
@@ -33,6 +34,8 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
   onDeleteEntity,
   onAddSessionToEntity,
 }) => {
+  const { t } = useTranslation("tacticalEditor");
+
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
   const [newDescription, setNewDescription] = useState("");
@@ -44,7 +47,8 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
   };
 
   const handleAdd = () => {
-    if (!newName.trim()) return alert("Name is required");
+    if (!newName.trim())
+      return alert(t("sessionSelector.namePlaceholder", { viewType }));
     const id = Date.now();
     if (viewType === "sessions") {
       onAddEntity({
@@ -115,38 +119,44 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
 
   return (
     <div className="session-selector-container">
-      <h3>Manage {viewType}</h3>
+      <h3>{t("sessionSelector.manageViewType", { viewType })}</h3>
       <select
         value={viewType}
         onChange={(e) => setViewType(e.target.value as ViewType)}
       >
-        <option value="sessions">Sessions</option>
-        <option value="practices">Practices</option>
-        <option value="gameTactics">Game Tactics</option>
+        <option value="sessions">
+          {t("sessionSelector.manageViewType", { viewType: "sessions" })}
+        </option>
+        <option value="practices">
+          {t("sessionSelector.manageViewType", { viewType: "practices" })}
+        </option>
+        <option value="gameTactics">
+          {t("sessionSelector.manageViewType", { viewType: "gameTactics" })}
+        </option>
       </select>
 
       <div className="new-session">
         <input
           type="text"
-          placeholder={`${viewType.slice(0, -1)} name`}
+          placeholder={t("sessionSelector.namePlaceholder", { viewType })}
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
         />
         <textarea
-          placeholder="Description"
+          placeholder={t("sessionSelector.descriptionPlaceholder")}
           value={newDescription}
           onChange={(e) => setNewDescription(e.target.value)}
         />
         {updatingId === null ? (
           <button className="light-button full-width" onClick={handleAdd}>
-            Add
+            {t("sessionSelector.add")}
           </button>
         ) : (
           <button
             className="light-button full-width"
             onClick={handleSaveUpdate}
           >
-            Save Update
+            {t("sessionSelector.saveUpdate")}
           </button>
         )}
       </div>
@@ -170,16 +180,14 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
               }
             />
 
-            {/* === Select Sessions === */}
             {viewType === "sessions" && (
               <button onClick={() => handleSelectSession(entity as Session)}>
-                Select
+                {t("sessionSelector.select")}
               </button>
             )}
 
             {(viewType === "practices" || viewType === "gameTactics") && (
               <>
-                {/* Current sessions buttons */}
                 <div className="current-sessions">
                   {(entity as Practice | GameTactic).sessionIds.map((sid) => {
                     const session = sessions.find((s) => s.id === sid);
@@ -196,7 +204,6 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
                   })}
                 </div>
 
-                {/* Dropdown to add new session */}
                 <select
                   onChange={(e) =>
                     onAddSessionToEntity(
@@ -206,7 +213,9 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
                     )
                   }
                 >
-                  <option value="">Add session...</option>
+                  <option value="">
+                    {t("sessionSelector.addSessionPlaceholder")}
+                  </option>
                   {sessions
                     .filter((s) => !(entity as any).sessionIds.includes(s.id))
                     .map((s) => (
@@ -219,8 +228,12 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
             )}
 
             <div className="buttons">
-              <button onClick={() => handleUpdate(entity.id)}>Update</button>
-              <button onClick={() => handleDelete(entity.id)}>Delete</button>
+              <button onClick={() => handleUpdate(entity.id)}>
+                {t("sessionSelector.update")}
+              </button>
+              <button onClick={() => handleDelete(entity.id)}>
+                {t("sessionSelector.delete")}
+              </button>
             </div>
           </li>
         ))}

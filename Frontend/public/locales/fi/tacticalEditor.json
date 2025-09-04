@@ -1,0 +1,51 @@
+{
+  "step": "Askel {{index}}",
+  "sessionAlreadyAdded": "Sessiota on jo lisätty!",
+  "stepAdded": "Askels lisätty! Yhteensä: {{count}}",
+  "stepUpdated": "Askels {{index}} päivitetty",
+  "saveStep": "Tallenna askel",
+  "play": "Toista",
+  "pause": "Tauko",
+  "continue": "Jatka",
+  "stop": "Pysäytä",
+  "clearPitch": "Tyhjennä kenttä",
+  "colors": {
+    "white": "valkoinen",
+    "black": "musta",
+    "blue": "sininen",
+    "red": "punainen",
+    "yellow": "keltainen",
+    "purple": "violetti",
+    "orange": "oranssi",
+    "cyan": "syaani",
+    "pink": "vaaleanpunainen"
+  },
+  "sessionSelector": {
+    "manageViewType": "Hallitse {{viewType}}",
+    "namePlaceholder": "{{viewType}} nimi",
+    "descriptionPlaceholder": "Kuvaus",
+    "add": "Lisää",
+    "saveUpdate": "Tallenna päivitys",
+    "select": "Valitse",
+    "addSessionPlaceholder": "Lisää sessio...",
+    "update": "Päivitä",
+    "delete": "Poista"
+  },
+  "controls": {
+    "createTeam": "Luo joukkue:",
+    "teamNamePlaceholder": "Joukkueen nimi",
+    "addTeam": "Lisää joukkue",
+    "players": "Pelaajat:",
+    "addPlayers": "Lisää pelaajia",
+    "balls": "Pallot:",
+    "addBalls": "Lisää palloja",
+    "goals": "Maalit:",
+    "addGoals": "Lisää maaleja",
+    "cones": "Kartioita:",
+    "addCones": "Lisää kartioita",
+    "animation": "Animaatio:",
+    "speed": "Nopeus:",
+    "resetSpeed": "Palauta nopeus",
+    "clearPitch": "Tyhjennä kenttä"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "step": "Step {{index}}",
+  "sessionAlreadyAdded": "Session already added!",
+  "stepAdded": "Step added! Total steps: {{count}}",
+  "stepUpdated": "Step {{index}} updated",
+  "saveStep": "Save Step",
+  "play": "Play",
+  "pause": "Pause",
+  "continue": "Continue",
+  "stop": "Stop",
+  "clearPitch": "Clear Pitch",
+  "colors": {
+    "white": "white",
+    "black": "black",
+    "blue": "blue",
+    "red": "red",
+    "yellow": "yellow",
+    "purple": "purple",
+    "orange": "orange",
+    "cyan": "cyan",
+    "pink": "pink"
+  },
+  "sessionSelector": {
+    "manageViewType": "Manage {{viewType}}",
+    "namePlaceholder": "{{viewType}} name",
+    "descriptionPlaceholder": "Description",
+    "add": "Add",
+    "saveUpdate": "Save Update",
+    "select": "Select",
+    "addSessionPlaceholder": "Add session...",
+    "update": "Update",
+    "delete": "Delete"
+  },
+  "controls": {
+    "createTeam": "Create Team:",
+    "teamNamePlaceholder": "Team name",
+    "addTeam": "Add Team",
+    "players": "Players:",
+    "addPlayers": "Add players",
+    "balls": "Balls:",
+    "addBalls": "Add balls",
+    "goals": "Goals:",
+    "addGoals": "Add goals",
+    "cones": "Cones:",
+    "addCones": "Add cones",
+    "animation": "Animation:",
+    "speed": "Speed:",
+    "resetSpeed": "Reset Speed",
+    "clearPitch": "Clear Pitch"
+  }
+}

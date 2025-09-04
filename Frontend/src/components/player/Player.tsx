@@ -7,7 +7,7 @@ interface PlayersProps {
   setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
 }
 
-const Players: React.FC<PlayersProps> = ({ players, dragRef, setPlayers }) => {
+const Players: React.FC<PlayersProps> = ({ players, dragRef }) => {
   const handleMouseDown = (id: number) => () => {
     dragRef.current = { type: "player", id };
   };

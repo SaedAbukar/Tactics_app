@@ -7,7 +7,7 @@ interface BallsProps {
   setBalls: React.Dispatch<React.SetStateAction<Ball[]>>;
 }
 
-const Balls: React.FC<BallsProps> = ({ balls, dragRef, setBalls }) => {
+const Balls: React.FC<BallsProps> = ({ balls, dragRef }) => {
   const handleMouseDown = (id: number) => () => {
     dragRef.current = { type: "ball", id };
   };
@@ -20,8 +20,9 @@ const Balls: React.FC<BallsProps> = ({ balls, dragRef, setBalls }) => {
           cx={b.x}
           cy={b.y}
           r={10}
-          fill={b.color || "white"}
+          fill="white"
           stroke="black"
+          strokeWidth={2.5}
           onMouseDown={handleMouseDown(b.id)}
           style={{ cursor: "grab" }}
         />

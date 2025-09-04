@@ -1,0 +1,10 @@
+{
+  "title": "Bienvenido a casa",
+  "description": "Esta es la página de inicio",
+  "greeting": "¡Hola, {{name}}!",
+  "items": "Tienes {{count}} artículo",
+  "items_plural": "Tienes {{count}} artículos",
+  "welcome": "Bienvenido",
+  "tactics_app": "Aplicación de tácticas",
+  "explore": "Explorar"
+}

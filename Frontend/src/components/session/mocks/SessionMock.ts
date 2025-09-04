@@ -372,13 +372,13 @@ function generateCompactPressSteps(): {
 
     // Blue Team press forward
     blueFormation.teams[0].positions.forEach((pos, idx) => {
-      const xShift = (idx % 2 === 0 ? -0.03 : 0.03) * stepIndex;
-      const yShift = -0.04 * stepIndex;
+      const xShift = 100;
+      const yShift = 100;
       players.push({
         id: idx + 1,
         number: idx + 1,
-        x: (pos.x + xShift) * 100,
-        y: (pos.y + yShift) * 100,
+        x: pos.x,
+        y: pos.y,
         color: "blue",
         teamId: 1,
       });

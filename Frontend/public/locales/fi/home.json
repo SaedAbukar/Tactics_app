@@ -1,0 +1,10 @@
+{
+  "title": "Tervetuloa kotiin",
+  "description": "Tämä on etusivu",
+  "greeting": "Hei, {{name}}!",
+  "items": "Sinulla on {{count}} esine",
+  "items_plural": "Sinulla on {{count}} esinettä",
+  "welcome": "Tervetuloa",
+  "tactics_app": "Taktiikkasovellus",
+  "explore": "Tutustu"
+}

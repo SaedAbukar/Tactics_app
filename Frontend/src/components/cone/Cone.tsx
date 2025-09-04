@@ -7,7 +7,7 @@ interface ConeProps {
   setCones: React.Dispatch<React.SetStateAction<Cone[]>>;
 }
 
-const ConeComponent: React.FC<ConeProps> = ({ cones, dragRef, setCones }) => {
+const ConeComponent: React.FC<ConeProps> = ({ cones, dragRef }) => {
   const handleMouseDown = (e: React.MouseEvent, coneId: number) => {
     dragRef.current = { type: "cone", id: coneId };
     e.stopPropagation();

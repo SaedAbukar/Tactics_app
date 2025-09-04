@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import type { Team } from "../../types/types";
 import "./Controls.css";
+import { useTranslation } from "react-i18next";
 
 interface ControlsProps {
-  colors: string[];
   teams: Team[];
   onAddPlayers: (count: number, color: string, teamId?: number) => void;
-  onAddBalls: (count: number, color: string) => void;
-  onAddGoals: (count: number, color: string) => void;
+  onAddBalls: (count: number) => void;
+  onAddGoals: (count: number) => void;
   onAddCones: (count: number, color: string) => void;
   onAddTeam: (name: string, color: string) => void;
   onSaveStep: () => void;
@@ -24,7 +24,6 @@ interface ControlsProps {
 }
 
 export const Controls: React.FC<ControlsProps> = ({
-  colors,
   teams,
   onAddPlayers,
   onAddBalls,
@@ -43,28 +42,50 @@ export const Controls: React.FC<ControlsProps> = ({
   stepsCount,
   speed,
 }) => {
+  const { t } = useTranslation("tacticalEditor");
   const [teamName, setTeamName] = useState("");
-  const [teamColor, setTeamColor] = useState(colors[0]);
+  const [teamColor, setTeamColor] = useState(t("colors.black"));
   const [playerCount, setPlayerCount] = useState(3);
   const [ballCount, setBallCount] = useState(1);
   const [goalCount, setGoalCount] = useState(1);
   const [coneCount, setConeCount] = useState(1);
-  const [playerColor, setPlayerColor] = useState(colors[0]);
-  const [ballColor, setBallColor] = useState(colors[0]);
-  const [goalColor, setGoalColor] = useState(colors[0]);
+  const [playerColor, setPlayerColor] = useState(t("colors.black"));
+  // const [ballColor, setBallColor] = useState(t("colors.black"));
+  // const [goalColor, setGoalColor] = useState(t("colors.black"));
   const [coneColor, setConeColor] = useState("orange");
   const [selectedTeamId, setSelectedTeamId] = useState<number | undefined>(
     undefined
   );
+  type ColorKeys =
+    | "black"
+    | "white"
+    | "blue"
+    | "red"
+    | "yellow"
+    | "purple"
+    | "orange"
+    | "cyan"
+    | "pink";
+  const colors1: ColorKeys[] = [
+    "black",
+    "white",
+    "blue",
+    "red",
+    "yellow",
+    "purple",
+    "orange",
+    "cyan",
+    "pink",
+  ];
 
   return (
     <div className="controls-container">
       <div className="control-group">
         {/* Teams */}
-        <label>Create Team:</label>
+        <label>{t("controls.createTeam")}</label>
         <input
           type="text"
-          placeholder="Team name"
+          placeholder={t("controls.teamNamePlaceholder")}
           value={teamName}
           onChange={(e) => setTeamName(e.target.value)}
         />
@@ -72,9 +93,9 @@ export const Controls: React.FC<ControlsProps> = ({
           value={teamColor}
           onChange={(e) => setTeamColor(e.target.value)}
         >
-          {colors.map((c) => (
+          {colors1.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {t(`colors.${c}`)}
             </option>
           ))}
         </select>
@@ -86,12 +107,13 @@ export const Controls: React.FC<ControlsProps> = ({
             }
           }}
         >
-          Add Team
+          {t("controls.addTeam")}
         </button>
       </div>
+
       {/* Players */}
       <div className="control-group">
-        <label>Players:</label>
+        <label>{t("controls.players")}</label>
         <input
           type="number"
           min={1}
@@ -103,9 +125,9 @@ export const Controls: React.FC<ControlsProps> = ({
           value={playerColor}
           onChange={(e) => setPlayerColor(e.target.value)}
         >
-          {colors.map((c) => (
+          {colors1.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {t(`colors.${c}`)}
             </option>
           ))}
         </select>
@@ -115,7 +137,7 @@ export const Controls: React.FC<ControlsProps> = ({
             setSelectedTeamId(Number(e.target.value) || undefined)
           }
         >
-          <option value="">No Team</option>
+          <option value="">{t("controls.createTeam")}</option>
           {teams.map((t) => (
             <option key={t.id} value={t.id}>
               {t.name}
@@ -126,13 +148,13 @@ export const Controls: React.FC<ControlsProps> = ({
           onClick={() => onAddPlayers(playerCount, playerColor, selectedTeamId)}
           disabled={playing}
         >
-          Add Players
+          {t("controls.addPlayers")}
         </button>
       </div>
 
       {/* Balls */}
       <div className="control-group">
-        <label>Balls:</label>
+        <label>{t("controls.balls")}</label>
         <input
           type="number"
           min={1}
@@ -140,27 +162,24 @@ export const Controls: React.FC<ControlsProps> = ({
           value={ballCount}
           onChange={(e) => setBallCount(Number(e.target.value))}
         />
-        <select
+        {/*<select
           value={ballColor}
           onChange={(e) => setBallColor(e.target.value)}
         >
-          {colors.map((c) => (
+          {colors1.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {t(`colors.${c}`)}
             </option>
           ))}
-        </select>
-        <button
-          onClick={() => onAddBalls(ballCount, ballColor)}
-          disabled={playing}
-        >
-          Add Balls
+        </select>*/}
+        <button onClick={() => onAddBalls(ballCount)} disabled={playing}>
+          {t("controls.addBalls")}
         </button>
       </div>
 
       {/* Goals */}
       <div className="control-group">
-        <label>Goals:</label>
+        <label>{t("controls.goals")}</label>
         <input
           type="number"
           min={1}
@@ -168,27 +187,24 @@ export const Controls: React.FC<ControlsProps> = ({
           value={goalCount}
           onChange={(e) => setGoalCount(Number(e.target.value))}
         />
-        <select
+        {/* <select
           value={goalColor}
           onChange={(e) => setGoalColor(e.target.value)}
         >
-          {colors.map((c) => (
+          {colors1.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {t(`colors.${c}`)}
             </option>
           ))}
-        </select>
-        <button
-          onClick={() => onAddGoals(goalCount, goalColor)}
-          disabled={playing}
-        >
-          Add Goals
+        </select> */}
+        <button onClick={() => onAddGoals(goalCount)} disabled={playing}>
+          {t("controls.addGoals")}
         </button>
       </div>
 
       {/* Cones */}
       <div className="control-group">
-        <label>Cones:</label>
+        <label>{t("controls.cones")}</label>
         <input
           type="number"
           min={1}
@@ -200,9 +216,9 @@ export const Controls: React.FC<ControlsProps> = ({
           value={coneColor}
           onChange={(e) => setConeColor(e.target.value)}
         >
-          {colors.map((c) => (
+          {colors1.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {t(`colors.${c}`)}
             </option>
           ))}
         </select>
@@ -210,33 +226,33 @@ export const Controls: React.FC<ControlsProps> = ({
           onClick={() => onAddCones(coneCount, coneColor)}
           disabled={playing}
         >
-          Add Cones
+          {t("controls.addCones")}
         </button>
       </div>
 
       {/* Save / Play / Pause / Continue / Stop */}
       <div className="control-group">
-        <label>Animation:</label>
+        <label>{t("controls.animation")}</label>
         <button onClick={onSaveStep} disabled={playing}>
-          Save Step
+          {t("saveStep")}
         </button>
         {!playing ? (
           <button onClick={onPlay} disabled={stepsCount === 0}>
-            Play
+            {t("play")}
           </button>
         ) : paused ? (
-          <button onClick={onContinue}>Continue</button>
+          <button onClick={onContinue}>{t("continue")}</button>
         ) : (
-          <button onClick={onPause}>Pause</button>
+          <button onClick={onPause}>{t("pause")}</button>
         )}
         <button onClick={onStop} disabled={!playing && !paused}>
-          Stop
+          {t("stop")}
         </button>
       </div>
 
       {/* Speed */}
       <div className="control-group speed-control">
-        <label>Speed:</label>
+        <label>{t("controls.speed")}</label>
         <input
           type="range"
           min={0.1}
@@ -247,11 +263,12 @@ export const Controls: React.FC<ControlsProps> = ({
         />
         <span style={{ color: "white" }}>{speed.toFixed(1)}x</span>
         <button onClick={() => onSpeedChange(1)} disabled={speed === 1}>
-          Reset Speed
+          {t("controls.resetSpeed")}
         </button>
       </div>
+
       {/* Clear pitch */}
-      <button onClick={onClearPitch}>Clear Pitch</button>
+      <button onClick={onClearPitch}>{t("controls.clearPitch")}</button>
     </div>
   );
 };

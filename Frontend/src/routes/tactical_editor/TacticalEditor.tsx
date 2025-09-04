@@ -20,6 +20,7 @@ import { SessionSelector } from "../../components/session/SessionSelector";
 import { sessions as initialSessions } from "../../components/session/mocks/SessionMock";
 import { practices as initialPractices } from "../../components/session/mocks/PracticeMocks";
 import { gameTactics as initialTactics } from "../../components/session/mocks/TacticsMocks";
+import { useTranslation } from "react-i18next";
 
 let lastTime = 0;
 let counter = 0;
@@ -34,6 +35,8 @@ function generateId(): number {
 let playerNumber = 1;
 
 export const TacticalEditor: React.FC = () => {
+  const { t } = useTranslation("tacticalEditor");
+
   const [players, setPlayers] = useState<Player[]>([]);
   const [balls, setBalls] = useState<Ball[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -61,18 +64,6 @@ export const TacticalEditor: React.FC = () => {
 
   const pitchWidth = 700;
   const pitchHeight = 900;
-
-  const colors = [
-    "white",
-    "black",
-    "blue",
-    "red",
-    "yellow",
-    "purple",
-    "orange",
-    "cyan",
-    "pink",
-  ];
 
   // ===== Generic Add Entity =====
   const addEntity = (
@@ -159,10 +150,10 @@ export const TacticalEditor: React.FC = () => {
       setSavedSteps((prev) =>
         prev.map((s, i) => (i === currentStepIndex ? newStep : s))
       );
-      alert(`Step ${currentStepIndex + 1} updated`);
+      alert(t("stepUpdated", { index: currentStepIndex + 1 }));
     } else {
       setSavedSteps((prev) => [...prev, newStep]);
-      alert(`Step added! Total steps: ${savedSteps.length + 1}`);
+      alert(t("stepAdded", { count: savedSteps.length + 1 }));
     }
     setCurrentStepIndex(null);
   };
@@ -279,7 +270,7 @@ export const TacticalEditor: React.FC = () => {
         prev.map((p) => {
           if (p.id === entityId) {
             if (p.sessionIds.includes(sessionId))
-              alert("Session already added!");
+              alert(t("sessionAlreadyAdded"));
             else p.sessionIds.push(sessionId);
           }
           return p;
@@ -287,13 +278,13 @@ export const TacticalEditor: React.FC = () => {
       );
     } else {
       setTactics((prev) =>
-        prev.map((t) => {
-          if (t.id === entityId) {
-            if (t.sessionIds.includes(sessionId))
-              alert("Session already added!");
-            else t.sessionIds.push(sessionId);
+        prev.map((te) => {
+          if (te.id === entityId) {
+            if (te.sessionIds.includes(sessionId))
+              alert(t("sessionAlreadyAdded"));
+            else te.sessionIds.push(sessionId);
           }
-          return t;
+          return te;
         })
       );
     }
@@ -351,20 +342,19 @@ export const TacticalEditor: React.FC = () => {
                 setCones(step.cones.map((c) => ({ ...c })));
               }}
             >
-              Step {idx + 1}
+              {t("step", { index: idx + 1 })}
             </button>
           ))}
         </div>
       </div>
       <div className="tactical-right">
         <Controls
-          colors={colors}
           teams={teams}
           onAddPlayers={(count, color, teamId) =>
             addEntity("player", count, color, teamId)
           }
-          onAddBalls={(count, color) => addEntity("ball", count, color)}
-          onAddGoals={(count, color) => addEntity("goal", count, color)}
+          onAddBalls={(count) => addEntity("ball", count)}
+          onAddGoals={(count) => addEntity("goal", count)}
           onAddCones={(count, color) => addEntity("cone", count, color)}
           onAddTeam={addTeam}
           onSaveStep={handleSaveStep}

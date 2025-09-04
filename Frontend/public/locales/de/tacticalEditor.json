@@ -1,0 +1,51 @@
+{
+  "step": "Schritt {{index}}",
+  "sessionAlreadyAdded": "Sitzung bereits hinzugefügt!",
+  "stepAdded": "Schritt hinzugefügt! Gesamt: {{count}}",
+  "stepUpdated": "Schritt {{index}} aktualisiert",
+  "saveStep": "Schritt speichern",
+  "play": "Abspielen",
+  "pause": "Pause",
+  "continue": "Fortsetzen",
+  "stop": "Stopp",
+  "clearPitch": "Spielfeld leeren",
+  "colors": {
+    "white": "weiß",
+    "black": "schwarz",
+    "blue": "blau",
+    "red": "rot",
+    "yellow": "gelb",
+    "purple": "lila",
+    "orange": "orange",
+    "cyan": "cyan",
+    "pink": "rosa"
+  },
+  "sessionSelector": {
+    "manageViewType": "{{viewType}} verwalten",
+    "namePlaceholder": "{{viewType}} Name",
+    "descriptionPlaceholder": "Beschreibung",
+    "add": "Hinzufügen",
+    "saveUpdate": "Aktualisierung speichern",
+    "select": "Auswählen",
+    "addSessionPlaceholder": "Sitzung hinzufügen...",
+    "update": "Aktualisieren",
+    "delete": "Löschen"
+  },
+  "controls": {
+    "createTeam": "Team erstellen:",
+    "teamNamePlaceholder": "Teamname",
+    "addTeam": "Team hinzufügen",
+    "players": "Spieler:",
+    "addPlayers": "Spieler hinzufügen",
+    "balls": "Bälle:",
+    "addBalls": "Bälle hinzufügen",
+    "goals": "Tore:",
+    "addGoals": "Tore hinzufügen",
+    "cones": "Hütchen:",
+    "addCones": "Hütchen hinzufügen",
+    "animation": "Animation:",
+    "speed": "Geschwindigkeit:",
+    "resetSpeed": "Geschwindigkeit zurücksetzen",
+    "clearPitch": "Spielfeld leeren"
+  }
+}

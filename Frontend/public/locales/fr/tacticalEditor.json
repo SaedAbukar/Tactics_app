@@ -1,0 +1,51 @@
+{
+  "step": "Étape {{index}}",
+  "sessionAlreadyAdded": "Session déjà ajoutée !",
+  "stepAdded": "Étape ajoutée ! Total : {{count}}",
+  "stepUpdated": "Étape {{index}} mise à jour",
+  "saveStep": "Enregistrer l'étape",
+  "play": "Lire",
+  "pause": "Pause",
+  "continue": "Continuer",
+  "stop": "Arrêter",
+  "clearPitch": "Vider le terrain",
+  "colors": {
+    "white": "blanc",
+    "black": "noir",
+    "blue": "black",
+    "red": "rouge",
+    "yellow": "jaune",
+    "purple": "violet",
+    "orange": "orange",
+    "cyan": "cyan",
+    "pink": "rose"
+  },
+  "sessionSelector": {
+    "manageViewType": "Gérer {{viewType}}",
+    "namePlaceholder": "Nom de {{viewType}}",
+    "descriptionPlaceholder": "Description",
+    "add": "Ajouter",
+    "saveUpdate": "Enregistrer la mise à jour",
+    "select": "Sélectionner",
+    "addSessionPlaceholder": "Ajouter une session...",
+    "update": "Mettre à jour",
+    "delete": "Supprimer"
+  },
+  "controls": {
+    "createTeam": "Créer une équipe :",
+    "teamNamePlaceholder": "Nom de l'équipe",
+    "addTeam": "Ajouter l'équipe",
+    "players": "Joueurs :",
+    "addPlayers": "Ajouter des joueurs",
+    "balls": "Balles :",
+    "addBalls": "Ajouter des balles",
+    "goals": "Buts :",
+    "addGoals": "Ajouter des buts",
+    "cones": "Cônes :",
+    "addCones": "Ajouter des cônes",
+    "animation": "Animation :",
+    "speed": "Vitesse :",
+    "resetSpeed": "Réinitialiser la vitesse",
+    "clearPitch": "Vider le terrain"
+  }
+}

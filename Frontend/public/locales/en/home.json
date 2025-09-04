@@ -1,0 +1,10 @@
+{
+  "title": "Welcome Home",
+  "description": "This is the home page",
+  "greeting": "Hello, {{name}}!",
+  "items": "You have {{count}} item",
+  "items_plural": "You have {{count}} items",
+  "welcome": "Welcome",
+  "tactics_app": "Tactics app",
+  "explore": "Explore"
+}
