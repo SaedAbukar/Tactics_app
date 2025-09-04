@@ -48,31 +48,6 @@ export const TacticalEditor: React.FC = () => {
   const elapsedBeforePauseRef = useRef(0);
   const pitchWidth = 700;
   const pitchHeight = 900;
-  /*const [pitchWidth, setPitchWidth] = useState(700);
-  const [pitchHeight, setPitchHeight] = useState(900);
-
-  // Maintain aspect ratio 7:9
-  useEffect(() => {
-    const handleResize = () => {
-      const maxWidth = window.innerWidth * 0.6; // 60% of screen width
-      const maxHeight = window.innerHeight * 0.8; // 80% of screen height
-      const ratio = 7 / 9;
-      let width = maxWidth;
-      let height = width / ratio;
-
-      if (height > maxHeight) {
-        height = maxHeight;
-        width = height * ratio;
-      }
-
-      setPitchWidth(width);
-      setPitchHeight(height);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);*/
 
   const colors = [
     "white",
@@ -154,7 +129,6 @@ export const TacticalEditor: React.FC = () => {
     setBalls([]);
     setGoals([]);
     setCones([]);
-    setTeams([]);
     setSavedSteps([]);
     setPlaying(false);
     setPaused(false);
