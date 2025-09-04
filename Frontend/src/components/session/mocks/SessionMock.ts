@@ -1,6 +1,8 @@
-import type { Session } from "../../types/types";
+import type { Player, Session, Team } from "../../../types/types";
+import { formations } from "../../formation_selector/formation";
 
 export const sessions: Session[] = [
+  // Original 10 drills
   {
     id: 1,
     name: "Basic Passing Drill",
@@ -240,4 +242,177 @@ export const sessions: Session[] = [
       },
     ],
   },
+  // Tactic Sessions
+  {
+    id: 11,
+    name: "4-4-2 Formation",
+    description: "Full 4-4-2 setup with two lines of midfield.",
+    steps: [
+      {
+        players: [
+          { id: 1, number: 1, x: 50, y: 90, color: "yellow" },
+          { id: 2, number: 2, x: 20, y: 70, color: "blue" },
+          { id: 3, number: 3, x: 35, y: 70, color: "blue" },
+          { id: 4, number: 4, x: 65, y: 70, color: "blue" },
+          { id: 5, number: 5, x: 80, y: 70, color: "blue" },
+          { id: 6, number: 6, x: 25, y: 50, color: "red" },
+          { id: 7, number: 7, x: 40, y: 50, color: "red" },
+          { id: 8, number: 8, x: 60, y: 50, color: "red" },
+          { id: 9, number: 9, x: 75, y: 50, color: "red" },
+          { id: 10, number: 10, x: 40, y: 30, color: "green" },
+          { id: 11, number: 11, x: 60, y: 30, color: "green" },
+        ],
+        balls: [{ id: 1, x: 50, y: 50 }],
+        goals: [],
+        cones: [],
+        teams: [
+          { id: 1, name: "Blue Team", color: "blue" },
+          { id: 2, name: "Red Team", color: "red" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 12,
+    name: "Corner Tactics",
+    description: "Attacking and defensive corner setups.",
+    steps: [
+      {
+        players: [
+          { id: 1, number: 1, x: 50, y: 90, color: "yellow" },
+          { id: 2, number: 2, x: 30, y: 80, color: "blue" },
+          { id: 3, number: 3, x: 70, y: 80, color: "blue" },
+        ],
+        balls: [{ id: 1, x: 80, y: 90 }],
+        goals: [{ id: 1, x: 50, y: 0, width: 100, depth: 40, color: "white" }],
+        cones: [],
+        teams: [
+          { id: 1, name: "Blue Team", color: "blue" },
+          { id: 2, name: "Red Team", color: "red" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 13,
+    name: "High Press Drill",
+    description: "Two teams practicing high pressing with multiple movements.",
+    steps: [
+      {
+        players: [
+          { id: 1, number: 1, x: 20, y: 70, color: "blue" },
+          { id: 2, number: 2, x: 35, y: 70, color: "blue" },
+          { id: 3, number: 3, x: 50, y: 70, color: "blue" },
+          { id: 4, number: 4, x: 65, y: 70, color: "blue" },
+          { id: 5, number: 5, x: 20, y: 50, color: "red" },
+          { id: 6, number: 6, x: 35, y: 50, color: "red" },
+          { id: 7, number: 7, x: 50, y: 50, color: "red" },
+          { id: 8, number: 8, x: 65, y: 50, color: "red" },
+        ],
+        balls: [{ id: 1, x: 50, y: 60 }],
+        goals: [],
+        cones: [],
+        teams: [
+          { id: 1, name: "Blue Team", color: "blue" },
+          { id: 2, name: "Red Team", color: "red" },
+        ],
+      },
+      {
+        players: [
+          { id: 1, number: 1, x: 25, y: 65, color: "blue" },
+          { id: 2, number: 2, x: 40, y: 65, color: "blue" },
+          { id: 3, number: 3, x: 55, y: 65, color: "blue" },
+          { id: 4, number: 4, x: 70, y: 65, color: "blue" },
+          { id: 5, number: 5, x: 25, y: 45, color: "red" },
+          { id: 6, number: 6, x: 40, y: 45, color: "red" },
+          { id: 7, number: 7, x: 55, y: 45, color: "red" },
+          { id: 8, number: 8, x: 70, y: 45, color: "red" },
+        ],
+        balls: [{ id: 1, x: 50, y: 55 }],
+        goals: [],
+        cones: [],
+        teams: [
+          { id: 1, name: "Blue Team", color: "blue" },
+          { id: 2, name: "Red Team", color: "red" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 14,
+    name: "Compact Team Press",
+    description:
+      "Blue Team (4-4-2) and Red Team (4-3-3) practicing coordinated pressing.",
+    steps: generateCompactPressSteps(),
+  },
 ];
+
+// Helper function to generate pressing steps
+function generateCompactPressSteps(): {
+  players: Player[];
+  balls: { id: number; x: number; y: number }[];
+  goals: {
+    id: number;
+    x: number;
+    y: number;
+    width: number;
+    depth: number;
+    color: string;
+  }[];
+  cones: { id: number; x: number; y: number; color: string }[];
+  teams: Team[];
+}[] {
+  const blueFormation = formations.find((f) => f.name === "4-4-2")!;
+  const redFormation = formations.find((f) => f.name === "4-3-3")!;
+
+  const steps = [];
+
+  for (let stepIndex = 0; stepIndex < 5; stepIndex++) {
+    const players: Player[] = [];
+
+    // Blue Team press forward
+    blueFormation.teams[0].positions.forEach((pos, idx) => {
+      const xShift = (idx % 2 === 0 ? -0.03 : 0.03) * stepIndex;
+      const yShift = -0.04 * stepIndex;
+      players.push({
+        id: idx + 1,
+        number: idx + 1,
+        x: (pos.x + xShift) * 100,
+        y: (pos.y + yShift) * 100,
+        color: "blue",
+        teamId: 1,
+      });
+    });
+
+    // Red Team press forward
+    redFormation.teams[0].positions.forEach((pos, idx) => {
+      const xShift = (idx % 2 === 0 ? -0.02 : 0.02) * stepIndex;
+      const yShift = -0.03 * stepIndex;
+      players.push({
+        id: idx + 11,
+        number: idx + 1,
+        x: (pos.x + xShift) * 100,
+        y: (pos.y + yShift) * 100,
+        color: "red",
+        teamId: 2,
+      });
+    });
+
+    const balls = [
+      { id: 1, x: 50 + stepIndex * 3, y: 50 - stepIndex * 2, color: "white" },
+    ];
+
+    steps.push({
+      players,
+      balls,
+      goals: [], // Correct type: Goal[]
+      cones: [], // Correct type: Cone[]
+      teams: [
+        { id: 1, name: "Blue Team", color: "blue" },
+        { id: 2, name: "Red Team", color: "red" },
+      ],
+    });
+  }
+
+  return steps;
+}

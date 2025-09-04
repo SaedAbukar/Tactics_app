@@ -3,16 +3,31 @@
   flex-direction: column;
   gap: 15px;
   text-align: left;
-  background-color: #111; /* dark background */
+  background-color: #111;
   padding: 20px;
   border-radius: 8px;
-  width: 280px;
+  width: 300px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #fff;
 }
 
 .session-selector-container h3 {
   margin: 0 0 10px 0;
+  font-size: 1.2rem;
+}
+
+.session-selector-container select {
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: #222;
+  color: #fff;
+  margin-bottom: 10px;
+  outline: none;
+}
+
+.session-selector-container select:focus {
+  border-color: #aaa;
 }
 
 .new-session {
@@ -26,10 +41,10 @@
 .new-session textarea {
   padding: 6px 8px;
   border-radius: 4px;
-  border: 1px solid #ccc;
+  border: 1px solid #555;
   outline: none;
   font-family: inherit;
-  background: #111;
+  background-color: #222;
   color: #fff;
 }
 
@@ -56,7 +71,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: 400px; /* scrollable */
+  max-height: 450px;
   overflow-y: auto;
   border-top: 1px solid #333;
   border-bottom: 1px solid #333;
@@ -64,53 +79,65 @@
 
 .session-list li {
   margin-bottom: 10px;
-  padding: 8px;
-  border-radius: 4px;
+  padding: 10px;
+  border-radius: 6px;
   background: #222;
-  cursor: pointer;
+  cursor: default;
   display: flex;
   flex-direction: column;
   gap: 5px;
-  transition: background 0.2s, border 0.2s;
+  transition: background 0.2s;
 }
 
-/* selected session */
 .session-list li.selected {
-  background: #444;
+  background-color: #444;
 }
 
-/* updating session */
-.session-list li.updating {
-  background: #1a237e; /* deep blue */
-  border: 1px solid #3f51b5; /* accent border for updating */
+.session-list li strong {
+  font-size: 1rem;
 }
 
-/* inputs and textareas inside list items */
-.session-list li input,
 .session-list li textarea {
-  width: 100%;
+  resize: vertical;
+  min-height: 40px;
   padding: 4px 6px;
   border-radius: 4px;
   border: 1px solid #555;
   background: #111;
   color: #fff;
-  font-family: inherit;
   outline: none;
 }
 
-.session-list li input:focus,
 .session-list li textarea:focus {
   border-color: #aaa;
 }
 
-.session-list li textarea {
-  resize: vertical;
+.session-list li select {
+  margin-top: 5px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: #222;
+  color: #fff;
+  outline: none;
+}
+
+.session-list li select:focus {
+  border-color: #aaa;
+}
+
+.session-list li ul {
+  list-style: disc;
+  padding-left: 20px;
+  margin: 5px 0;
+  max-height: 100px;
+  overflow-y: auto;
 }
 
 .session-list li .buttons {
   display: flex;
-  justify-content: space-between;
   gap: 5px;
+  margin-top: 5px;
 }
 
 .session-list li .buttons button {

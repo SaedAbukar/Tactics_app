@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import "./TacticalEditor.css";
 import type {
   Player,
@@ -6,28 +6,28 @@ import type {
   Goal,
   Cone,
   Step,
-  DragItem,
+  Session,
+  Practice,
+  GameTactic,
   EntityType,
   Team,
-  Session,
 } from "../../types/types";
 import { Pitch } from "../../components/pitch/Pitch";
 import { Controls } from "../../components/controls/Controls";
 import { FormationSelector } from "../../components/formation_selector/FormationSelector";
 import { formations } from "../../components/formation_selector/formation";
 import { SessionSelector } from "../../components/session/SessionSelector";
-import { sessions } from "../../components/session/SessionMock";
+import { sessions as initialSessions } from "../../components/session/mocks/SessionMock";
+import { practices as initialPractices } from "../../components/session/mocks/PracticeMocks";
+import { gameTactics as initialTactics } from "../../components/session/mocks/TacticsMocks";
 
-// ID generator for numeric IDs
 let lastTime = 0;
 let counter = 0;
 function generateId(): number {
   const now = Date.now();
   if (now === lastTime) counter++;
-  else {
-    lastTime = now;
-    counter = 0;
-  }
+  else counter = 0;
+  lastTime = now;
   return now * 1000 + counter;
 }
 
@@ -43,14 +43,22 @@ export const TacticalEditor: React.FC = () => {
   const [playing, setPlaying] = useState(false);
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const [sessionsState, setSessionsState] = useState(sessions);
   const [currentStepIndex, setCurrentStepIndex] = useState<number | null>(null);
 
-  const dragRef = useRef<DragItem | null>(null);
+  const [viewType, setViewType] = useState<
+    "sessions" | "practices" | "gameTactics"
+  >("sessions");
+  const [sessionsState, setSessionsState] =
+    useState<Session[]>(initialSessions);
+  const [practices, setPractices] = useState<Practice[]>(initialPractices);
+  const [tactics, setTactics] = useState<GameTactic[]>(initialTactics);
+
+  const dragRef = useRef<any>(null);
   const animRef = useRef<number | null>(null);
   const stepIndexRef = useRef(0);
   const startTimeRef = useRef(0);
   const elapsedBeforePauseRef = useRef(0);
+
   const pitchWidth = 700;
   const pitchHeight = 900;
 
@@ -84,45 +92,42 @@ export const TacticalEditor: React.FC = () => {
           color: teamId
             ? teams.find((t) => t.id === teamId)?.color || "white"
             : color || "white",
-          teamId: teamId,
+          teamId,
         });
       }
       setPlayers((prev) => [...prev, ...newPlayers]);
     } else if (type === "ball") {
-      const newBalls: Ball[] = [];
-      for (let i = 0; i < count; i++) {
-        newBalls.push({
+      setBalls((prev) => [
+        ...prev,
+        ...Array.from({ length: count }, (_, i) => ({
           id: generateId(),
-          x: 100 + balls.length * 50 + i * 20,
+          x: 100 + prev.length * 50 + i * 20,
           y: 200,
           color: color || "white",
-        });
-      }
-      setBalls((prev) => [...prev, ...newBalls]);
+        })),
+      ]);
     } else if (type === "goal") {
-      const newGoals: Goal[] = [];
-      for (let i = 0; i < count; i++) {
-        newGoals.push({
+      setGoals((prev) => [
+        ...prev,
+        ...Array.from({ length: count }, (_, i) => ({
           id: generateId(),
-          x: 50 + goals.length * 60 + i * 10,
+          x: 50 + prev.length * 60 + i * 10,
           y: 350,
           width: 70,
           depth: 30,
           color: color || "white",
-        });
-      }
-      setGoals((prev) => [...prev, ...newGoals]);
+        })),
+      ]);
     } else if (type === "cone") {
-      const newCones: Cone[] = [];
-      for (let i = 0; i < count; i++) {
-        newCones.push({
+      setCones((prev) => [
+        ...prev,
+        ...Array.from({ length: count }, (_, i) => ({
           id: generateId(),
-          x: 50 + cones.length * 40 + i * 10,
-          y: 100 + cones.length * 20 + i * 5,
+          x: 50 + prev.length * 40 + i * 10,
+          y: 100 + prev.length * 20 + i * 5,
           color: color || "orange",
-        });
-      }
-      setCones((prev) => [...prev, ...newCones]);
+        })),
+      ]);
     }
   };
 
@@ -150,52 +155,38 @@ export const TacticalEditor: React.FC = () => {
       cones: cones.map((c) => ({ ...c })),
       teams: teams.map((t) => ({ ...t })),
     };
-
     if (currentStepIndex !== null) {
-      // Modify existing step
       setSavedSteps((prev) =>
-        prev.map((step, idx) => (idx === currentStepIndex ? newStep : step))
+        prev.map((s, i) => (i === currentStepIndex ? newStep : s))
       );
       alert(`Step ${currentStepIndex + 1} updated`);
     } else {
-      // Append new step
       setSavedSteps((prev) => [...prev, newStep]);
       alert(`Step added! Total steps: ${savedSteps.length + 1}`);
     }
-
-    // Reset selection
     setCurrentStepIndex(null);
   };
 
-  // ===== Animation =====
   const stepDuration = () => 1500 / speed;
 
   const animateStep = (timestamp: number) => {
     const currentIdx = stepIndexRef.current;
     const current = savedSteps[currentIdx];
     const next = savedSteps[currentIdx + 1] ?? current;
-
     if (!startTimeRef.current) startTimeRef.current = timestamp;
-
     const elapsed =
       timestamp - startTimeRef.current + elapsedBeforePauseRef.current;
     const t = Math.min(elapsed / stepDuration(), 1);
-
     const interpolate = (from: any[], to: any[]) =>
-      from.map((item, i) => {
-        const target = to[i];
-        return {
-          ...item,
-          x: item.x + (target.x - item.x) * t,
-          y: item.y + (target.y - item.y) * t,
-        };
-      });
-
+      from.map((item, i) => ({
+        ...item,
+        x: item.x + (to[i].x - item.x) * t,
+        y: item.y + (to[i].y - item.y) * t,
+      }));
     setPlayers(interpolate(current.players, next.players));
     setBalls(interpolate(current.balls, next.balls));
     setGoals(interpolate(current.goals, next.goals));
     setCones(interpolate(current.cones, next.cones));
-
     if (t < 1) animRef.current = requestAnimationFrame(animateStep);
     else if (currentIdx + 1 < savedSteps.length) {
       stepIndexRef.current++;
@@ -209,7 +200,6 @@ export const TacticalEditor: React.FC = () => {
     }
   };
 
-  // ===== Controls Handlers =====
   const handlePlay = () => {
     if (!savedSteps.length) return;
     setPlaying(true);
@@ -219,21 +209,18 @@ export const TacticalEditor: React.FC = () => {
     elapsedBeforePauseRef.current = 0;
     animRef.current = requestAnimationFrame(animateStep);
   };
-
   const handlePause = () => {
     if (!playing || paused) return;
     setPaused(true);
     if (animRef.current) cancelAnimationFrame(animRef.current);
     elapsedBeforePauseRef.current += performance.now() - startTimeRef.current;
   };
-
   const handleContinue = () => {
     if (!playing || !paused) return;
     setPaused(false);
     startTimeRef.current = performance.now();
     animRef.current = requestAnimationFrame(animateStep);
   };
-
   const handleStop = () => {
     if (animRef.current) cancelAnimationFrame(animRef.current);
     setPlaying(false);
@@ -241,7 +228,6 @@ export const TacticalEditor: React.FC = () => {
     stepIndexRef.current = 0;
     startTimeRef.current = 0;
     elapsedBeforePauseRef.current = 0;
-
     if (savedSteps.length > 0) {
       const first = savedSteps[0];
       setPlayers(first.players.map((p) => ({ ...p })));
@@ -251,41 +237,92 @@ export const TacticalEditor: React.FC = () => {
     }
   };
 
-  const handleAddSession = (session: Session) => {
-    setSessionsState((prev) => [...prev, session]);
+  // ===== CRUD for sessions/practices/tactics =====
+  const handleAddEntity = (entity: Session | Practice | GameTactic) => {
+    if (viewType === "sessions")
+      setSessionsState((prev) => [...prev, entity as Session]);
+    else if (viewType === "practices")
+      setPractices((prev) => [...prev, entity as Practice]);
+    else setTactics((prev) => [...prev, entity as GameTactic]);
   };
 
-  const handleUpdateSession = (updatedSession: Session) => {
-    setSessionsState((prev) =>
-      prev.map((s) => (s.id === updatedSession.id ? updatedSession : s))
-    );
+  const handleUpdateEntity = (updated: Session | Practice | GameTactic) => {
+    if (viewType === "sessions")
+      setSessionsState((prev) =>
+        prev.map((s) => (s.id === updated.id ? (updated as Session) : s))
+      );
+    else if (viewType === "practices")
+      setPractices((prev) =>
+        prev.map((p) => (p.id === updated.id ? (updated as Practice) : p))
+      );
+    else
+      setTactics((prev) =>
+        prev.map((t) => (t.id === updated.id ? (updated as GameTactic) : t))
+      );
   };
 
-  const handleDeleteSession = (id: number) => {
-    setSessionsState((prev) => prev.filter((s) => s.id !== id));
+  const handleDeleteEntity = (id: number) => {
+    if (viewType === "sessions")
+      setSessionsState((prev) => prev.filter((s) => s.id !== id));
+    else if (viewType === "practices")
+      setPractices((prev) => prev.filter((p) => p.id !== id));
+    else setTactics((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleAddSessionToEntity = (
+    type: "practice" | "tactic",
+    entityId: number,
+    sessionId: number
+  ) => {
+    if (type === "practice") {
+      setPractices((prev) =>
+        prev.map((p) => {
+          if (p.id === entityId) {
+            if (p.sessionIds.includes(sessionId))
+              alert("Session already added!");
+            else p.sessionIds.push(sessionId);
+          }
+          return p;
+        })
+      );
+    } else {
+      setTactics((prev) =>
+        prev.map((t) => {
+          if (t.id === entityId) {
+            if (t.sessionIds.includes(sessionId))
+              alert("Session already added!");
+            else t.sessionIds.push(sessionId);
+          }
+          return t;
+        })
+      );
+    }
   };
 
   return (
     <div className="tactical-container">
       <div className="tactical-left">
-        {/* Left: Session Selector */}
         <SessionSelector
-          sessions={sessions}
-          onSelectSession={(steps) => {
-            if (steps.length === 0) return;
+          viewType={viewType}
+          setViewType={setViewType}
+          sessions={sessionsState}
+          practices={practices}
+          gameTactics={tactics}
+          onSelectSession={(steps: Step[]) => {
+            if (!steps.length) return;
             const firstStep = steps[0];
-            setPlayers(firstStep.players.map((p: Player) => ({ ...p })));
-            setBalls(firstStep.balls.map((b: Ball) => ({ ...b })));
-            setGoals(firstStep.goals.map((g: Goal) => ({ ...g })));
-            setCones(firstStep.cones.map((c: Cone) => ({ ...c })));
+            setPlayers(firstStep.players.map((p) => ({ ...p })));
+            setBalls(firstStep.balls.map((b) => ({ ...b })));
+            setGoals(firstStep.goals.map((g) => ({ ...g })));
+            setCones(firstStep.cones.map((c) => ({ ...c })));
             setSavedSteps(steps);
           }}
-          onUpdateSession={handleUpdateSession}
-          onDeleteSession={handleDeleteSession}
-          onAddSession={handleAddSession}
+          onAddEntity={handleAddEntity}
+          onUpdateEntity={handleUpdateEntity}
+          onDeleteEntity={handleDeleteEntity}
+          onAddSessionToEntity={handleAddSessionToEntity}
         />
       </div>
-      {/* Left: Pitch */}
       <div className="tactical-mid">
         <Pitch
           width={pitchWidth}
@@ -319,8 +356,6 @@ export const TacticalEditor: React.FC = () => {
           ))}
         </div>
       </div>
-
-      {/* Right: Controls + Formation */}
       <div className="tactical-right">
         <Controls
           colors={colors}
@@ -344,7 +379,6 @@ export const TacticalEditor: React.FC = () => {
           stepsCount={savedSteps.length}
           speed={speed}
         />
-
         <FormationSelector
           formations={formations}
           teams={teams}

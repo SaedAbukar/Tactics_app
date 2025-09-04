@@ -69,3 +69,17 @@ export type Session = {
   description: string;
   steps: Step[];
 };
+
+export type Practice = {
+  id: number;
+  name: string;
+  description: string;
+  sessionIds: number[];
+};
+
+export type GameTactic = {
+  id: number;
+  name: string;
+  description: string;
+  sessionIds: number[];
+};
