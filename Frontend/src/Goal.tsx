@@ -22,9 +22,10 @@ const GoalComponent: React.FC<GoalProps> = ({ goals, dragRef, setGoals }) => {
           y={g.y}
           width={g.width}
           height={g.depth}
-          fill="none"
+          fill="white"
           stroke={g.color || "yellow"}
           onMouseDown={(e) => handleMouseDown(e, g.id)}
+          style={{ cursor: "grab" }}
         />
       ))}
     </>

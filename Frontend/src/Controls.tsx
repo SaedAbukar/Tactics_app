@@ -5,15 +5,17 @@ import "./Controls.css";
 interface ControlsProps {
   colors: string[];
   teams: Team[];
-  onAddPlayers: (count: number, color?: string, teamId?: number) => void;
-  onAddBalls: (count: number, color?: string) => void;
-  onAddGoals: (count: number, color?: string) => void;
-  onAddCones: (count: number, color?: string) => void;
+  onAddPlayers: (count: number, color: string, teamId?: number) => void;
+  onAddBalls: (count: number, color: string) => void;
+  onAddGoals: (count: number, color: string) => void;
+  onAddCones: (count: number, color: string) => void;
+  onAddTeam: (name: string, color: string) => void;
   onSaveStep: () => void;
   onPlay: () => void;
   onPause: () => void;
   onContinue: () => void;
   onStop: () => void;
+  onClearPitch: () => void;
   onSpeedChange: (speed: number) => void;
   playing: boolean;
   paused: boolean;
@@ -28,22 +30,25 @@ export const Controls: React.FC<ControlsProps> = ({
   onAddBalls,
   onAddGoals,
   onAddCones,
+  onAddTeam,
   onSaveStep,
   onPlay,
   onPause,
   onContinue,
   onStop,
+  onClearPitch,
   onSpeedChange,
   playing,
   paused,
   stepsCount,
   speed,
 }) => {
+  const [teamName, setTeamName] = useState("");
+  const [teamColor, setTeamColor] = useState(colors[0]);
   const [playerCount, setPlayerCount] = useState(3);
   const [ballCount, setBallCount] = useState(1);
   const [goalCount, setGoalCount] = useState(1);
   const [coneCount, setConeCount] = useState(1);
-
   const [playerColor, setPlayerColor] = useState(colors[0]);
   const [ballColor, setBallColor] = useState(colors[0]);
   const [goalColor, setGoalColor] = useState(colors[0]);
@@ -54,6 +59,36 @@ export const Controls: React.FC<ControlsProps> = ({
 
   return (
     <div className="controls-container">
+      <div className="control-group">
+        {/* Teams */}
+        <label>Create Team:</label>
+        <input
+          type="text"
+          placeholder="Team name"
+          value={teamName}
+          onChange={(e) => setTeamName(e.target.value)}
+        />
+        <select
+          value={teamColor}
+          onChange={(e) => setTeamColor(e.target.value)}
+        >
+          {colors.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={() => {
+            if (teamName.trim()) {
+              onAddTeam(teamName, teamColor);
+              setTeamName("");
+            }
+          }}
+        >
+          Add Team
+        </button>
+      </div>
       {/* Players */}
       <div className="control-group">
         <label>Players:</label>
@@ -88,7 +123,6 @@ export const Controls: React.FC<ControlsProps> = ({
           ))}
         </select>
         <button
-          className="light-button"
           onClick={() => onAddPlayers(playerCount, playerColor, selectedTeamId)}
           disabled={playing}
         >
@@ -117,7 +151,6 @@ export const Controls: React.FC<ControlsProps> = ({
           ))}
         </select>
         <button
-          className="light-button"
           onClick={() => onAddBalls(ballCount, ballColor)}
           disabled={playing}
         >
@@ -146,7 +179,6 @@ export const Controls: React.FC<ControlsProps> = ({
           ))}
         </select>
         <button
-          className="light-button"
           onClick={() => onAddGoals(goalCount, goalColor)}
           disabled={playing}
         >
@@ -175,7 +207,6 @@ export const Controls: React.FC<ControlsProps> = ({
           ))}
         </select>
         <button
-          className="light-button"
           onClick={() => onAddCones(coneCount, coneColor)}
           disabled={playing}
         >
@@ -185,35 +216,20 @@ export const Controls: React.FC<ControlsProps> = ({
 
       {/* Save / Play / Pause / Continue / Stop */}
       <div className="control-group">
-        <button
-          className="light-button"
-          onClick={onSaveStep}
-          disabled={playing}
-        >
+        <label>Animation:</label>
+        <button onClick={onSaveStep} disabled={playing}>
           Save Step
         </button>
         {!playing ? (
-          <button
-            className="light-button"
-            onClick={onPlay}
-            disabled={stepsCount === 0}
-          >
+          <button onClick={onPlay} disabled={stepsCount === 0}>
             Play
           </button>
         ) : paused ? (
-          <button className="light-button" onClick={onContinue}>
-            Continue
-          </button>
+          <button onClick={onContinue}>Continue</button>
         ) : (
-          <button className="light-button" onClick={onPause}>
-            Pause
-          </button>
+          <button onClick={onPause}>Pause</button>
         )}
-        <button
-          className="light-button"
-          onClick={onStop}
-          disabled={!playing && !paused}
-        >
+        <button onClick={onStop} disabled={!playing && !paused}>
           Stop
         </button>
       </div>
@@ -230,14 +246,12 @@ export const Controls: React.FC<ControlsProps> = ({
           onChange={(e) => onSpeedChange(Number(e.target.value))}
         />
         <span style={{ color: "white" }}>{speed.toFixed(1)}x</span>
-        <button
-          className="light-button"
-          onClick={() => onSpeedChange(1)}
-          disabled={speed === 1}
-        >
+        <button onClick={() => onSpeedChange(1)} disabled={speed === 1}>
           Reset
         </button>
       </div>
+      {/* Clear pitch */}
+      <button onClick={onClearPitch}>Clear Pitch</button>
     </div>
   );
 };

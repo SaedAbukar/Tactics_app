@@ -46,7 +46,9 @@ export const TacticalEditor: React.FC = () => {
   const stepIndexRef = useRef(0);
   const startTimeRef = useRef(0);
   const elapsedBeforePauseRef = useRef(0);
-  const [pitchWidth, setPitchWidth] = useState(700);
+  const pitchWidth = 700;
+  const pitchHeight = 900;
+  /*const [pitchWidth, setPitchWidth] = useState(700);
   const [pitchHeight, setPitchHeight] = useState(900);
 
   // Maintain aspect ratio 7:9
@@ -70,7 +72,7 @@ export const TacticalEditor: React.FC = () => {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, []);*/
 
   const colors = [
     "white",
@@ -146,6 +148,20 @@ export const TacticalEditor: React.FC = () => {
 
   const addTeam = (name: string, color: string) =>
     setTeams((prev) => [...prev, { id: generateId(), name, color }]);
+
+  const handleClearPitch = () => {
+    setPlayers([]);
+    setBalls([]);
+    setGoals([]);
+    setCones([]);
+    setTeams([]);
+    setSavedSteps([]);
+    setPlaying(false);
+    setPaused(false);
+    stepIndexRef.current = 0;
+    startTimeRef.current = 0;
+    elapsedBeforePauseRef.current = 0;
+  };
 
   const handleSaveStep = () => {
     setSavedSteps((prev) => [
@@ -276,11 +292,13 @@ export const TacticalEditor: React.FC = () => {
           onAddBalls={(count, color) => addEntity("ball", count, color)}
           onAddGoals={(count, color) => addEntity("goal", count, color)}
           onAddCones={(count, color) => addEntity("cone", count, color)}
+          onAddTeam={addTeam}
           onSaveStep={handleSaveStep}
           onPlay={handlePlay}
           onPause={handlePause}
           onContinue={handleContinue}
           onStop={handleStop}
+          onClearPitch={handleClearPitch}
           onSpeedChange={setSpeed}
           playing={playing}
           paused={paused}
