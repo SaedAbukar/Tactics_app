@@ -1,5 +1,5 @@
 import React from "react";
-import type { Goal, DragItem } from "./types";
+import type { Goal, DragItem } from "../../types/types";
 
 interface GoalProps {
   goals: Goal[];

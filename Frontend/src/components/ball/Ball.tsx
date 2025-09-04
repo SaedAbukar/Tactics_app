@@ -1,5 +1,5 @@
 import React from "react";
-import type { Ball, DragItem } from "./types";
+import type { Ball, DragItem } from "../../types/types";
 
 interface BallsProps {
   balls: Ball[];

@@ -9,11 +9,14 @@ import type {
   DragItem,
   EntityType,
   Team,
-} from "./types";
-import { Pitch } from "./Pitch";
-import { Controls } from "./Controls";
-import { FormationSelector } from "./FormationSelector";
-import { formations } from "./formation";
+  Session,
+} from "../../types/types";
+import { Pitch } from "../../components/pitch/Pitch";
+import { Controls } from "../../components/controls/Controls";
+import { FormationSelector } from "../../components/formation_selector/FormationSelector";
+import { formations } from "../../components/formation_selector/formation";
+import { SessionSelector } from "../../components/session/SessionSelector";
+import { sessions } from "../../components/session/SessionMock";
 
 // ID generator for numeric IDs
 let lastTime = 0;
@@ -40,6 +43,8 @@ export const TacticalEditor: React.FC = () => {
   const [playing, setPlaying] = useState(false);
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [sessionsState, setSessionsState] = useState(sessions);
+  const [currentStepIndex, setCurrentStepIndex] = useState<number | null>(null);
 
   const dragRef = useRef<DragItem | null>(null);
   const animRef = useRef<number | null>(null);
@@ -138,17 +143,28 @@ export const TacticalEditor: React.FC = () => {
   };
 
   const handleSaveStep = () => {
-    setSavedSteps((prev) => [
-      ...prev,
-      {
-        players: players.map((p) => ({ ...p })),
-        balls: balls.map((b) => ({ ...b })),
-        goals: goals.map((g) => ({ ...g })),
-        cones: cones.map((c) => ({ ...c })),
-        teams: teams.map((t) => ({ ...t })),
-      },
-    ]);
-    alert(`Step saved! Total steps: ${savedSteps.length + 1}`);
+    const newStep: Step = {
+      players: players.map((p) => ({ ...p })),
+      balls: balls.map((b) => ({ ...b })),
+      goals: goals.map((g) => ({ ...g })),
+      cones: cones.map((c) => ({ ...c })),
+      teams: teams.map((t) => ({ ...t })),
+    };
+
+    if (currentStepIndex !== null) {
+      // Modify existing step
+      setSavedSteps((prev) =>
+        prev.map((step, idx) => (idx === currentStepIndex ? newStep : step))
+      );
+      alert(`Step ${currentStepIndex + 1} updated`);
+    } else {
+      // Append new step
+      setSavedSteps((prev) => [...prev, newStep]);
+      alert(`Step added! Total steps: ${savedSteps.length + 1}`);
+    }
+
+    // Reset selection
+    setCurrentStepIndex(null);
   };
 
   // ===== Animation =====
@@ -235,10 +251,42 @@ export const TacticalEditor: React.FC = () => {
     }
   };
 
+  const handleAddSession = (session: Session) => {
+    setSessionsState((prev) => [...prev, session]);
+  };
+
+  const handleUpdateSession = (updatedSession: Session) => {
+    setSessionsState((prev) =>
+      prev.map((s) => (s.id === updatedSession.id ? updatedSession : s))
+    );
+  };
+
+  const handleDeleteSession = (id: number) => {
+    setSessionsState((prev) => prev.filter((s) => s.id !== id));
+  };
+
   return (
     <div className="tactical-container">
-      {/* Left: Pitch */}
       <div className="tactical-left">
+        {/* Left: Session Selector */}
+        <SessionSelector
+          sessions={sessions}
+          onSelectSession={(steps) => {
+            if (steps.length === 0) return;
+            const firstStep = steps[0];
+            setPlayers(firstStep.players.map((p: Player) => ({ ...p })));
+            setBalls(firstStep.balls.map((b: Ball) => ({ ...b })));
+            setGoals(firstStep.goals.map((g: Goal) => ({ ...g })));
+            setCones(firstStep.cones.map((c: Cone) => ({ ...c })));
+            setSavedSteps(steps);
+          }}
+          onUpdateSession={handleUpdateSession}
+          onDeleteSession={handleDeleteSession}
+          onAddSession={handleAddSession}
+        />
+      </div>
+      {/* Left: Pitch */}
+      <div className="tactical-mid">
         <Pitch
           width={pitchWidth}
           height={pitchHeight}
@@ -253,6 +301,23 @@ export const TacticalEditor: React.FC = () => {
           setGoals={setGoals}
           setCones={setCones}
         />
+        <div className="step-list">
+          {savedSteps.map((step, idx) => (
+            <button
+              key={idx}
+              className={currentStepIndex === idx ? "selected-step" : ""}
+              onClick={() => {
+                setCurrentStepIndex(idx);
+                setPlayers(step.players.map((p) => ({ ...p })));
+                setBalls(step.balls.map((b) => ({ ...b })));
+                setGoals(step.goals.map((g) => ({ ...g })));
+                setCones(step.cones.map((c) => ({ ...c })));
+              }}
+            >
+              Step {idx + 1}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Right: Controls + Formation */}

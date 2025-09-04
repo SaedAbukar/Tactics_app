@@ -18,6 +18,14 @@ body {
 }
 
 .tactical-left {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  flex: 1 1 300px;
+  min-width: 30%;
+}
+
+.tactical-mid {
   flex: 1 1 700px;
   min-width: 70%;
 }

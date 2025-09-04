@@ -1,5 +1,5 @@
 import React from "react";
-import type { Player, DragItem } from "./types";
+import type { Player, DragItem } from "../../types/types";
 
 interface PlayersProps {
   players: Player[];
@@ -28,7 +28,7 @@ const Players: React.FC<PlayersProps> = ({ players, dragRef, setPlayers }) => {
             x={p.x}
             y={p.y + 5}
             fontSize={12}
-            fill="white"
+            fill={p.color === "white" ? "black" : "white"}
             textAnchor="middle"
           >
             {p.number}

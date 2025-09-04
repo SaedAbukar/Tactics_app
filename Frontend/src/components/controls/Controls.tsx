@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { Team } from "./types";
+import type { Team } from "../../types/types";
 import "./Controls.css";
 
 interface ControlsProps {
@@ -247,7 +247,7 @@ export const Controls: React.FC<ControlsProps> = ({
         />
         <span style={{ color: "white" }}>{speed.toFixed(1)}x</span>
         <button onClick={() => onSpeedChange(1)} disabled={speed === 1}>
-          Reset
+          Reset Speed
         </button>
       </div>
       {/* Clear pitch */}

@@ -1,5 +1,5 @@
 import React from "react";
-import type { Cone, DragItem } from "./types";
+import type { Cone, DragItem } from "../../types/types";
 
 interface ConeProps {
   cones: Cone[];

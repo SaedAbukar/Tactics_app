@@ -1,4 +1,4 @@
-import type { Formation } from "./types";
+import type { Formation } from "../../types/types";
 
 export const formations: Formation[] = [
   // 1. 4-4-2 (classic balanced)

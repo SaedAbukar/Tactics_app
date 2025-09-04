@@ -62,3 +62,10 @@ export type Step = {
   cones: Cone[];
   teams: Team[];
 };
+
+export type Session = {
+  id: number;
+  name: string;
+  description: string;
+  steps: Step[];
+};

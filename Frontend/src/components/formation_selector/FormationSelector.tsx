@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { Formation, Team } from "./types";
+import type { Formation, Team } from "../../types/types";
 import "./FormationSelector.css";
 
 interface FormationSelectorProps {

@@ -1,10 +1,17 @@
 import React from "react";
-import type { Player, Ball, Goal, Cone, DragItem, Team } from "./types";
-import PitchField from "./PitchField";
-import Players from "./Players";
-import Balls from "./Balls";
-import GoalComponent from "./Goal";
-import ConeComponent from "./Cone";
+import type {
+  Player,
+  Ball,
+  Goal,
+  Cone,
+  DragItem,
+  Team,
+} from "../../types/types";
+import PitchField from "../pitch_field/PitchField";
+import Players from "../player/Player";
+import Balls from "../ball/Ball";
+import GoalComponent from "../goal/Goal";
+import ConeComponent from "../cone/Cone";
 
 interface PitchProps {
   players: Player[];
