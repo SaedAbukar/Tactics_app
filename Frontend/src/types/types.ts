@@ -1,3 +1,13 @@
+export type User = {
+  id: string; // Unique user ID
+  email: string; // User email
+  password: string; // Plain password (for mock/demo purposes)
+  role: "user" | "admin"; // User role
+  sessionIds: number[]; // IDs of sessions the user has access to
+  practiceIds: number[]; // IDs of practices assigned to the user
+  tacticIds: number[]; // IDs of game tactics assigned to the user
+};
+
 export type Player = {
   id: number;
   number: number;

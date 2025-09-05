@@ -1,20 +1,24 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Header from "./components/header/Header";
-import Footer from "./components/footer/Footer";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./components/layout/Layout";
 import Home from "./routes/home/Home";
 import { TacticalEditor } from "./routes/tactical_editor/TacticalEditor";
+import ProtectedRoute from "./components/protectedRoute/ProtectedRoute";
+import Profile from "./routes/profile/Profile";
+import AuthForm from "./components/authForm/AuthForm";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Header />
-      <main style={{ padding: 20 }}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/tacticalEditor" element={<TacticalEditor />} />
-        </Routes>
-      </main>
-      <Footer />
-    </BrowserRouter>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="tacticalEditor" element={<TacticalEditor />} />
+            <Route path="profile" element={<Profile />} />
+          </Route>
+          <Route path="login" element={<AuthForm />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }

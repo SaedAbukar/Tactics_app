@@ -3,7 +3,7 @@ import type { Step, Session, Practice, GameTactic } from "../../types/types";
 import { useTranslation } from "react-i18next";
 import "./SessionSelector.css";
 
-type ViewType = "sessions" | "practices" | "gameTactics";
+type ViewType = "sessions" | "practices" | "game tactics";
 
 interface SessionSelectorProps {
   viewType: ViewType;
@@ -130,8 +130,8 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
         <option value="practices">
           {t("sessionSelector.manageViewType", { viewType: "practices" })}
         </option>
-        <option value="gameTactics">
-          {t("sessionSelector.manageViewType", { viewType: "gameTactics" })}
+        <option value="game tactics">
+          {t("sessionSelector.manageViewType", { viewType: "game tactics" })}
         </option>
       </select>
 
@@ -186,7 +186,7 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
               </button>
             )}
 
-            {(viewType === "practices" || viewType === "gameTactics") && (
+            {(viewType === "practices" || viewType === "game tactics") && (
               <>
                 <div className="current-sessions">
                   {(entity as Practice | GameTactic).sessionIds.map((sid) => {

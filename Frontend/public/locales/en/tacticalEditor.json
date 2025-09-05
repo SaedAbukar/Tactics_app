@@ -9,6 +9,8 @@
   "continue": "Continue",
   "stop": "Stop",
   "clearPitch": "Clear Pitch",
+  "useUserData": "Select user data",
+  "useMockData": "Select mock data",
   "colors": {
     "white": "white",
     "black": "black",
@@ -47,5 +49,16 @@
     "speed": "Speed:",
     "resetSpeed": "Reset Speed",
     "clearPitch": "Clear Pitch"
+  },
+  "formationSelector": {
+    "teamLabel": "Team:",
+    "noTeamOption": "No Team",
+    "formationLabel": "Formation:",
+    "selectFormationOption": "Select Formation",
+    "addFormation": "Add Formation",
+    "selectTeamAlert": "Please select a team.",
+    "selectFormationAlert": "Please select a formation.",
+    "invalidFormationAlert": "Invalid formation selected.",
+    "noPositionsAlert": "Cannot add formation: no positions available."
   }
 }

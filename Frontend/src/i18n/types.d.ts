@@ -18,6 +18,9 @@ declare module "i18next" {
         english: string;
         finnish: string;
         spanish: string;
+        login: string;
+        logout: string;
+        profile: string;
       };
       footer: { copyright: string };
       home: {
@@ -41,6 +44,8 @@ declare module "i18next" {
         continue: string;
         stop: string;
         clearPitch: string;
+        useUserData: string;
+        useMockData: string;
         colors: {
           white: string;
           black: string;
@@ -79,6 +84,17 @@ declare module "i18next" {
           speed: string;
           resetSpeed: string;
           clearPitch: string;
+        };
+        formationSelector: {
+          teamLabel: string;
+          formationLabel: string;
+          noTeamOption: string;
+          selectFormationOption: string;
+          addFormation: string;
+          selectTeamAlert: string;
+          selectFormationAlert: string;
+          invalidFormationAlert: string;
+          noPositionsAlert: string;
         };
       };
     };

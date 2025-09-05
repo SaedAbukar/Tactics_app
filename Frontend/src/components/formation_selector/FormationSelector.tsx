@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import type { Formation, Team } from "../../types/types";
+import { useFetch } from "../../hooks/useFetch";
+import { fetchFormations } from "../../mock/formationsAPI";
+import { useTranslation } from "react-i18next";
 import "./FormationSelector.css";
 
 interface FormationSelectorProps {
-  formations: Formation[];
   teams: Team[];
   pitchWidth: number;
   pitchHeight: number;
@@ -27,23 +29,27 @@ function generateId(): number {
 let playerNumber = 1;
 
 export const FormationSelector: React.FC<FormationSelectorProps> = ({
-  formations,
   teams,
   pitchWidth,
   pitchHeight,
   currentPlayersCount,
   onAddFormation,
 }) => {
+  const { t } = useTranslation("tacticalEditor"); // Translation hook
+  const { data, loading, error } = useFetch(fetchFormations);
+  const formations = data || [];
   const [selectedTeamId, setSelectedTeamId] = useState<number | undefined>(
     undefined
   );
   const [selectedFormation, setSelectedFormation] = useState<string>("");
 
   const handleAddFormation = () => {
-    if (!selectedFormation) return alert("Please select a formation.");
+    // if (!selectedTeamId) return alert(t("formationSelector.selectTeamAlert"));
+    if (!selectedFormation)
+      return alert(t("formationSelector.selectFormationAlert"));
 
     const formation = formations.find((f) => f.name === selectedFormation);
-    if (!formation) return alert("Invalid formation selected.");
+    if (!formation) return alert(t("formationSelector.invalidFormationAlert"));
 
     const teamObj = teams.find((t) => t.id === selectedTeamId);
     const defaultColor = "white";
@@ -67,22 +73,25 @@ export const FormationSelector: React.FC<FormationSelectorProps> = ({
     );
 
     if (!scaledPlayers.length)
-      return alert("Cannot add formation: no positions available.");
+      return alert(t("formationSelector.noPositionsAlert"));
 
     onAddFormation(scaledPlayers);
   };
 
+  if (loading) return <div>Loading formations...</div>;
+  if (error) return <div>Error loading formations: {error}</div>;
+
   return (
     <div className="formation-selector-container">
       <div className="formation-row">
-        <label>Team:</label>
+        <label>{t("formationSelector.teamLabel")}</label>
         <select
           value={selectedTeamId}
           onChange={(e) =>
             setSelectedTeamId(Number(e.target.value) || undefined)
           }
         >
-          <option value="">No Team</option>
+          <option value="">{t("formationSelector.noTeamOption")}</option>
           {teams.map((t) => (
             <option key={t.id} value={t.id}>
               {t.name}
@@ -92,12 +101,14 @@ export const FormationSelector: React.FC<FormationSelectorProps> = ({
       </div>
 
       <div className="formation-row">
-        <label>Formation:</label>
+        <label>{t("formationSelector.formationLabel")}</label>
         <select
           value={selectedFormation}
           onChange={(e) => setSelectedFormation(e.target.value)}
         >
-          <option value="">Select Formation</option>
+          <option value="">
+            {t("formationSelector.selectFormationOption")}
+          </option>
           {formations.map((f) => (
             <option key={f.name} value={f.name}>
               {f.name}
@@ -105,7 +116,7 @@ export const FormationSelector: React.FC<FormationSelectorProps> = ({
           ))}
         </select>
         <button className="light-button" onClick={handleAddFormation}>
-          Add Formation
+          {t("formationSelector.addFormation")}
         </button>
       </div>
     </div>
