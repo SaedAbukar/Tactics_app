@@ -18,7 +18,7 @@ interface SessionSelectorProps {
   onAddSessionToEntity: (
     type: "practice" | "tactic",
     entityId: number,
-    sessionId: number
+    session: Session
   ) => void;
 }
 
@@ -49,7 +49,7 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
   const handleAdd = () => {
     if (!newName.trim())
       return alert(t("sessionSelector.namePlaceholder", { viewType }));
-    const id = Date.now();
+    const id = Date.now(); // temporary ID
     if (viewType === "sessions") {
       onAddEntity({
         id,
@@ -62,14 +62,14 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
         id,
         name: newName,
         description: newDescription,
-        sessionIds: [],
+        sessions: [],
       } as Practice);
     } else {
       onAddEntity({
         id,
         name: newName,
         description: newDescription,
-        sessionIds: [],
+        sessions: [],
       } as GameTactic);
     }
     setNewName("");
@@ -189,35 +189,40 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
             {(viewType === "practices" || viewType === "game tactics") && (
               <>
                 <div className="current-sessions">
-                  {(entity as Practice | GameTactic).sessionIds.map((sid) => {
-                    const session = sessions.find((s) => s.id === sid);
-                    if (!session) return null;
-                    return (
-                      <button
-                        key={sid}
-                        onClick={() => handleSelectSession(session)}
-                        className="light-button"
-                      >
-                        {session.name}
-                      </button>
-                    );
-                  })}
+                  {(entity as Practice | GameTactic).sessions.map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => handleSelectSession(s)}
+                      className="light-button"
+                    >
+                      {s.name}
+                    </button>
+                  ))}
                 </div>
 
                 <select
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const sessionToAdd = sessions.find(
+                      (s) => s.id === Number(e.target.value)
+                    );
+                    if (!sessionToAdd) return;
                     onAddSessionToEntity(
                       viewType === "practices" ? "practice" : "tactic",
                       entity.id,
-                      Number(e.target.value)
-                    )
-                  }
+                      sessionToAdd
+                    );
+                  }}
                 >
                   <option value="">
                     {t("sessionSelector.addSessionPlaceholder")}
                   </option>
                   {sessions
-                    .filter((s) => !(entity as any).sessionIds.includes(s.id))
+                    .filter(
+                      (s) =>
+                        !(entity as Practice | GameTactic).sessions.some(
+                          (es) => es.id === s.id
+                        )
+                    )
                     .map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.name}

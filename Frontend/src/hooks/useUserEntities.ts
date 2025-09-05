@@ -1,144 +1,133 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-// import { useFetchWithAuth } from "./useFetchWithAuth"; // commented out for mock
-import type { Session, Practice, GameTactic } from "../types/types";
+import type { User, Session, Practice, GameTactic } from "../types/types";
 import {
-  mockAddEntityToUser,
-  mockRemoveEntityFromUser,
-  mockGetUserEntities,
-  mockSetUserEntities,
-} from "../mock/mockAuth";
+  sessions as allSessions,
+  practices as allPractices,
+  gameTactics as allTactics,
+} from "../mock/allMocks";
 
-type Entity = Session | Practice | GameTactic;
+type LoginCredentials = { email: string; password: string };
+type SignupDetails = {
+  email: string;
+  password: string;
+  role?: "user" | "admin";
+};
 
-type EntityType = "sessions" | "practices" | "gameTactics";
+let refreshTokens: Record<string, string> = {};
 
-interface UseUserEntitiesReturn<T extends Entity> {
-  entities: T[];
-  loading: boolean;
-  error: string | null;
-  addEntity: (entity: Partial<T>) => Promise<void>;
-  updateEntity: (entity: T) => Promise<void>;
-  deleteEntity: (id: number) => Promise<void>;
-  refresh: () => Promise<void>;
-}
+export let mockUsers: User[] = [
+  {
+    id: "1",
+    email: "sessiononly@example.com",
+    password: "password123",
+    role: "user",
+    sessions: [allSessions[0], allSessions[1]], // Sessions by index
+    practices: [],
+    tactics: [],
+  },
+  {
+    id: "2",
+    email: "practiceonly@example.com",
+    password: "password123",
+    role: "user",
+    sessions: [],
+    practices: [allPractices[0], allPractices[1], allPractices[2]],
+    tactics: [],
+  },
+  {
+    id: "3",
+    email: "tacticonly@example.com",
+    password: "password123",
+    role: "user",
+    sessions: [],
+    practices: [],
+    tactics: [allTactics[0], allTactics[1]],
+  },
+  {
+    id: "4",
+    email: "a@a.com",
+    password: "123",
+    role: "admin",
+    sessions: [allSessions[0], allSessions[2]],
+    practices: [allPractices[3], allPractices[4]],
+    tactics: [allTactics[2]],
+  },
+];
 
-export const useUserEntities = <T extends Entity>(
-  entityType: EntityType
-): UseUserEntitiesReturn<T> => {
-  const { user } = useAuth();
-  // const { request } = useFetchWithAuth(); // commented out for mock
-  const [entities, setEntities] = useState<T[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-  const entityKeyMap: Record<
-    EntityType,
-    "sessionIds" | "practiceIds" | "tacticIds"
-  > = {
-    sessions: "sessionIds",
-    practices: "practiceIds",
-    gameTactics: "tacticIds",
+/* ---------- Auth ---------- */
+
+export const mockLogin = async (credentials: LoginCredentials) => {
+  await delay(100);
+
+  const user = mockUsers.find(
+    (u) => u.email === credentials.email && u.password === credentials.password
+  );
+  if (!user) throw new Error("Invalid email or password");
+
+  const token = createJwt(user.id);
+  const refreshToken = createJwt(user.id, 60 * 60);
+
+  refreshTokens[user.id] = refreshToken;
+
+  return { user, token, refreshToken };
+};
+
+export const mockSignup = async (details: SignupDetails) => {
+  await delay(100);
+
+  if (mockUsers.some((u) => u.email === details.email)) {
+    throw new Error("Email already exists");
+  }
+
+  const newUser: User = {
+    id: (mockUsers.length + 1).toString(),
+    email: details.email,
+    password: details.password,
+    role: details.role ?? "user",
+    sessions: [],
+    practices: [],
+    tactics: [],
   };
 
-  const fetchEntities = async () => {
-    if (!user) return;
-    setLoading(true);
-    setError(null);
-    try {
-      // ---------- MOCK ----------
-      const ids = await mockGetUserEntities(user.id, entityKeyMap[entityType]);
-      // Here you could map ids to actual mock entity objects if needed
-      setEntities(
-        ids.map((id) => ({
-          id,
-          name: `Mock ${entityType.slice(0, -1)} ${id}`,
-          description: "",
-        })) as T[]
-      );
+  mockUsers.push(newUser);
 
-      // ---------- REAL API (commented out) ----------
-      // const data: T[] = await request(`/api/${entityType}`);
-      // setEntities(data);
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch entities");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const token = createJwt(newUser.id);
+  const refreshToken = createJwt(newUser.id, 60 * 60);
+  refreshTokens[newUser.id] = refreshToken;
 
-  const addEntity = async (entity: Partial<T>) => {
-    if (!user) return;
-    try {
-      const newId = Date.now(); // mock ID
-      // ---------- MOCK ----------
-      await mockAddEntityToUser(user.id, entityKeyMap[entityType], newId);
-      setEntities((prev) => [
-        ...prev,
-        {
-          ...entity,
-          id: newId,
-          name: entity.name || `Mock ${entityType.slice(0, -1)} ${newId}`,
-        } as T,
-      ]);
+  return { user: newUser, token, refreshToken };
+};
 
-      // ---------- REAL API (commented out) ----------
-      // const newEntity: T = await request(`/api/${entityType}`, {
-      //   method: "POST",
-      //   body: JSON.stringify(entity),
-      //   headers: { "Content-Type": "application/json" },
-      // });
-      // setEntities((prev) => [...prev, newEntity]);
-    } catch (err: any) {
-      setError(err.message || "Failed to add entity");
-    }
-  };
+export const mockRefresh = async (refreshToken: string) => {
+  await delay(100);
 
-  const updateEntity = async (entity: T) => {
-    if (!user) return;
-    try {
-      // ---------- MOCK ----------
-      // For simplicity, we replace the entity locally
-      setEntities((prev) => prev.map((e) => (e.id === entity.id ? entity : e)));
+  const payload = decodeJwt(refreshToken);
+  if (!payload || refreshTokens[payload.userId] !== refreshToken) {
+    throw new Error("Invalid refresh token");
+  }
 
-      // ---------- REAL API (commented out) ----------
-      // const updated: T = await request(`/api/${entityType}/${entity.id}`, {
-      //   method: "PUT",
-      //   body: JSON.stringify(entity),
-      //   headers: { "Content-Type": "application/json" },
-      // });
-      // setEntities((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
-    } catch (err: any) {
-      setError(err.message || "Failed to update entity");
-    }
-  };
+  const user = mockUsers.find((u) => u.id === payload.userId);
+  if (!user) throw new Error("User not found");
 
-  const deleteEntity = async (id: number) => {
-    if (!user) return;
-    try {
-      // ---------- MOCK ----------
-      await mockRemoveEntityFromUser(user.id, entityKeyMap[entityType], id);
-      setEntities((prev) => prev.filter((e) => e.id !== id));
+  const newToken = createJwt(user.id);
+  return { user, token: newToken, refreshToken };
+};
 
-      // ---------- REAL API (commented out) ----------
-      // await request(`/api/${entityType}/${id}`, { method: "DELETE" });
-      // setEntities((prev) => prev.filter((e) => e.id !== id));
-    } catch (err: any) {
-      setError(err.message || "Failed to delete entity");
-    }
-  };
+/* ---------- JWT helpers ---------- */
 
-  useEffect(() => {
-    fetchEntities();
-  }, [user]);
+type JwtPayload = { userId: string; exp: number };
 
-  return {
-    entities,
-    loading,
-    error,
-    addEntity,
-    updateEntity,
-    deleteEntity,
-    refresh: fetchEntities,
-  };
+const createJwt = (userId: string, expiresInSeconds = 5 * 60) => {
+  const exp = Math.floor(Date.now() / 1000) + expiresInSeconds;
+  const payload = { userId, exp };
+  return btoa(JSON.stringify(payload));
+};
+
+const decodeJwt = (token: string): JwtPayload | null => {
+  try {
+    return JSON.parse(atob(token)) as JwtPayload;
+  } catch {
+    return null;
+  }
 };

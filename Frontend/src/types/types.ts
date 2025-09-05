@@ -3,9 +3,9 @@ export type User = {
   email: string; // User email
   password: string; // Plain password (for mock/demo purposes)
   role: "user" | "admin"; // User role
-  sessionIds: number[]; // IDs of sessions the user has access to
-  practiceIds: number[]; // IDs of practices assigned to the user
-  tacticIds: number[]; // IDs of game tactics assigned to the user
+  sessions: Session[]; // Sessions the user has access to
+  practices: Practice[]; // Practices assigned to the user
+  tactics: GameTactic[]; // Game tactics assigned to the user
 };
 
 export type Player = {
@@ -14,7 +14,7 @@ export type Player = {
   x: number;
   y: number;
   color: string;
-  teamId?: number;
+  team?: Team;
 };
 
 export type Ball = {
@@ -54,7 +54,7 @@ export type DragItem = {
 export type Position = { x: number; y: number }; // x,y as percentages (0–1)
 
 export type TeamFormation = {
-  teamId: number;
+  team: Team;
   positions: Position[];
 };
 
@@ -84,12 +84,12 @@ export type Practice = {
   id: number;
   name: string;
   description: string;
-  sessionIds: number[];
+  sessions: Session[];
 };
 
 export type GameTactic = {
   id: number;
   name: string;
   description: string;
-  sessionIds: number[];
+  sessions: Session[];
 };

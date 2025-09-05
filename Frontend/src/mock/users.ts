@@ -1,4 +1,5 @@
 import type { User } from "../types/types";
+import { sessions, practices, gameTactics } from "../mock/allMocks";
 
 export const mockUsers: User[] = [
   {
@@ -6,35 +7,35 @@ export const mockUsers: User[] = [
     email: "sessiononly@example.com",
     password: "password123",
     role: "user",
-    sessionIds: [1, 2],
-    practiceIds: [],
-    tacticIds: [],
+    sessions: [sessions[0], sessions[1]], // First two sessions
+    practices: [],
+    tactics: [],
   },
   {
     id: "2",
     email: "practiceonly@example.com",
     password: "password123",
     role: "user",
-    sessionIds: [],
-    practiceIds: [1, 2, 3],
-    tacticIds: [],
+    sessions: [],
+    practices: [practices[0], practices[1], practices[2]], // First three practices
+    tactics: [],
   },
   {
     id: "3",
     email: "tacticonly@example.com",
     password: "password123",
     role: "user",
-    sessionIds: [],
-    practiceIds: [],
-    tacticIds: [201, 202],
+    sessions: [],
+    practices: [],
+    tactics: [gameTactics[0], gameTactics[1]], // First two tactics
   },
   {
     id: "4",
     email: "a@a.com",
     password: "123",
     role: "admin",
-    sessionIds: [1, 3],
-    practiceIds: [4, 5],
-    tacticIds: [203],
+    sessions: [sessions[0], sessions[2]], // Sessions 1 and 3
+    practices: [practices[3], practices[4]], // Practices 4 and 5
+    tactics: [gameTactics[2]], // Third tactic
   },
 ];

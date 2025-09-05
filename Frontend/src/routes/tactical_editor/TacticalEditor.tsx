@@ -17,11 +17,7 @@ import { Controls } from "../../components/controls/Controls";
 import { FormationSelector } from "../../components/formation_selector/FormationSelector";
 import { SessionSelector } from "../../components/session/SessionSelector";
 import { useTranslation } from "react-i18next";
-import { mockUsers } from "../../mock/users";
 import { useAuth } from "../../context/AuthContext";
-import { sessions as mockSessions } from "../../components/session/mocks/SessionMock";
-import { practices as mockPractices } from "../../components/session/mocks/PracticeMocks";
-import { gameTactics as mockTactics } from "../../components/session/mocks/TacticsMocks";
 
 let lastTime = 0;
 let counter = 0;
@@ -34,7 +30,6 @@ function generateId(): number {
 }
 
 let playerNumber = 1;
-type Entity = Session | Practice | GameTactic;
 
 export const TacticalEditor: React.FC = () => {
   const { t } = useTranslation("tacticalEditor");
@@ -68,40 +63,25 @@ export const TacticalEditor: React.FC = () => {
   const pitchWidth = 700;
   const pitchHeight = 900;
 
-  // ===== Load user data or mock data =====
+  // Load user data or mock data
   useEffect(() => {
-    if (useMockData) {
-      setSessionsState(mockSessions);
-      setPractices(mockPractices);
-      setTactics(mockTactics);
-      return;
-    }
-
     if (user) {
-      setSessionsState(
-        user.sessionIds
-          ?.map((id: number) => mockSessions.find((s) => s.id === id))
-          .filter(Boolean) as Session[]
-      );
-      setPractices(
-        user.practiceIds
-          ?.map((id: number) => mockPractices.find((p) => p.id === id))
-          .filter(Boolean) as Practice[]
-      );
-      setTactics(
-        user.tacticIds
-          ?.map((id: number) => mockTactics.find((t) => t.id === id))
-          .filter(Boolean) as GameTactic[]
-      );
+      setSessionsState(user.sessions ? [...user.sessions] : []);
+      setPractices(user.practices ? [...user.practices] : []);
+      setTactics(user.tactics ? [...user.tactics] : []);
+      console.log("user", user);
+      console.log("user.sessions", user?.sessions);
+      console.log("user.practices", user?.practices);
+      console.log("user.tactics", user?.tactics);
     }
   }, [user, useMockData]);
 
-  // ===== Generic Add Entity =====
+  // Generic Add Entity
   const addEntity = (
     type: EntityType,
     count: number = 1,
     color?: string,
-    teamId?: number
+    team?: Team
   ) => {
     if (type === "player") {
       const newPlayers: Player[] = [];
@@ -111,10 +91,8 @@ export const TacticalEditor: React.FC = () => {
           number: playerNumber++,
           x: 50 + players.length * 50 + i * 20,
           y: 100 + players.length * 30 + i * 10,
-          color: teamId
-            ? teams.find((t) => t.id === teamId)?.color || "white"
-            : color || "white",
-          teamId,
+          color: team?.color || color || "white",
+          team,
         });
       }
       setPlayers((prev) => [...prev, ...newPlayers]);
@@ -156,7 +134,7 @@ export const TacticalEditor: React.FC = () => {
   const addTeam = (name: string, color: string) =>
     setTeams((prev) => [...prev, { id: generateId(), name, color }]);
 
-  // ===== Pitch / Step Handlers =====
+  // Pitch / Step Handlers
   const handleClearPitch = () => {
     setPlayers([]);
     setBalls([]);
@@ -182,10 +160,8 @@ export const TacticalEditor: React.FC = () => {
       setSavedSteps((prev) =>
         prev.map((s, i) => (i === currentStepIndex ? newStep : s))
       );
-      alert(t("stepUpdated", { index: currentStepIndex + 1 }));
     } else {
       setSavedSteps((prev) => [...prev, newStep]);
-      alert(t("stepAdded", { count: savedSteps.length + 1 }));
     }
     setCurrentStepIndex(null);
   };
@@ -200,7 +176,11 @@ export const TacticalEditor: React.FC = () => {
     const elapsed =
       timestamp - startTimeRef.current + elapsedBeforePauseRef.current;
     const t = Math.min(elapsed / stepDuration(), 1);
-    const interpolate = (from: any[], to: any[]) =>
+
+    const interpolate = <T extends { x: number; y: number }>(
+      from: T[],
+      to: T[]
+    ): T[] =>
       from.map((item, i) => ({
         ...item,
         x: item.x + (to[i].x - item.x) * t,
@@ -265,199 +245,93 @@ export const TacticalEditor: React.FC = () => {
     }
   };
 
-  // ===== CRUD for sessions/practices/tactics (user-aware) =====
-  // ===== Add Entity =====
-  // ===== Add Entity =====
+  // CRUD for sessions/practices/tactics
   const handleAddEntity = (entity: Session | Practice | GameTactic) => {
     if (!user) return;
 
     if (viewType === "sessions") {
       const newSession: Session = {
-        ...(entity as Session),
-        steps:
-          savedSteps.length > 0
-            ? [...savedSteps]
-            : [
-                {
-                  players: players.map((p) => ({ ...p })),
-                  balls: balls.map((b) => ({ ...b })),
-                  goals: goals.map((g) => ({ ...g })),
-                  cones: cones.map((c) => ({ ...c })),
-                  teams: teams.map((t) => ({ ...t })),
-                },
-              ],
+        ...entity,
+        steps: savedSteps.length > 0 ? [...savedSteps] : [],
       };
-
       setSessionsState((prev) => [...prev, newSession]);
-
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u && !u.sessionIds.includes(newSession.id)) {
-        u.sessionIds.push(newSession.id as number);
-      }
-      console.log("➕ [SESSION ADDED]", newSession);
-      console.log("👤 User Sessions:", u?.sessionIds);
+      user.sessions = [...user.sessions, newSession];
     } else if (viewType === "practices") {
       setPractices((prev) => [...prev, entity as Practice]);
-
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u && !u.practiceIds.includes(entity.id as number)) {
-        u.practiceIds.push(entity.id as number);
-      }
-      console.log("➕ [PRACTICE ADDED]", entity);
-      console.log("👤 User Practices:", u?.practiceIds);
+      user.practices = [...user.practices, entity as Practice];
     } else {
       setTactics((prev) => [...prev, entity as GameTactic]);
-
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u && !u.tacticIds.includes(entity.id as number)) {
-        u.tacticIds.push(entity.id as number);
-      }
-      console.log("➕ [TACTIC ADDED]", entity);
-      console.log("👤 User Tactics:", u?.tacticIds);
+      user.tactics = [...user.tactics, entity as GameTactic];
     }
   };
 
-  // ===== Update Entity =====
   const handleUpdateEntity = (updated: Session | Practice | GameTactic) => {
     if (!user) return;
 
-    const stepIndex =
-      currentStepIndex ?? (savedSteps.length ? savedSteps.length - 1 : 0);
-
     if (viewType === "sessions") {
-      const existing = sessionsState.find((s) => s.id === updated.id);
-      if (!existing) return;
-
-      const newSteps = [...existing.steps];
-
-      // Get the latest saved step from savedSteps
-      const latestStep = savedSteps[stepIndex];
-      if (!latestStep) {
-        alert("⚠️ No step selected to update. Please save a step first.");
-        return;
-      }
-
-      // Replace the step with the latest saved version
-      newSteps[stepIndex] = latestStep;
-
-      const updatedSession: Session = {
-        ...existing,
-        name: updated.name,
-        description: updated.description,
-        steps: newSteps,
-      };
-
-      // Update session state immutably
       setSessionsState((prev) =>
-        prev.map((s) => (s.id === updatedSession.id ? updatedSession : s))
+        prev.map((s) => (s.id === updated.id ? (updated as Session) : s))
       );
-
-      // Update mock user sessions
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u && !u.sessionIds.includes(updatedSession.id)) {
-        u.sessionIds.push(updatedSession.id as number);
-      }
-
-      console.log("✏️ [SESSION UPDATED]", updatedSession);
-      console.log("👤 User Sessions:", u?.sessionIds);
+      user.sessions = user.sessions.map((s: Session) =>
+        s.id === updated.id ? (updated as Session) : s
+      );
     } else if (viewType === "practices") {
       setPractices((prev) =>
         prev.map((p) => (p.id === updated.id ? (updated as Practice) : p))
       );
-
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u && !u.practiceIds.includes(updated.id as number)) {
-        u.practiceIds.push(updated.id as number);
-      }
-
-      console.log("✏️ [PRACTICE UPDATED]", updated);
-      console.log("👤 User Practices:", u?.practiceIds);
+      user.practices = user.practices.map((p: Practice) =>
+        p.id === updated.id ? (updated as Practice) : p
+      );
     } else {
       setTactics((prev) =>
         prev.map((t) => (t.id === updated.id ? (updated as GameTactic) : t))
       );
-
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u && !u.tacticIds.includes(updated.id as number)) {
-        u.tacticIds.push(updated.id as number);
-      }
-
-      console.log("✏️ [TACTIC UPDATED]", updated);
-      console.log("👤 User Tactics:", u?.tacticIds);
+      user.tactics = user.tactics.map((t: GameTactic) =>
+        t.id === updated.id ? (updated as GameTactic) : t
+      );
     }
   };
 
-  // ===== Delete Entity =====
   const handleDeleteEntity = (id: number) => {
     if (!user) return;
 
     if (viewType === "sessions") {
       setSessionsState((prev) => prev.filter((s) => s.id !== id));
-
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u) u.sessionIds = u.sessionIds.filter((sid) => sid !== id);
-
-      console.log("🗑 [SESSION DELETED]", id);
-      console.log("👤 User Sessions:", u?.sessionIds);
+      user.sessions = user.sessions.filter((s: Session) => s.id !== id);
     } else if (viewType === "practices") {
-      setPractices((prev) => prev.filter((p) => p.id !== id));
-
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u) u.practiceIds = u.practiceIds.filter((pid) => pid !== id);
-
-      console.log("🗑 [PRACTICE DELETED]", id);
-      console.log("👤 User Practices:", u?.practiceIds);
+      setPractices((prev) => prev.filter((p: Practice) => p.id !== id));
+      user.practices = user.practices.filter((p: Practice) => p.id !== id);
     } else {
       setTactics((prev) => prev.filter((t) => t.id !== id));
-
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u) u.tacticIds = u.tacticIds.filter((tid) => tid !== id);
-
-      console.log("🗑 [TACTIC DELETED]", id);
-      console.log("👤 User Tactics:", u?.tacticIds);
+      user.tactics = user.tactics.filter((t: GameTactic) => t.id !== id);
     }
   };
 
-  // ===== Add Session to Practice or Tactic =====
   const handleAddSessionToEntity = (
-    type: "practice" | "tactic", // 👈 match SessionSelector
+    type: "practice" | "tactic",
     entityId: number,
-    sessionId: number
+    session: Session
   ) => {
     if (!user) return;
 
     if (type === "practice") {
       setPractices((prev) =>
         prev.map((p) =>
-          p.id === entityId
-            ? { ...p, sessionIds: [...(p.sessionIds || []), sessionId] }
-            : p
+          p.id === entityId ? { ...p, sessions: [...p.sessions, session] } : p
         )
       );
-
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u && !u.practiceIds.includes(entityId)) {
-        u.practiceIds.push(entityId);
-      }
-
-      console.log(`➕ [SESSION ${sessionId} ADDED TO PRACTICE ${entityId}]`);
-      console.log("👤 User Practices:", u?.practiceIds);
-    } else if (type === "tactic") {
+      user.practices = user.practices.map((p: Practice) =>
+        p.id === entityId ? { ...p, sessions: [...p.sessions, session] } : p
+      );
+    } else {
       setTactics((prev) =>
         prev.map((t) =>
-          t.id === entityId
-            ? { ...t, sessionIds: [...(t.sessionIds || []), sessionId] }
-            : t
+          t.id === entityId ? { ...t, sessions: [...t.sessions, session] } : t
         )
       );
-
-      const u = mockUsers.find((u) => u.id === user.id);
-      if (u && !u.tacticIds.includes(entityId)) {
-        u.tacticIds.push(entityId);
-      }
-
-      console.log(`➕ [SESSION ${sessionId} ADDED TO TACTIC ${entityId}]`);
-      console.log("👤 User Tactics:", u?.tacticIds);
+      user.tactics = user.tactics.map((t: GameTactic) =>
+        t.id === entityId ? { ...t, sessions: [...t.sessions, session] } : t
+      );
     }
   };
 
@@ -467,6 +341,7 @@ export const TacticalEditor: React.FC = () => {
         <button onClick={() => setUseMockData((prev) => !prev)}>
           {useMockData ? t("useUserData") : t("useMockData")}
         </button>
+
         <SessionSelector
           viewType={viewType}
           setViewType={setViewType}
@@ -526,9 +401,10 @@ export const TacticalEditor: React.FC = () => {
       <div className="tactical-right">
         <Controls
           teams={teams}
-          onAddPlayers={(count, color, teamId) =>
-            addEntity("player", count, color, teamId)
-          }
+          onAddPlayers={(count, color, teamId) => {
+            const team = teams.find((t) => t.id === teamId);
+            addEntity("player", count, color, team);
+          }}
           onAddBalls={(count) => addEntity("ball", count)}
           onAddGoals={(count) => addEntity("goal", count)}
           onAddCones={(count, color) => addEntity("cone", count, color)}

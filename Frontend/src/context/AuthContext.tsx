@@ -1,14 +1,13 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
-import type { ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  type ReactNode,
+} from "react";
 import { mockLogin, mockSignup, mockRefresh } from "../mock/mockAuth";
 import * as jwt_decode from "jwt-decode";
-
-interface User {
-  id: string;
-  email: string;
-  role?: string;
-  [key: string]: any;
-}
+import type { User } from "../types/types";
 
 interface AuthContextType {
   user: User | null;
@@ -66,6 +65,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     accessToken: string,
     refreshToken: string
   ) => {
+    // Ensure arrays always exist
+    userData.sessions ||= [];
+    userData.practices ||= [];
+    userData.tactics ||= [];
+
     setUser(userData);
     setToken(accessToken);
     setRefreshTokenValue(refreshToken);
@@ -95,7 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (timeout > 0)
         refreshTimeout = setTimeout(() => refreshAccessToken(), timeout);
     } catch {
-      // ignore errors
+      // ignore
     }
   };
 
@@ -108,7 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return null;
     }
     try {
-      const data = await mockRefresh(refreshTokenValue); // replace with fetch for real server
+      const data = await mockRefresh(refreshTokenValue);
       if (!data) throw new Error("Failed to refresh token");
       saveAuth(data.user, data.token, data.refreshToken);
       return data;
