@@ -31,7 +31,7 @@ function generateId(): number {
 
 let playerNumber = 1;
 
-export const FormationSelector: React.FC<FormationSelectorProps> = ({
+export const ApiFormationSelector: React.FC<FormationSelectorProps> = ({
   teams,
   pitchWidth,
   pitchHeight,
