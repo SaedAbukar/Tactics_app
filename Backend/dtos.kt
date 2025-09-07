@@ -110,6 +110,7 @@ data class TeamDto(
 // ===================
 @Serializable
 data class FormationDto(
+    val id: Int,
     val name: String,
     val teams: List<TeamFormationDto> = emptyList()
 )
