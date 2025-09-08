@@ -1,42 +1,40 @@
+package org.sportstechsolutions.apitacticsapp.model
+
 import jakarta.persistence.*
 
-// ===================
-// USER
-// ===================
 @Entity
-@Table(name = "user")
+@Table(name = "app_user") // ✅ avoid reserved keyword 'user'
 data class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
-    @Column(nullable = false, unique = true)
-    val email: String = "",
-
-    @Column(nullable = false)
-    val password: String = "",
+    var email: String = "",
+    var password: String = "",
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val role: UserRole = UserRole.USER
+    var role: UserRole = UserRole.USER,
+
+    @OneToMany(mappedBy = "owner", cascade = [CascadeType.ALL])
+    val sessions: MutableList<Session> = mutableListOf(),
+
+    @OneToMany(mappedBy = "owner", cascade = [CascadeType.ALL])
+    val practices: MutableList<Practice> = mutableListOf(),
+
+    @OneToMany(mappedBy = "owner", cascade = [CascadeType.ALL])
+    val gameTactics: MutableList<GameTactic> = mutableListOf()
 )
 
 enum class UserRole { USER, ADMIN }
 enum class AccessRole { OWNER, EDITOR, VIEWER }
 
-// ===================
-// USER GROUPS
-// ===================
 @Entity
 @Table(name = "user_group")
 data class UserGroup(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
-    @Column(nullable = false)
-    val name: String = "",
-
-    @Column(columnDefinition = "TEXT")
-    val description: String? = null,
+    var name: String = "",
+    var description: String? = null,
 
     @ManyToMany
     @JoinTable(
@@ -44,41 +42,48 @@ data class UserGroup(
         joinColumns = [JoinColumn(name = "group_id")],
         inverseJoinColumns = [JoinColumn(name = "user_id")]
     )
-    val members: List<User> = emptyList()
+    val members: MutableList<User> = mutableListOf()
 )
 
-// ===================
-// SESSION
-// ===================
 @Entity
 @Table(name = "session")
 data class Session(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
-    @Column(nullable = false)
-    val name: String = "",
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    val description: String = "",
+    var name: String = "",
+    var description: String = "",
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    val owner: User,
+    @JoinColumn(name = "user_id")
+    var owner: User? = null,
 
-    @OneToMany(mappedBy = "session", cascade = [CascadeType.ALL])
-    val steps: List<Step> = emptyList(),
+    @OneToMany(mappedBy = "session", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val steps: MutableList<Step> = mutableListOf(),
 
-    @OneToMany(mappedBy = "session", cascade = [CascadeType.ALL])
-    val userAccess: List<UserSessionAccess> = emptyList(),
+    @OneToMany(mappedBy = "session", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val userAccess: MutableList<UserSessionAccess> = mutableListOf(),
 
-    @OneToMany(mappedBy = "session", cascade = [CascadeType.ALL])
-    val groupAccess: List<GroupSessionAccess> = emptyList()
+    @OneToMany(mappedBy = "session", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val groupAccess: MutableList<GroupSessionAccess> = mutableListOf(),
+
+    @ManyToMany
+    @JoinTable(
+        name = "session_practice",
+        joinColumns = [JoinColumn(name = "session_id")],
+        inverseJoinColumns = [JoinColumn(name = "practice_id")]
+    )
+    val practices: MutableList<Practice> = mutableListOf(),
+
+    @ManyToMany
+    @JoinTable(
+        name = "session_game_tactic",
+        joinColumns = [JoinColumn(name = "session_id")],
+        inverseJoinColumns = [JoinColumn(name = "game_tactic_id")]
+    )
+    val gameTactics: MutableList<GameTactic> = mutableListOf()
 )
 
-// ===================
-// USER / GROUP SESSION ACCESS
-// ===================
 @Entity
 @Table(name = "user_session")
 data class UserSessionAccess(
@@ -86,16 +91,15 @@ data class UserSessionAccess(
     val id: Int = 0,
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    val user: User,
+    @JoinColumn(name = "user_id")
+    var user: User? = null,
 
     @ManyToOne
-    @JoinColumn(name = "session_id", nullable = false)
-    val session: Session,
+    @JoinColumn(name = "session_id")
+    var session: Session? = null,
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val role: AccessRole = AccessRole.VIEWER
+    var role: AccessRole = AccessRole.VIEWER
 )
 
 @Entity
@@ -105,48 +109,39 @@ data class GroupSessionAccess(
     val id: Int = 0,
 
     @ManyToOne
-    @JoinColumn(name = "group_id", nullable = false)
-    val group: UserGroup,
+    @JoinColumn(name = "group_id")
+    var group: UserGroup? = null,
 
     @ManyToOne
-    @JoinColumn(name = "session_id", nullable = false)
-    val session: Session,
+    @JoinColumn(name = "session_id")
+    var session: Session? = null,
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val role: AccessRole = AccessRole.VIEWER
+    var role: AccessRole = AccessRole.VIEWER
 )
 
-// ===================
-// PRACTICE
-// ===================
 @Entity
 @Table(name = "practice")
 data class Practice(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
-    @Column(nullable = false)
-    val name: String = "",
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    val description: String = "",
+    var name: String = "",
+    var description: String = "",
+    var is_premade: Boolean = false, // ✅ snake_case
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    val owner: User,
+    @JoinColumn(name = "user_id")
+    var owner: User? = null,
 
-    @Column(name = "is_premade", nullable = false)
-    val isPremade: Boolean = false,
+    @OneToMany(mappedBy = "practice", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val userAccess: MutableList<UserPracticeAccess> = mutableListOf(),
+
+    @OneToMany(mappedBy = "practice", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val groupAccess: MutableList<GroupPracticeAccess> = mutableListOf(),
 
     @ManyToMany(mappedBy = "practices")
-    val sessions: List<Session> = emptyList(),
-
-    @OneToMany(mappedBy = "practice", cascade = [CascadeType.ALL])
-    val userAccess: List<UserPracticeAccess> = emptyList(),
-
-    @OneToMany(mappedBy = "practice", cascade = [CascadeType.ALL])
-    val groupAccess: List<GroupPracticeAccess> = emptyList()
+    val sessions: MutableList<Session> = mutableListOf()
 )
 
 @Entity
@@ -156,16 +151,15 @@ data class UserPracticeAccess(
     val id: Int = 0,
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    val user: User,
+    @JoinColumn(name = "user_id")
+    var user: User? = null,
 
     @ManyToOne
-    @JoinColumn(name = "practice_id", nullable = false)
-    val practice: Practice,
+    @JoinColumn(name = "practice_id")
+    var practice: Practice? = null,
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val role: AccessRole = AccessRole.VIEWER
+    var role: AccessRole = AccessRole.VIEWER
 )
 
 @Entity
@@ -175,98 +169,84 @@ data class GroupPracticeAccess(
     val id: Int = 0,
 
     @ManyToOne
-    @JoinColumn(name = "group_id", nullable = false)
-    val group: UserGroup,
+    @JoinColumn(name = "group_id")
+    var group: UserGroup? = null,
 
     @ManyToOne
-    @JoinColumn(name = "practice_id", nullable = false)
-    val practice: Practice,
+    @JoinColumn(name = "practice_id")
+    var practice: Practice? = null,
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val role: AccessRole = AccessRole.VIEWER
+    var role: AccessRole = AccessRole.VIEWER
 )
 
-// ===================
-// GAMETACTIC
-// ===================
 @Entity
-@Table(name = "gameTactic")
+@Table(name = "game_tactic")
 data class GameTactic(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
-    @Column(nullable = false)
-    val name: String = "",
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    val description: String = "",
+    var name: String = "",
+    var description: String = "",
+    var is_premade: Boolean = false,
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    val owner: User,
+    @JoinColumn(name = "user_id")
+    var owner: User? = null,
 
-    @Column(name = "is_premade", nullable = false)
-    val isPremade: Boolean = false,
+    @OneToMany(mappedBy = "gameTactic", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val userAccess: MutableList<UserGameTacticAccess> = mutableListOf(),
+
+    @OneToMany(mappedBy = "gameTactic", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val groupAccess: MutableList<GroupGameTacticAccess> = mutableListOf(),
 
     @ManyToMany(mappedBy = "gameTactics")
-    val sessions: List<Session> = emptyList(),
-
-    @OneToMany(mappedBy = "gameTactic", cascade = [CascadeType.ALL])
-    val userAccess: List<UserGameTacticAccess> = emptyList(),
-
-    @OneToMany(mappedBy = "gameTactic", cascade = [CascadeType.ALL])
-    val groupAccess: List<GroupGameTacticAccess> = emptyList()
+    val sessions: MutableList<Session> = mutableListOf()
 )
 
 @Entity
-@Table(name = "user_gameTactic")
+@Table(name = "user_game_tactic") // ✅ renamed
 data class UserGameTacticAccess(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    val user: User,
+    @JoinColumn(name = "user_id")
+    var user: User? = null,
 
     @ManyToOne
-    @JoinColumn(name = "gameTactic_id", nullable = false)
-    val gameTactic: GameTactic,
+    @JoinColumn(name = "game_tactic_id")
+    var gameTactic: GameTactic? = null,
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val role: AccessRole = AccessRole.VIEWER
+    var role: AccessRole = AccessRole.VIEWER
 )
 
 @Entity
-@Table(name = "group_gameTactic")
+@Table(name = "group_game_tactic") // ✅ renamed
 data class GroupGameTacticAccess(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
     @ManyToOne
-    @JoinColumn(name = "group_id", nullable = false)
-    val group: UserGroup,
+    @JoinColumn(name = "group_id")
+    var group: UserGroup? = null,
 
     @ManyToOne
-    @JoinColumn(name = "gameTactic_id", nullable = false)
-    val gameTactic: GameTactic,
+    @JoinColumn(name = "game_tactic_id")
+    var gameTactic: GameTactic? = null,
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val role: AccessRole = AccessRole.VIEWER
+    var role: AccessRole = AccessRole.VIEWER
 )
 
-// ===================
-// TEAM, PLAYER, BALL, GOAL, CONE
-// ===================
 @Entity
 @Table(name = "team")
 data class Team(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    val name: String = "",
-    val color: String = ""
+    var name: String = "",
+    var color: String = ""
 )
 
 @Entity
@@ -274,14 +254,14 @@ data class Team(
 data class Player(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    val x: Int = 0,
-    val y: Int = 0,
-    val number: Int = 0,
-    val color: String = "",
+    var x: Int = 0,
+    var y: Int = 0,
+    var number: Int = 0,
+    var color: String = "",
 
     @ManyToOne
     @JoinColumn(name = "team_id")
-    val team: Team? = null
+    var team: Team? = null
 )
 
 @Entity
@@ -289,9 +269,9 @@ data class Player(
 data class Ball(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    val color: String? = null,
-    val x: Int = 0,
-    val y: Int = 0
+    var x: Int = 0,
+    var y: Int = 0,
+    var color: String? = null
 )
 
 @Entity
@@ -299,11 +279,11 @@ data class Ball(
 data class Goal(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    val x: Int = 0,
-    val y: Int = 0,
-    val width: Int = 0,
-    val depth: Int = 0,
-    val color: String? = null
+    var x: Int = 0,
+    var y: Int = 0,
+    var width: Int = 0,
+    var depth: Int = 0,
+    var color: String? = null
 )
 
 @Entity
@@ -311,26 +291,21 @@ data class Goal(
 data class Cone(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    val x: Int = 0,
-    val y: Int = 0,
-    val color: String? = null
+    var x: Int = 0,
+    var y: Int = 0,
+    var color: String? = null
 )
 
-// ===================
-// FORMATION
-// ===================
 @Entity
 @Table(name = "formation")
 data class Formation(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-
-    val name: String = "",
+    var name: String = "",
 
     @OneToMany(mappedBy = "formation", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val positions: List<FormationPosition> = emptyList()
+    val positions: MutableList<FormationPosition> = mutableListOf()
 )
-
 
 @Entity
 @Table(name = "formation_position")
@@ -339,20 +314,17 @@ data class FormationPosition(
     val id: Int = 0,
 
     @ManyToOne
-    @JoinColumn(name = "formation_id", nullable = false)
-    val formation: Formation,
+    @JoinColumn(name = "formation_id")
+    var formation: Formation? = null,
 
     @ManyToOne
-    @JoinColumn(name = "team_id", nullable = false)
-    val team: Team,
+    @JoinColumn(name = "team_id")
+    var team: Team? = null,
 
-    val x: Double = 0.0,
-    val y: Double = 0.0
+    var x: Double = 0.0,
+    var y: Double = 0.0
 )
 
-// ===================
-// STEP
-// ===================
 @Entity
 @Table(name = "step")
 data class Step(
@@ -360,30 +332,30 @@ data class Step(
     val id: Int = 0,
 
     @ManyToOne
-    @JoinColumn(name = "session_id", nullable = false)
-    val session: Session,
+    @JoinColumn(name = "session_id")
+    var session: Session? = null,
 
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinColumn(name = "step_id")
-    val players: List<Player> = emptyList(),
+    val players: MutableList<Player> = mutableListOf(),
 
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinColumn(name = "step_id")
-    val balls: List<Ball> = emptyList(),
+    val balls: MutableList<Ball> = mutableListOf(),
 
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinColumn(name = "step_id")
-    val goals: List<Goal> = emptyList(),
+    val goals: MutableList<Goal> = mutableListOf(),
 
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinColumn(name = "step_id")
-    val teams: List<Team> = emptyList(),
+    val teams: MutableList<Team> = mutableListOf(),
 
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinColumn(name = "step_id")
-    val formations: List<Formation> = emptyList(),
+    val formations: MutableList<Formation> = mutableListOf(),
 
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinColumn(name = "step_id")
-    val cones: List<Cone> = emptyList()
+    val cones: MutableList<Cone> = mutableListOf()
 )
