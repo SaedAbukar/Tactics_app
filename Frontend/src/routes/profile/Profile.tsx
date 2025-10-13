@@ -16,7 +16,7 @@ const Profile: React.FC = () => {
         <strong>Role:</strong> {user.role}
       </p>
 
-      {user.sessionIds?.length > 0 && (
+      {/* {user.sessionIds?.length > 0 && (
         <div>
           <strong>Sessions:</strong> {user.sessionIds.join(", ")}
         </div>
@@ -32,7 +32,7 @@ const Profile: React.FC = () => {
         <div>
           <strong>Game Tactics:</strong> {user.tacticIds.join(", ")}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

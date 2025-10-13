@@ -5,19 +5,25 @@ import React, {
   useContext,
   type ReactNode,
 } from "react";
-import { mockLogin, mockSignup, mockRefresh } from "../mock/mockAuth";
 import * as jwt_decode from "jwt-decode";
-import type { User } from "../types/types";
+
+// Minimal user type
+export type AuthUser = {
+  id: string;
+  email: string;
+  role: "user" | "admin";
+  name?: string;
+};
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   token: string | null;
   loading: boolean;
   error: Error | null;
   login: (credentials: { email: string; password: string }) => Promise<void>;
   signup: (details: { email: string; password: string }) => Promise<void>;
   logout: () => void;
-  refreshAccessToken: () => Promise<{ token: string; user: User } | null>;
+  refreshAccessToken: () => Promise<{ token: string; user: AuthUser } | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,7 +39,7 @@ interface JwtPayload {
 
 let refreshTimeout: NodeJS.Timeout;
 
-const isTokenValid = (token: string | null): boolean => {
+function isTokenValid(token: string | null): boolean {
   if (!token) return false;
   try {
     const decoded = (jwt_decode as unknown as (token: string) => JwtPayload)(
@@ -43,43 +49,53 @@ const isTokenValid = (token: string | null): boolean => {
   } catch {
     return false;
   }
-};
+}
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(() => {
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<AuthUser | null>(() => {
     const storedUser = sessionStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
+
   const [token, setToken] = useState<string | null>(() => {
     const storedToken = sessionStorage.getItem("token");
     return isTokenValid(storedToken) ? storedToken : null;
   });
+
   const [refreshTokenValue, setRefreshTokenValue] = useState<string | null>(
     () => sessionStorage.getItem("refreshToken")
   );
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const saveAuth = (
-    userData: User,
+  function saveAuth(
+    userData: AuthUser,
     accessToken: string,
     refreshToken: string
-  ) => {
-    // Ensure arrays always exist
-    userData.sessions ||= [];
-    userData.practices ||= [];
-    userData.tactics ||= [];
-
+  ) {
     setUser(userData);
     setToken(accessToken);
     setRefreshTokenValue(refreshToken);
+
     sessionStorage.setItem("user", JSON.stringify(userData));
     sessionStorage.setItem("token", accessToken);
     sessionStorage.setItem("refreshToken", refreshToken);
-    scheduleTokenRefresh(accessToken);
-  };
 
-  const clearAuth = () => {
+    scheduleTokenRefresh(accessToken);
+  }
+
+  function saveTokensOnly(accessToken: string, refreshToken: string) {
+    setToken(accessToken);
+    setRefreshTokenValue(refreshToken);
+
+    sessionStorage.setItem("token", accessToken);
+    sessionStorage.setItem("refreshToken", refreshToken);
+
+    scheduleTokenRefresh(accessToken);
+  }
+
+  function clearAuth() {
     setUser(null);
     setToken(null);
     setRefreshTokenValue(null);
@@ -87,9 +103,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("refreshToken");
     if (refreshTimeout) clearTimeout(refreshTimeout);
-  };
+  }
 
-  const scheduleTokenRefresh = (accessToken: string) => {
+  function scheduleTokenRefresh(accessToken: string) {
     try {
       const decoded = (jwt_decode as unknown as (token: string) => JwtPayload)(
         accessToken
@@ -101,58 +117,105 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch {
       // ignore
     }
-  };
+  }
 
-  const refreshAccessToken = async (): Promise<{
+  async function fetchUser(accessToken: string): Promise<AuthUser> {
+    const res = await fetch("http://localhost:8085/auth/me", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const data = await res.json().catch(() => ({}));
+    console.log("User info response:", data);
+
+    if (!data || !data.id) throw new Error("Failed to fetch user info");
+
+    return {
+      id: data.id,
+      email: data.email,
+      role: data.role as "user" | "admin",
+      name: data.name,
+    };
+  }
+
+  async function refreshAccessToken(): Promise<{
     token: string;
-    user: User;
-  } | null> => {
+    user: AuthUser;
+  } | null> {
     if (!refreshTokenValue) {
       clearAuth();
       return null;
     }
     try {
-      const data = await mockRefresh(refreshTokenValue);
-      if (!data) throw new Error("Failed to refresh token");
-      saveAuth(data.user, data.token, data.refreshToken);
-      return data;
+      const res = await fetch("http://localhost:8085/auth/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken: refreshTokenValue }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      console.log("Refresh response:", data);
+
+      const tokenValue = data.token ?? data.accessToken;
+      if (!tokenValue || !data.refreshToken)
+        throw new Error("Invalid refresh response");
+
+      saveTokensOnly(tokenValue, data.refreshToken);
+
+      const userData = await fetchUser(tokenValue);
+      setUser(userData);
+
+      return { token: tokenValue, user: userData };
     } catch {
       clearAuth();
       return null;
     }
-  };
+  }
 
   useEffect(() => {
     if (token && refreshTokenValue && !isTokenValid(token))
       refreshAccessToken();
   }, []);
 
-  const authRequest = async (
+  async function authRequest(
     endpoint: string,
     body: { email: string; password: string }
-  ) => {
+  ) {
     setLoading(true);
     setError(null);
     try {
-      let data;
-      if (endpoint === "/api/auth/login") data = await mockLogin(body);
-      if (endpoint === "/api/auth/signup") data = await mockSignup(body);
-      if (!data) throw new Error("Authentication failed: no data returned");
-      saveAuth(data.user, data.token, data.refreshToken);
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      console.log("Auth response:", data);
+
+      const tokenValue = data.token ?? data.accessToken;
+      if (!tokenValue || !data.refreshToken)
+        throw new Error("No tokens returned from server");
+
+      // Save tokens first
+      saveTokensOnly(tokenValue, data.refreshToken);
+
+      // Fetch the user info
+      const userData = await fetchUser(tokenValue);
+      setUser(userData);
     } catch (err: any) {
       setError(err);
       throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const login = async (credentials: { email: string; password: string }) => {
-    await authRequest("/api/auth/login", credentials);
+    await authRequest("http://localhost:8085/auth/login", credentials);
   };
 
   const signup = async (details: { email: string; password: string }) => {
-    await authRequest("/api/auth/signup", details);
+    await authRequest("http://localhost:8085/auth/signup", details);
   };
 
   const logout = () => clearAuth();
@@ -173,10 +236,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = (): AuthContextType => {
+// HMR-safe hook export
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
-};
+}

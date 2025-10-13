@@ -63,12 +63,20 @@ export const ApiTacticalEditor: React.FC = () => {
   const pitchWidth = 700;
   const pitchHeight = 900;
 
-  const token = localStorage.getItem("token");
-
   // ------------------------------
   // API helpers
   // ------------------------------
+  const { token } = useAuth(); // get the latest token from context
+
+  const normalizeSessions = (sessions: Session[] | null) => sessions || [];
+  const normalizePractices = (practices: Practice[] | null) =>
+    practices?.map((p) => ({ ...p, sessions: p.sessions || [] })) || [];
+  const normalizeTactics = (tactics: GameTactic[] | null) =>
+    tactics?.map((t) => ({ ...t, sessions: t.sessions || [] })) || [];
+
   const apiRequest = async (url: string, options: RequestInit = {}) => {
+    if (!token) throw new Error("No token available");
+
     const res = await fetch(url, {
       ...options,
       headers: {
@@ -77,17 +85,28 @@ export const ApiTacticalEditor: React.FC = () => {
         ...(options.headers || {}),
       },
     });
-    if (!res.ok) throw new Error(await res.text());
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`API request failed: ${text}`);
+    }
+
     return res.json();
   };
 
   const fetchUserData = async () => {
     if (!user) return;
     try {
-      const data = await apiRequest(`/api/users/${user.id}`);
-      setSessionsState(data.sessions || []);
-      setPractices(data.practices || []);
-      setTactics(data.tactics || []);
+      const [sessionsData, practicesData, tacticsData] = await Promise.all([
+        apiRequest("http://localhost:8085/sessions"),
+        apiRequest("http://localhost:8085/practices"),
+        apiRequest("http://localhost:8085/game-tactics"),
+      ]);
+
+      setSessionsState(sessionsData || []);
+      setPractices(practicesData || []);
+      setTactics(tacticsData || []);
+      console.log(sessionsState, practices, tactics);
     } catch (err) {
       console.error("Failed to fetch user data:", err);
     }

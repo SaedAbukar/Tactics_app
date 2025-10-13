@@ -41,14 +41,23 @@ export const ApiSessionSelector: React.FC<SessionSelectorProps> = ({
   const [newDescription, setNewDescription] = useState("");
   const [updatingId, setUpdatingId] = useState<number | null>(null);
 
-  // ✅ Select a session and switch to "sessions" view for editing
+  // Determine which entities to display
+  const entities =
+    viewType === "sessions"
+      ? sessions
+      : viewType === "practices"
+      ? practices
+      : gameTactics;
+
+  // ✅ Runtime check: ensure it's always an array
+  const safeEntities = Array.isArray(entities) ? entities : [];
+
   const handleSelectSession = (session: Session) => {
     setSelectedId(session.id);
     setNewName(session.name);
     setNewDescription(session.description);
     setUpdatingId(session.id);
 
-    // Force editing mode for session
     setViewType("sessions");
     onSelectSession(session.steps, session);
   };
@@ -56,6 +65,7 @@ export const ApiSessionSelector: React.FC<SessionSelectorProps> = ({
   const handleAdd = () => {
     if (!newName.trim())
       return alert(t("sessionSelector.namePlaceholder", { viewType }));
+
     const id = Date.now();
     if (viewType === "sessions") {
       onAddEntity({
@@ -79,6 +89,7 @@ export const ApiSessionSelector: React.FC<SessionSelectorProps> = ({
         sessions: [],
       } as GameTactic);
     }
+
     setNewName("");
     setNewDescription("");
   };
@@ -91,13 +102,16 @@ export const ApiSessionSelector: React.FC<SessionSelectorProps> = ({
         : viewType === "practices"
         ? practices.find((p) => p.id === id)
         : gameTactics.find((t) => t.id === id);
+
     if (!entity) return;
+
     setNewName(entity.name);
     setNewDescription(entity.description);
   };
 
   const handleSaveUpdate = () => {
     if (updatingId === null) return;
+
     const updatedEntity =
       viewType === "sessions"
         ? ({
@@ -123,7 +137,6 @@ export const ApiSessionSelector: React.FC<SessionSelectorProps> = ({
     setUpdatingId(null);
   };
 
-  // ✅ Updated delete to support deleting sessions from practices/tactics
   const handleDelete = (id: number, sessionId?: number) => {
     onDeleteEntity(id, sessionId);
   };
@@ -131,6 +144,7 @@ export const ApiSessionSelector: React.FC<SessionSelectorProps> = ({
   return (
     <div className="session-selector-container">
       <h3>{t("sessionSelector.manageViewType", { viewType })}</h3>
+
       <select
         value={viewType}
         onChange={(e) => setViewType(e.target.value as ViewType)}
@@ -173,95 +187,96 @@ export const ApiSessionSelector: React.FC<SessionSelectorProps> = ({
       </div>
 
       <ul className="session-list">
-        {(viewType === "sessions"
-          ? sessions
-          : viewType === "practices"
-          ? practices
-          : gameTactics
-        ).map((entity) => (
-          <li
-            key={entity.id}
-            className={selectedId === entity.id ? "selected" : ""}
-          >
-            <strong>{entity.name}</strong>
-            <textarea
-              value={entity.description}
-              onChange={(e) =>
-                onUpdateEntity({ ...entity, description: e.target.value })
-              }
-            />
+        {safeEntities.map((entity) => {
+          // ✅ Nested sessions array runtime check
+          const entitySessions = Array.isArray(
+            (entity as Practice | GameTactic).sessions
+          )
+            ? (entity as Practice | GameTactic).sessions
+            : [];
 
-            {viewType === "sessions" && (
-              <button onClick={() => handleSelectSession(entity as Session)}>
-                {t("sessionSelector.select")}
-              </button>
-            )}
+          return (
+            <li
+              key={entity.id}
+              className={selectedId === entity.id ? "selected" : ""}
+            >
+              <strong>{entity.name}</strong>
+              <textarea
+                value={entity.description}
+                onChange={(e) =>
+                  onUpdateEntity({ ...entity, description: e.target.value })
+                }
+              />
 
-            {(viewType === "practices" || viewType === "game tactics") && (
-              <>
-                <div className="current-sessions">
-                  {(entity as Practice | GameTactic).sessions.map((s) => (
-                    <div key={s.id} className="session-item">
-                      <button
-                        onClick={() => handleSelectSession(s)}
-                        className="light-button"
-                      >
-                        {s.name}
-                      </button>
-                      <button
-                        className="delete-session"
-                        onClick={() => handleDelete(entity.id, s.id)}
-                      >
-                        {t("sessionSelector.delete")}
-                      </button>
-                    </div>
-                  ))}
-                </div>
+              {viewType === "sessions" && (
+                <button onClick={() => handleSelectSession(entity as Session)}>
+                  {t("sessionSelector.select")}
+                </button>
+              )}
 
-                <select
-                  onChange={(e) => {
-                    const sessionToAdd = sessions.find(
-                      (s) => s.id === Number(e.target.value)
-                    );
-                    if (!sessionToAdd) return;
-                    onAddSessionToEntity(
-                      viewType === "practices" ? "practice" : "tactic",
-                      entity.id,
-                      sessionToAdd
-                    );
-                  }}
-                >
-                  <option value="">
-                    {t("sessionSelector.addSessionPlaceholder")}
-                  </option>
-                  {sessions
-                    .filter(
-                      (s) =>
-                        !(entity as Practice | GameTactic).sessions.some(
-                          (es) => es.id === s.id
-                        )
-                    )
-                    .map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
+              {(viewType === "practices" || viewType === "game tactics") && (
+                <>
+                  <div className="current-sessions">
+                    {entitySessions.map((s) => (
+                      <div key={s.id} className="session-item">
+                        <button
+                          onClick={() => handleSelectSession(s)}
+                          className="light-button"
+                        >
+                          {s.name}
+                        </button>
+                        <button
+                          className="delete-session"
+                          onClick={() => handleDelete(entity.id, s.id)}
+                        >
+                          {t("sessionSelector.delete")}
+                        </button>
+                      </div>
                     ))}
-                </select>
-              </>
-            )}
+                  </div>
 
-            {!(viewType === "practices" || viewType === "game tactics") && (
-              <div className="buttons">
-                <button onClick={() => handleUpdate(entity.id)}>
-                  {t("sessionSelector.update")}
-                </button>
-                <button onClick={() => handleDelete(entity.id)}>
-                  {t("sessionSelector.delete")}
-                </button>
-              </div>
-            )}
-          </li>
-        ))}
+                  <select
+                    onChange={(e) => {
+                      const sessionToAdd = sessions.find(
+                        (s) => s.id === Number(e.target.value)
+                      );
+                      if (!sessionToAdd) return;
+                      onAddSessionToEntity(
+                        viewType === "practices" ? "practice" : "tactic",
+                        entity.id,
+                        sessionToAdd
+                      );
+                    }}
+                  >
+                    <option value="">
+                      {t("sessionSelector.addSessionPlaceholder")}
+                    </option>
+                    {sessions
+                      .filter(
+                        (s) => !entitySessions.some((es) => es.id === s.id)
+                      )
+                      .map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name}
+                        </option>
+                      ))}
+                  </select>
+                </>
+              )}
+
+              {!(viewType === "practices" || viewType === "game tactics") && (
+                <div className="buttons">
+                  <button onClick={() => handleUpdate(entity.id)}>
+                    {t("sessionSelector.update")}
+                  </button>
+                  <button onClick={() => handleDelete(entity.id)}>
+                    {t("sessionSelector.delete")}
+                  </button>
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
