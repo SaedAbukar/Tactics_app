@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import LanguageSwitcher from "../LanguageSwitcher";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/Auth/AuthContext";
 import "./Header.css";
 
 export default function Header() {

@@ -17,8 +17,9 @@ import { Controls } from "../../components/controls/Controls";
 import { FormationSelector } from "../../components/formation_selector/FormationSelector";
 import { SessionSelector } from "../../components/session/SessionSelector";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/Auth/AuthContext";
 import { ApiSessionSelector } from "../../components/session/ApiSessionSelector";
+import { useFetchWithAuth } from "../../hooks/useFetchWithAuth";
 
 let lastTime = 0;
 let counter = 0;
@@ -35,6 +36,7 @@ let playerNumber = 1;
 export const ApiTacticalEditor: React.FC = () => {
   const { t } = useTranslation("tacticalEditor");
   const { user } = useAuth();
+  const { request } = useFetchWithAuth();
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [balls, setBalls] = useState<Ball[]>([]);
@@ -64,57 +66,38 @@ export const ApiTacticalEditor: React.FC = () => {
   const pitchHeight = 900;
 
   // ------------------------------
-  // API helpers
+  // Fetch user-related data
   // ------------------------------
-  const { token } = useAuth(); // get the latest token from context
-
-  const normalizeSessions = (sessions: Session[] | null) => sessions || [];
-  const normalizePractices = (practices: Practice[] | null) =>
-    practices?.map((p) => ({ ...p, sessions: p.sessions || [] })) || [];
-  const normalizeTactics = (tactics: GameTactic[] | null) =>
-    tactics?.map((t) => ({ ...t, sessions: t.sessions || [] })) || [];
-
-  const apiRequest = async (url: string, options: RequestInit = {}) => {
-    if (!token) throw new Error("No token available");
-
-    const res = await fetch(url, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        ...(options.headers || {}),
-      },
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`API request failed: ${text}`);
-    }
-
-    return res.json();
-  };
-
   const fetchUserData = async () => {
-    if (!user) return;
+    if (!user) return; // you can remove this if not needed
+
     try {
+      // 👇 automatically attaches token, base URL, and handles refresh
       const [sessionsData, practicesData, tacticsData] = await Promise.all([
-        apiRequest("http://localhost:8085/sessions"),
-        apiRequest("http://localhost:8085/practices"),
-        apiRequest("http://localhost:8085/game-tactics"),
+        request("/sessions"),
+        request("/practices"),
+        request("/game-tactics"),
       ]);
 
       setSessionsState(sessionsData || []);
       setPractices(practicesData || []);
       setTactics(tacticsData || []);
-      console.log(sessionsState, practices, tactics);
     } catch (err) {
       console.error("Failed to fetch user data:", err);
     }
   };
 
+  // ------------------------------
+  // Fetch when user changes
+  // ------------------------------
   useEffect(() => {
     fetchUserData();
   }, [user]);
+
+  // Optional: Log updated data once state updates
+  useEffect(() => {
+    console.log("Updated state:", sessionsState, practices, tactics);
+  }, [sessionsState, practices, tactics]);
 
   // ------------------------------
   // Generic Add Entity
@@ -290,48 +273,64 @@ export const ApiTacticalEditor: React.FC = () => {
   };
 
   // ------------------------------
-  // CRUD with API
+  // CRUD with API (using useFetchWithAuth)
   // ------------------------------
   const handleAddEntity = async (entity: Session | Practice | GameTactic) => {
     try {
       let saved: Session | Practice | GameTactic;
+
       if (viewType === "sessions") {
-        saved = await apiRequest("/api/sessions", {
+        saved = await request<Session>("/sessions", {
           method: "POST",
           body: JSON.stringify({ ...entity, steps: savedSteps }),
         });
-        setSessionsState((prev) => [...prev, saved as Session]);
+
+        setSessionsState((prev) =>
+          prev.map((s) =>
+            s.id === (saved as Session).id ? (saved as Session) : s
+          )
+        );
       } else if (viewType === "practices") {
-        saved = await apiRequest("/api/practices", {
+        saved = await request<Practice>("/practices", {
           method: "POST",
           body: JSON.stringify(entity),
         });
-        setPractices((prev) => [...prev, saved as Practice]);
+
+        setPractices((prev) =>
+          prev.map((p) =>
+            p.id === (saved as Practice).id ? (saved as Practice) : p
+          )
+        );
       } else {
-        saved = await apiRequest("/api/gameTactics", {
+        saved = await request<GameTactic>("/gameTactics", {
           method: "POST",
           body: JSON.stringify(entity),
         });
-        setTactics((prev) => [...prev, saved as GameTactic]);
+
+        setTactics((prev) =>
+          prev.map((t) =>
+            t.id === (saved as GameTactic).id ? (saved as GameTactic) : t
+          )
+        );
       }
     } catch (err) {
       console.error("Failed to add entity:", err);
     }
   };
 
+  // ------------------------------
+  // Update Entity
+  // ------------------------------
   const handleUpdateEntity = async (
     updated: Session | Practice | GameTactic
   ) => {
     try {
       if ("steps" in updated) {
         // It's a Session
-        const savedSession: Session = await apiRequest(
-          `/api/sessions/${updated.id}`,
-          {
-            method: "PUT",
-            body: JSON.stringify(updated),
-          }
-        );
+        const savedSession = await request<Session>(`/sessions/${updated.id}`, {
+          method: "PUT",
+          body: JSON.stringify(updated),
+        });
 
         setSessionsState((prev) =>
           prev.map((s) => (s.id === savedSession.id ? savedSession : s))
@@ -357,10 +356,10 @@ export const ApiTacticalEditor: React.FC = () => {
           }))
         );
 
-        // Optional DB update for practices/tactics
+        // Optional DB updates
         practices.forEach((p) => {
           if (p.sessions.some((s) => s.id === savedSession.id)) {
-            apiRequest(`/api/practices/${p.id}`, {
+            request(`/practices/${p.id}`, {
               method: "PUT",
               body: JSON.stringify({
                 ...p,
@@ -371,9 +370,10 @@ export const ApiTacticalEditor: React.FC = () => {
             }).catch(console.error);
           }
         });
+
         tactics.forEach((t) => {
           if (t.sessions.some((s) => s.id === savedSession.id)) {
-            apiRequest(`/api/gameTactics/${t.id}`, {
+            request(`/gameTactics/${t.id}`, {
               method: "PUT",
               body: JSON.stringify({
                 ...t,
@@ -388,20 +388,21 @@ export const ApiTacticalEditor: React.FC = () => {
         // It's a Practice or GameTactic
         let url = "";
         if ("sessions" in updated && viewType === "practices")
-          url = `/api/practices/${updated.id}`;
-        else url = `/api/gameTactics/${updated.id}`;
+          url = `/practices/${updated.id}`;
+        else url = `/gameTactics/${updated.id}`;
 
-        const saved = await apiRequest(url, {
+        const saved = await request<Practice | GameTactic>(url, {
           method: "PUT",
           body: JSON.stringify(updated),
         });
+
         if (viewType === "practices")
           setPractices((prev) =>
-            prev.map((p) => (p.id === saved.id ? saved : p))
+            prev.map((p) => (p.id === saved.id ? (saved as Practice) : p))
           );
         else
           setTactics((prev) =>
-            prev.map((t) => (t.id === saved.id ? saved : t))
+            prev.map((t) => (t.id === saved.id ? (saved as GameTactic) : t))
           );
       }
     } catch (err) {
@@ -410,16 +411,16 @@ export const ApiTacticalEditor: React.FC = () => {
   };
 
   // ------------------------------
-  // Delete Entity Helper
+  // Delete Entity
   // ------------------------------
   const deleteEntity = async (
     entityId: number,
-    sessionId?: number // optional: only used when deleting a session from practice/tactic
+    sessionId?: number // optional
   ) => {
     try {
       if (viewType === "sessions" && !sessionId) {
         // Delete session globally
-        await apiRequest(`/api/sessions/${entityId}`, { method: "DELETE" });
+        await request(`/sessions/${entityId}`, { method: "DELETE" });
 
         // Remove from local state
         setSessionsState((prev) => prev.filter((s) => s.id !== entityId));
@@ -436,12 +437,12 @@ export const ApiTacticalEditor: React.FC = () => {
           }))
         );
       } else if (sessionId) {
-        // Delete session only from a specific practice or tactic
+        // Delete session from a specific practice/tactic
         const url =
           viewType === "practices"
-            ? `/api/practices/${entityId}/sessions/${sessionId}`
-            : `/api/gameTactics/${entityId}/sessions/${sessionId}`;
-        await apiRequest(url, { method: "DELETE" });
+            ? `/practices/${entityId}/sessions/${sessionId}`
+            : `/gameTactics/${entityId}/sessions/${sessionId}`;
+        await request(url, { method: "DELETE" });
 
         if (viewType === "practices") {
           setPractices((prev) =>
@@ -467,12 +468,10 @@ export const ApiTacticalEditor: React.FC = () => {
           );
         }
       } else if (viewType === "practices") {
-        // Delete full practice
-        await apiRequest(`/api/practices/${entityId}`, { method: "DELETE" });
+        await request(`/practices/${entityId}`, { method: "DELETE" });
         setPractices((prev) => prev.filter((p) => p.id !== entityId));
       } else if (viewType === "game tactics") {
-        // Delete full tactic
-        await apiRequest(`/api/gameTactics/${entityId}`, { method: "DELETE" });
+        await request(`/gameTactics/${entityId}`, { method: "DELETE" });
         setTactics((prev) => prev.filter((t) => t.id !== entityId));
       }
     } catch (err) {
@@ -480,9 +479,11 @@ export const ApiTacticalEditor: React.FC = () => {
     }
   };
 
-  // Replace your old handleDeleteEntity
   const handleDeleteEntity = (id: number) => deleteEntity(id);
 
+  // ------------------------------
+  // Add Session to Practice/Tactic
+  // ------------------------------
   const handleAddSessionToEntity = async (
     type: "practice" | "tactic",
     entityId: number,
@@ -491,9 +492,10 @@ export const ApiTacticalEditor: React.FC = () => {
     try {
       const url =
         type === "practice"
-          ? `/api/practices/${entityId}/sessions`
-          : `/api/gameTactics/${entityId}/sessions`;
-      const updatedEntity = await apiRequest(url, {
+          ? `/practices/${entityId}/sessions`
+          : `/gameTactics/${entityId}/sessions`;
+
+      const updatedEntity = await request<Practice | GameTactic>(url, {
         method: "POST",
         body: JSON.stringify({ sessionId: session.id }),
       });

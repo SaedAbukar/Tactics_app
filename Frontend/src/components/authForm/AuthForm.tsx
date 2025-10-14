@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/Auth/AuthContext";
 
 const AuthForm: React.FC = () => {
   const { user, loading, error, login, signup, logout } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState(""); // for notifications
 
   const handleLogin = async () => {
     try {
@@ -16,9 +17,13 @@ const AuthForm: React.FC = () => {
 
   const handleSignup = async () => {
     try {
-      await signup({ email, password });
-    } catch (err) {
+      await signup({ email, password }); // single argument
+      setMessage("Account created successfully! Please log in.");
+      setEmail("");
+      setPassword("");
+    } catch (err: any) {
       console.error(err);
+      setMessage(""); // clear success if there was an error
     }
   };
 
@@ -50,6 +55,7 @@ const AuthForm: React.FC = () => {
             Signup
           </button>
           {error && <p style={{ color: "red" }}>{error.message}</p>}
+          {message && <p style={{ color: "green" }}>{message}</p>}
         </div>
       )}
     </div>

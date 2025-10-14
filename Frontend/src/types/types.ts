@@ -3,9 +3,6 @@ export type User = {
   email: string; // User email
   password: string; // Plain password (for mock/demo purposes)
   role: "user" | "admin"; // User role
-  sessions: Session[]; // Sessions the user has access to
-  practices: Practice[]; // Practices assigned to the user
-  tactics: GameTactic[]; // Game tactics assigned to the user
 };
 
 export type Player = {
@@ -93,3 +90,19 @@ export type GameTactic = {
   description: string;
   sessions: Session[];
 };
+
+export type AuthUser = {
+  id: number;              
+  email: string;
+  role: "USER" | "ADMIN";  
+  name?: string;
+  groups?: any[];          
+  createdAt?: string;      
+  lastLogin?: string;      
+};
+
+
+export type JwtPayload {
+  exp: number;
+  [key: string]: any;
+}
