@@ -1,20 +1,30 @@
 import React, { useState } from "react";
-import type { Step, Session, Practice, GameTactic } from "../../types/types";
-import { useTranslation } from "react-i18next";
-import "./SessionSelector.css";
+import type {
+  Session,
+  Practice,
+  GameTactic,
+  ItemsState,
+  Step,
+} from "../../types/types";
 
 type ViewType = "sessions" | "practices" | "game tactics";
+type Category = "personal" | "userShared" | "groupShared";
 
-interface SessionSelectorProps {
+interface Props {
   viewType: ViewType;
   setViewType: (v: ViewType) => void;
-  sessions: Session[];
-  practices: Practice[];
-  gameTactics: GameTactic[];
-  onSelectSession: (steps: Step[], session: Session) => void;
+
+  sessions: ItemsState<Session>;
+  practices: ItemsState<Practice>;
+  gameTactics: ItemsState<GameTactic>;
+
+  onSelectSession: (steps: Step[]) => void;
   onAddEntity: (entity: Session | Practice | GameTactic) => void;
-  onUpdateEntity: (entity: Session | Practice | GameTactic) => void;
-  onDeleteEntity: (id: number, sessionId?: number) => void;
+  onUpdateEntity: (
+    entity: Session | Practice | GameTactic,
+    category?: Category
+  ) => void;
+  onDeleteEntity: (id: number, category?: Category) => void;
   onAddSessionToEntity: (
     type: "practice" | "tactic",
     entityId: number,
@@ -22,7 +32,7 @@ interface SessionSelectorProps {
   ) => void;
 }
 
-export const ApiSessionSelector: React.FC<SessionSelectorProps> = ({
+export const ApiSessionSelector: React.FC<Props> = ({
   viewType,
   setViewType,
   sessions,
@@ -34,250 +44,314 @@ export const ApiSessionSelector: React.FC<SessionSelectorProps> = ({
   onDeleteEntity,
   onAddSessionToEntity,
 }) => {
-  const { t } = useTranslation("tacticalEditor");
+  const [drafts, setDrafts] = useState<(Session | Practice | GameTactic)[]>([]);
+  const [newDraftId, setNewDraftId] = useState<number | null>(null);
 
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [newName, setNewName] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [updatingId, setUpdatingId] = useState<number | null>(null);
-
-  // Determine which entities to display
-  const entities =
+  const getState = () =>
     viewType === "sessions"
       ? sessions
       : viewType === "practices"
       ? practices
       : gameTactics;
 
-  // ✅ Runtime check: ensure it's always an array
-  const safeEntities = Array.isArray(entities) ? entities : [];
-
-  const handleSelectSession = (session: Session) => {
-    setSelectedId(session.id);
-    setNewName(session.name);
-    setNewDescription(session.description);
-    setUpdatingId(session.id);
-
-    setViewType("sessions");
-    onSelectSession(session.steps, session);
+  const handleEditClick = (item: Session | Practice | GameTactic) => {
+    if (!drafts.some((d) => d.id === item.id)) setDrafts([...drafts, item]);
   };
 
-  const handleAdd = () => {
-    if (!newName.trim())
-      return alert(t("sessionSelector.namePlaceholder", { viewType }));
+  const handleDraftChange = (
+    id: number,
+    field: "name" | "description",
+    value: string
+  ) => {
+    setDrafts((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, [field]: value } : d))
+    );
+  };
 
-    const id = Date.now();
-    if (viewType === "sessions") {
-      onAddEntity({
-        id,
-        name: newName,
-        description: newDescription,
-        steps: [],
-      } as Session);
-    } else if (viewType === "practices") {
-      onAddEntity({
-        id,
-        name: newName,
-        description: newDescription,
-        sessions: [],
-      } as Practice);
-    } else {
-      onAddEntity({
-        id,
-        name: newName,
-        description: newDescription,
-        sessions: [],
-      } as GameTactic);
+  const handleAttachSession = (draftId: number, session: Session) => {
+    setDrafts((prev) =>
+      prev.map((d) => {
+        if (d.id !== draftId) return d;
+        if ("sessions" in d && Array.isArray(d.sessions)) {
+          if (!d.sessions.some((s) => s.id === session.id)) {
+            return { ...d, sessions: [...d.sessions, session] };
+          }
+        }
+        return d;
+      })
+    );
+  };
+
+  const handleRemoveSession = (draftId: number, sessionId: number) => {
+    setDrafts((prev) =>
+      prev.map((d) => {
+        if (d.id !== draftId) return d;
+        if ("sessions" in d && Array.isArray(d.sessions)) {
+          return {
+            ...d,
+            sessions: d.sessions.filter((s) => s.id !== sessionId),
+          };
+        }
+        return d;
+      })
+    );
+  };
+
+  const handleSaveDraft = (draft: Session | Practice | GameTactic) => {
+    if (!draft.name.trim() || !draft.description.trim()) {
+      alert("Please fill all required fields.");
+      return;
+    }
+    if (
+      "steps" in draft &&
+      draft.steps.length === 0 &&
+      viewType === "sessions"
+    ) {
+      alert("Sessions must have at least one step before saving.");
+      return;
     }
 
-    setNewName("");
-    setNewDescription("");
+    if (newDraftId === draft.id) {
+      // New entity
+      onAddEntity(draft);
+      setNewDraftId(null);
+    } else {
+      // Existing entity
+      onUpdateEntity(draft);
+    }
+
+    setDrafts((prev) => prev.filter((d) => d.id !== draft.id));
   };
 
-  const handleUpdate = (id: number) => {
-    setUpdatingId(id);
-    const entity =
-      viewType === "sessions"
-        ? sessions.find((s) => s.id === id)
-        : viewType === "practices"
-        ? practices.find((p) => p.id === id)
-        : gameTactics.find((t) => t.id === id);
-
-    if (!entity) return;
-
-    setNewName(entity.name);
-    setNewDescription(entity.description);
+  const handleCancelDraft = (id: number) => {
+    setDrafts((prev) => prev.filter((d) => d.id !== id));
+    if (newDraftId === id) setNewDraftId(null);
   };
 
-  const handleSaveUpdate = () => {
-    if (updatingId === null) return;
-
-    const updatedEntity =
-      viewType === "sessions"
-        ? ({
-            ...sessions.find((s) => s.id === updatingId),
-            name: newName,
-            description: newDescription,
-          } as Session)
-        : viewType === "practices"
-        ? ({
-            ...practices.find((p) => p.id === updatingId),
-            name: newName,
-            description: newDescription,
-          } as Practice)
-        : ({
-            ...gameTactics.find((t) => t.id === updatingId),
-            name: newName,
-            description: newDescription,
-          } as GameTactic);
-
-    onUpdateEntity(updatedEntity);
-    setNewName("");
-    setNewDescription("");
-    setUpdatingId(null);
+  const handleAddNew = () => {
+    const id = Date.now();
+    const newEntity: Session | Practice | GameTactic = {
+      id,
+      name: "",
+      description: "",
+      steps: viewType === "sessions" ? [] : undefined,
+      sessions: viewType !== "sessions" ? [] : undefined,
+    } as any;
+    setDrafts([...drafts, newEntity]);
+    setNewDraftId(id);
   };
 
-  const handleDelete = (id: number, sessionId?: number) => {
-    onDeleteEntity(id, sessionId);
+  const renderItems = () => {
+    const state = getState();
+
+    return (
+      <ul className="session-list">
+        {(["personal", "userShared", "groupShared"] as Category[]).map(
+          (category) => (
+            <div key={category}>
+              <h4>{category}</h4>
+              {state[category].map((item) => {
+                const draft = drafts.find((d) => d.id === item.id);
+                return draft ? (
+                  <li key={draft.id} className="session-list-item draft">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={draft.name}
+                      onChange={(e) =>
+                        handleDraftChange(draft.id, "name", e.target.value)
+                      }
+                    />
+                    <textarea
+                      placeholder="Description"
+                      value={draft.description}
+                      onChange={(e) =>
+                        handleDraftChange(
+                          draft.id,
+                          "description",
+                          e.target.value
+                        )
+                      }
+                    />
+                    {viewType !== "sessions" && "sessions" in draft && (
+                      <div className="attached-sessions">
+                        <h5>Attached Sessions:</h5>
+                        {draft.sessions?.map((s) => (
+                          <div key={s.id}>
+                            {s.name}{" "}
+                            <button
+                              onClick={() =>
+                                handleRemoveSession(draft.id, s.id)
+                              }
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                        <select
+                          onChange={(e) => {
+                            const s = [
+                              ...sessions.personal,
+                              ...sessions.userShared,
+                              ...sessions.groupShared,
+                            ].find(
+                              (sess) => sess.id === Number(e.target.value)
+                            );
+                            if (s) handleAttachSession(draft.id, s);
+                            e.currentTarget.value = "";
+                          }}
+                        >
+                          <option value="">Add session...</option>
+                          {[
+                            ...sessions.personal,
+                            ...sessions.userShared,
+                            ...sessions.groupShared,
+                          ]
+                            .filter(
+                              (s) =>
+                                !draft.sessions?.some((ds) => ds.id === s.id)
+                            )
+                            .map((s) => (
+                              <option key={s.id} value={s.id}>
+                                {s.name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                    )}
+                    <div className="buttons">
+                      <button onClick={() => handleSaveDraft(draft)}>
+                        Save
+                      </button>
+                      <button onClick={() => handleCancelDraft(draft.id)}>
+                        Cancel
+                      </button>
+                    </div>
+                  </li>
+                ) : (
+                  <li key={item.id} className="session-list-item">
+                    <strong>{item.name}</strong>
+                    <div className="buttons">
+                      {"steps" in item && (
+                        <button onClick={() => onSelectSession(item.steps)}>
+                          Load
+                        </button>
+                      )}
+                      <button onClick={() => handleEditClick(item)}>
+                        Edit
+                      </button>
+                      <button onClick={() => onDeleteEntity(item.id, category)}>
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </div>
+          )
+        )}
+        {/* Draft for newly created entity */}
+        {newDraftId &&
+          drafts
+            .filter((d) => d.id === newDraftId)
+            .map((draft) => (
+              <li key={draft.id} className="session-list-item draft">
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={draft.name}
+                  onChange={(e) =>
+                    handleDraftChange(draft.id, "name", e.target.value)
+                  }
+                />
+                <textarea
+                  placeholder="Description"
+                  value={draft.description}
+                  onChange={(e) =>
+                    handleDraftChange(draft.id, "description", e.target.value)
+                  }
+                />
+                {viewType !== "sessions" && "sessions" in draft && (
+                  <div className="attached-sessions">
+                    <h5>Attached Sessions:</h5>
+                    {draft.sessions?.map((s) => (
+                      <div key={s.id}>
+                        {s.name}{" "}
+                        <button
+                          onClick={() => handleRemoveSession(draft.id, s.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <select
+                      onChange={(e) => {
+                        const s = [
+                          ...sessions.personal,
+                          ...sessions.userShared,
+                          ...sessions.groupShared,
+                        ].find((sess) => sess.id === Number(e.target.value));
+                        if (s) handleAttachSession(draft.id, s);
+                        e.currentTarget.value = "";
+                      }}
+                    >
+                      <option value="">Add session...</option>
+                      {[
+                        ...sessions.personal,
+                        ...sessions.userShared,
+                        ...sessions.groupShared,
+                      ]
+                        .filter(
+                          (s) => !draft.sessions?.some((ds) => ds.id === s.id)
+                        )
+                        .map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                )}
+                <div className="buttons">
+                  <button onClick={() => handleSaveDraft(draft)}>Save</button>
+                  <button onClick={() => handleCancelDraft(draft.id)}>
+                    Cancel
+                  </button>
+                </div>
+              </li>
+            ))}
+      </ul>
+    );
   };
 
   return (
     <div className="session-selector-container">
-      <h3>{t("sessionSelector.manageViewType", { viewType })}</h3>
-
-      <select
-        value={viewType}
-        onChange={(e) => setViewType(e.target.value as ViewType)}
-      >
-        <option value="sessions">
-          {t("sessionSelector.manageViewType", { viewType: "sessions" })}
-        </option>
-        <option value="practices">
-          {t("sessionSelector.manageViewType", { viewType: "practices" })}
-        </option>
-        <option value="game tactics">
-          {t("sessionSelector.manageViewType", { viewType: "game tactics" })}
-        </option>
-      </select>
-
-      <div className="new-session">
-        <input
-          type="text"
-          placeholder={t("sessionSelector.namePlaceholder", { viewType })}
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-        />
-        <textarea
-          placeholder={t("sessionSelector.descriptionPlaceholder")}
-          value={newDescription}
-          onChange={(e) => setNewDescription(e.target.value)}
-        />
-        {updatingId === null ? (
-          <button className="light-button full-width" onClick={handleAdd}>
-            {t("sessionSelector.add")}
-          </button>
-        ) : (
-          <button
-            className="light-button full-width"
-            onClick={handleSaveUpdate}
-          >
-            {t("sessionSelector.saveUpdate")}
-          </button>
-        )}
+      <div className="view-type-buttons">
+        <button
+          onClick={() => setViewType("sessions")}
+          className={viewType === "sessions" ? "selected" : ""}
+        >
+          Sessions
+        </button>
+        <button
+          onClick={() => setViewType("practices")}
+          className={viewType === "practices" ? "selected" : ""}
+        >
+          Practices
+        </button>
+        <button
+          onClick={() => setViewType("game tactics")}
+          className={viewType === "game tactics" ? "selected" : ""}
+        >
+          Game Tactics
+        </button>
       </div>
 
-      <ul className="session-list">
-        {safeEntities.map((entity) => {
-          // ✅ Nested sessions array runtime check
-          const entitySessions = Array.isArray(
-            (entity as Practice | GameTactic).sessions
-          )
-            ? (entity as Practice | GameTactic).sessions
-            : [];
+      {renderItems()}
 
-          return (
-            <li
-              key={entity.id}
-              className={selectedId === entity.id ? "selected" : ""}
-            >
-              <strong>{entity.name}</strong>
-              <textarea
-                value={entity.description}
-                onChange={(e) =>
-                  onUpdateEntity({ ...entity, description: e.target.value })
-                }
-              />
-
-              {viewType === "sessions" && (
-                <button onClick={() => handleSelectSession(entity as Session)}>
-                  {t("sessionSelector.select")}
-                </button>
-              )}
-
-              {(viewType === "practices" || viewType === "game tactics") && (
-                <>
-                  <div className="current-sessions">
-                    {entitySessions.map((s) => (
-                      <div key={s.id} className="session-item">
-                        <button
-                          onClick={() => handleSelectSession(s)}
-                          className="light-button"
-                        >
-                          {s.name}
-                        </button>
-                        <button
-                          className="delete-session"
-                          onClick={() => handleDelete(entity.id, s.id)}
-                        >
-                          {t("sessionSelector.delete")}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <select
-                    onChange={(e) => {
-                      const sessionToAdd = sessions.find(
-                        (s) => s.id === Number(e.target.value)
-                      );
-                      if (!sessionToAdd) return;
-                      onAddSessionToEntity(
-                        viewType === "practices" ? "practice" : "tactic",
-                        entity.id,
-                        sessionToAdd
-                      );
-                    }}
-                  >
-                    <option value="">
-                      {t("sessionSelector.addSessionPlaceholder")}
-                    </option>
-                    {sessions
-                      .filter(
-                        (s) => !entitySessions.some((es) => es.id === s.id)
-                      )
-                      .map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.name}
-                        </option>
-                      ))}
-                  </select>
-                </>
-              )}
-
-              {!(viewType === "practices" || viewType === "game tactics") && (
-                <div className="buttons">
-                  <button onClick={() => handleUpdate(entity.id)}>
-                    {t("sessionSelector.update")}
-                  </button>
-                  <button onClick={() => handleDelete(entity.id)}>
-                    {t("sessionSelector.delete")}
-                  </button>
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      <div className="new-session">
+        <button onClick={handleAddNew}>Add New</button>
+      </div>
     </div>
   );
 };

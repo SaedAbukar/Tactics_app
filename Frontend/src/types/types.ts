@@ -1,9 +1,14 @@
-export type User = {
-  id: string; // Unique user ID
-  email: string; // User email
-  password: string; // Plain password (for mock/demo purposes)
-  role: "user" | "admin"; // User role
-};
+// ------------------------------
+// Core Types
+// ------------------------------
+
+export type EntityType = "player" | "ball" | "goal" | "cone";
+
+export type Position = { x: number; y: number }; // x,y as percentages (0–1)
+
+// ------------------------------
+// Player / Ball / Goal / Cone / Team
+// ------------------------------
 
 export type Player = {
   id: number;
@@ -11,7 +16,7 @@ export type Player = {
   x: number;
   y: number;
   color: string;
-  team?: Team;
+  teamName?: string;
 };
 
 export type Ball = {
@@ -43,24 +48,26 @@ export type Team = {
   color: string;
 };
 
-export type DragItem = {
-  type: "player" | "ball" | "goal" | "cone";
-  id: number;
-};
+// ------------------------------
+// Formations
+// ------------------------------
 
-export type Position = { x: number; y: number }; // x,y as percentages (0–1)
-
-export type TeamFormation = {
-  team: Team;
-  positions: Position[];
+export type FormationPosition = {
+  x: number;
+  y: number;
+  teamName?: string;
+  teamColor?: string;
 };
 
 export type Formation = {
+  id?: number;
   name: string;
-  teams: TeamFormation[];
+  positions: FormationPosition[];
 };
 
-export type EntityType = "player" | "ball" | "goal" | "cone";
+// ------------------------------
+// Step
+// ------------------------------
 
 export type Step = {
   players: Player[];
@@ -68,7 +75,12 @@ export type Step = {
   goals: Goal[];
   cones: Cone[];
   teams: Team[];
+  formations: Formation[];
 };
+
+// ------------------------------
+// Entities
+// ------------------------------
 
 export type Session = {
   id: number;
@@ -81,6 +93,7 @@ export type Practice = {
   id: number;
   name: string;
   description: string;
+  isPremade?: boolean;
   sessions: Session[];
 };
 
@@ -88,21 +101,35 @@ export type GameTactic = {
   id: number;
   name: string;
   description: string;
+  isPremade?: boolean;
   sessions: Session[];
 };
 
+// ------------------------------
+// Auth / Users
+// ------------------------------
+
 export type AuthUser = {
-  id: number;              
+  id: number;
   email: string;
-  role: "USER" | "ADMIN";  
+  role: "USER" | "ADMIN";
   name?: string;
-  groups?: any[];          
-  createdAt?: string;      
-  lastLogin?: string;      
+  groups?: any[];
+  createdAt?: string;
+  lastLogin?: string;
 };
 
-
-export type JwtPayload {
+export type JwtPayload = {
   exp: number;
   [key: string]: any;
-}
+};
+
+// ------------------------------
+// State
+// ------------------------------
+
+export type ItemsState<T> = {
+  personal: T[];
+  userShared: T[];
+  groupShared: T[];
+};

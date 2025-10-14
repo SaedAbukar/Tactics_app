@@ -11,15 +11,16 @@ import type {
   GameTactic,
   EntityType,
   Team,
+  ItemsState,
 } from "../../types/types";
 import { Pitch } from "../../components/pitch/Pitch";
 import { Controls } from "../../components/controls/Controls";
 import { FormationSelector } from "../../components/formation_selector/FormationSelector";
-import { SessionSelector } from "../../components/session/SessionSelector";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/Auth/AuthContext";
 import { ApiSessionSelector } from "../../components/session/ApiSessionSelector";
 import { useFetchWithAuth } from "../../hooks/useFetchWithAuth";
+import { formations } from "../../components/formation_selector/formation";
 
 let lastTime = 0;
 let counter = 0;
@@ -38,6 +39,9 @@ export const ApiTacticalEditor: React.FC = () => {
   const { user } = useAuth();
   const { request } = useFetchWithAuth();
 
+  // ------------------------------
+  // Pitch and animation states
+  // ------------------------------
   const [players, setPlayers] = useState<Player[]>([]);
   const [balls, setBalls] = useState<Ball[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -48,13 +52,7 @@ export const ApiTacticalEditor: React.FC = () => {
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [currentStepIndex, setCurrentStepIndex] = useState<number | null>(null);
-
-  const [viewType, setViewType] = useState<
-    "sessions" | "practices" | "game tactics"
-  >("sessions");
-  const [sessionsState, setSessionsState] = useState<Session[]>([]);
-  const [practices, setPractices] = useState<Practice[]>([]);
-  const [tactics, setTactics] = useState<GameTactic[]>([]);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
 
   const dragRef = useRef<any>(null);
   const animRef = useRef<number | null>(null);
@@ -66,41 +64,77 @@ export const ApiTacticalEditor: React.FC = () => {
   const pitchHeight = 900;
 
   // ------------------------------
+  // View type: sessions / practices / game tactics
+  // ------------------------------
+  const [viewType, setViewType] = useState<
+    "sessions" | "practices" | "game tactics"
+  >("sessions");
+
+  // ------------------------------
+  // Items states: personal / userShared / groupShared
+  // ------------------------------
+  const [sessionsState, setSessionsState] = useState<ItemsState<Session>>({
+    personal: [],
+    userShared: [],
+    groupShared: [],
+  });
+  const [practicesState, setPracticesState] = useState<ItemsState<Practice>>({
+    personal: [],
+    userShared: [],
+    groupShared: [],
+  });
+  const [tacticsState, setTacticsState] = useState<ItemsState<GameTactic>>({
+    personal: [],
+    userShared: [],
+    groupShared: [],
+  });
+
+  // ------------------------------
   // Fetch user-related data
   // ------------------------------
   const fetchUserData = async () => {
-    if (!user) return; // you can remove this if not needed
+    if (!user) return;
 
     try {
-      // 👇 automatically attaches token, base URL, and handles refresh
       const [sessionsData, practicesData, tacticsData] = await Promise.all([
         request("/sessions"),
         request("/practices"),
         request("/game-tactics"),
       ]);
 
-      setSessionsState(sessionsData || []);
-      setPractices(practicesData || []);
-      setTactics(tacticsData || []);
+      setSessionsState({
+        personal: sessionsData.personalItems || [],
+        userShared: sessionsData.userSharedItems || [],
+        groupShared: sessionsData.groupSharedItems || [],
+      });
+
+      setPracticesState({
+        personal: practicesData.personalItems || [],
+        userShared: practicesData.userSharedItems || [],
+        groupShared: practicesData.groupSharedItems || [],
+      });
+
+      setTacticsState({
+        personal: tacticsData.personalItems || [],
+        userShared: tacticsData.userSharedItems || [],
+        groupShared: tacticsData.groupSharedItems || [],
+      });
     } catch (err) {
       console.error("Failed to fetch user data:", err);
     }
   };
 
-  // ------------------------------
-  // Fetch when user changes
-  // ------------------------------
   useEffect(() => {
     fetchUserData();
   }, [user]);
 
-  // Optional: Log updated data once state updates
+  // Optional logging
   useEffect(() => {
-    console.log("Updated state:", sessionsState, practices, tactics);
-  }, [sessionsState, practices, tactics]);
+    console.log("Updated states:", sessionsState, practicesState, tacticsState);
+  }, [sessionsState, practicesState, tacticsState]);
 
   // ------------------------------
-  // Generic Add Entity
+  // Generic Add Entity to pitch
   // ------------------------------
   const addEntity = (
     type: EntityType,
@@ -117,7 +151,7 @@ export const ApiTacticalEditor: React.FC = () => {
           x: 50 + players.length * 50 + i * 20,
           y: 100 + players.length * 30 + i * 10,
           color: team?.color || color || "white",
-          team,
+          teamName: team?.name,
         });
       }
       setPlayers((prev) => [...prev, ...newPlayers]);
@@ -182,6 +216,7 @@ export const ApiTacticalEditor: React.FC = () => {
       goals: goals.map((g) => ({ ...g })),
       cones: cones.map((c) => ({ ...c })),
       teams: teams.map((t) => ({ ...t })),
+      formations: formations.map((f) => ({ ...f })),
     };
     if (currentStepIndex !== null) {
       setSavedSteps((prev) =>
@@ -273,217 +308,192 @@ export const ApiTacticalEditor: React.FC = () => {
   };
 
   // ------------------------------
-  // CRUD with API (using useFetchWithAuth)
+  // CRUD: Add / Update / Delete
   // ------------------------------
-  const handleAddEntity = async (entity: Session | Practice | GameTactic) => {
+
+  type Entity = Session | Practice | GameTactic;
+
+  type Category = "personal" | "userShared" | "groupShared";
+
+  function getItemsState<T extends Entity>(): [
+    ItemsState<T>,
+    React.Dispatch<React.SetStateAction<ItemsState<T>>>
+  ] {
+    if (viewType === "sessions")
+      return [
+        sessionsState as ItemsState<T>,
+        setSessionsState as React.Dispatch<React.SetStateAction<ItemsState<T>>>,
+      ];
+    if (viewType === "practices")
+      return [
+        practicesState as ItemsState<T>,
+        setPracticesState as React.Dispatch<
+          React.SetStateAction<ItemsState<T>>
+        >,
+      ];
+    return [
+      tacticsState as ItemsState<T>,
+      setTacticsState as React.Dispatch<React.SetStateAction<ItemsState<T>>>,
+    ];
+  }
+
+  const handleAddEntity = async (entity: Entity) => {
     try {
-      let saved: Session | Practice | GameTactic;
+      let url = "";
+      let payload: any;
 
       if (viewType === "sessions") {
-        saved = await request<Session>("/sessions", {
-          method: "POST",
-          body: JSON.stringify({ ...entity, steps: savedSteps }),
-        });
-
-        setSessionsState((prev) =>
-          prev.map((s) =>
-            s.id === (saved as Session).id ? (saved as Session) : s
-          )
-        );
+        url = "/sessions";
+        payload = { ...entity, steps: savedSteps }; // include steps for sessions
       } else if (viewType === "practices") {
-        saved = await request<Practice>("/practices", {
-          method: "POST",
-          body: JSON.stringify(entity),
-        });
-
-        setPractices((prev) =>
-          prev.map((p) =>
-            p.id === (saved as Practice).id ? (saved as Practice) : p
-          )
-        );
+        url = "/practices";
+        payload = {
+          name: entity.name,
+          description: entity.description,
+          isPremade: (entity as Practice).isPremade ?? false,
+          sessions: (entity as Practice).sessions ?? [],
+        };
       } else {
-        saved = await request<GameTactic>("/gameTactics", {
-          method: "POST",
-          body: JSON.stringify(entity),
-        });
+        url = "/game-tactics";
+        payload = {
+          name: entity.name,
+          description: entity.description,
+          isPremade: (entity as GameTactic).isPremade ?? false,
+          sessions: (entity as GameTactic).sessions ?? [],
+        };
+      }
 
-        setTactics((prev) =>
-          prev.map((t) =>
-            t.id === (saved as GameTactic).id ? (saved as GameTactic) : t
-          )
-        );
+      const saved = await request<Entity>(url, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      // --- Everything below stays exactly the same ---
+      if (viewType === "sessions") {
+        const [, setState] = getItemsState<Session>();
+        setState((prev) => ({
+          ...prev,
+          personal: [...prev.personal, saved as Session],
+        }));
+      } else if (viewType === "practices") {
+        const [, setState] = getItemsState<Practice>();
+        setState((prev) => ({
+          ...prev,
+          personal: [...prev.personal, saved as Practice],
+        }));
+      } else {
+        const [, setState] = getItemsState<GameTactic>();
+        setState((prev) => ({
+          ...prev,
+          personal: [...prev.personal, saved as GameTactic],
+        }));
       }
     } catch (err) {
       console.error("Failed to add entity:", err);
     }
   };
 
-  // ------------------------------
-  // Update Entity
-  // ------------------------------
   const handleUpdateEntity = async (
-    updated: Session | Practice | GameTactic
+    updated: Entity,
+    category: Category = "personal"
   ) => {
     try {
-      if ("steps" in updated) {
-        // It's a Session
-        const savedSession = await request<Session>(`/sessions/${updated.id}`, {
-          method: "PUT",
-          body: JSON.stringify(updated),
-        });
+      let url = "";
+      let payload: any;
 
-        setSessionsState((prev) =>
-          prev.map((s) => (s.id === savedSession.id ? savedSession : s))
-        );
-
-        // Update in practices
-        setPractices((prev) =>
-          prev.map((p) => ({
-            ...p,
-            sessions: p.sessions.map((s) =>
-              s.id === savedSession.id ? savedSession : s
-            ),
-          }))
-        );
-
-        // Update in tactics
-        setTactics((prev) =>
-          prev.map((t) => ({
-            ...t,
-            sessions: t.sessions.map((s) =>
-              s.id === savedSession.id ? savedSession : s
-            ),
-          }))
-        );
-
-        // Optional DB updates
-        practices.forEach((p) => {
-          if (p.sessions.some((s) => s.id === savedSession.id)) {
-            request(`/practices/${p.id}`, {
-              method: "PUT",
-              body: JSON.stringify({
-                ...p,
-                sessions: p.sessions.map((s) =>
-                  s.id === savedSession.id ? savedSession : s
-                ),
-              }),
-            }).catch(console.error);
-          }
-        });
-
-        tactics.forEach((t) => {
-          if (t.sessions.some((s) => s.id === savedSession.id)) {
-            request(`/gameTactics/${t.id}`, {
-              method: "PUT",
-              body: JSON.stringify({
-                ...t,
-                sessions: t.sessions.map((s) =>
-                  s.id === savedSession.id ? savedSession : s
-                ),
-              }),
-            }).catch(console.error);
-          }
-        });
+      if (viewType === "sessions") {
+        url = `/sessions/${updated.id}`;
+        payload = updated;
+      } else if (viewType === "practices") {
+        url = `/practices/${updated.id}`;
+        payload = {
+          name: updated.name,
+          description: updated.description,
+          isPremade: (updated as Practice).isPremade ?? false,
+          sessions: (updated as Practice).sessions ?? [],
+        };
       } else {
-        // It's a Practice or GameTactic
-        let url = "";
-        if ("sessions" in updated && viewType === "practices")
-          url = `/practices/${updated.id}`;
-        else url = `/gameTactics/${updated.id}`;
+        url = `/game-tactics/${updated.id}`;
+        payload = {
+          name: updated.name,
+          description: updated.description,
+          isPremade: (updated as GameTactic).isPremade ?? false,
+          sessions: (updated as GameTactic).sessions ?? [],
+        };
+      }
 
-        const saved = await request<Practice | GameTactic>(url, {
-          method: "PUT",
-          body: JSON.stringify(updated),
-        });
+      const saved = await request<Entity>(url, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
 
-        if (viewType === "practices")
-          setPractices((prev) =>
-            prev.map((p) => (p.id === saved.id ? (saved as Practice) : p))
-          );
-        else
-          setTactics((prev) =>
-            prev.map((t) => (t.id === saved.id ? (saved as GameTactic) : t))
-          );
+      // --- Everything below stays exactly the same ---
+      if (viewType === "sessions") {
+        const [, setState] = getItemsState<Session>();
+        setState((prev) => ({
+          ...prev,
+          [category]: prev[category].map((item) =>
+            item.id === saved.id ? (saved as Session) : item
+          ),
+        }));
+      } else if (viewType === "practices") {
+        const [, setState] = getItemsState<Practice>();
+        setState((prev) => ({
+          ...prev,
+          [category]: prev[category].map((item) =>
+            item.id === saved.id ? (saved as Practice) : item
+          ),
+        }));
+      } else {
+        const [, setState] = getItemsState<GameTactic>();
+        setState((prev) => ({
+          ...prev,
+          [category]: prev[category].map((item) =>
+            item.id === saved.id ? (saved as GameTactic) : item
+          ),
+        }));
       }
     } catch (err) {
       console.error("Failed to update entity:", err);
     }
   };
 
-  // ------------------------------
-  // Delete Entity
-  // ------------------------------
-  const deleteEntity = async (
+  const handleDeleteEntity = async (
     entityId: number,
-    sessionId?: number // optional
+    category: Category = "personal"
   ) => {
     try {
-      if (viewType === "sessions" && !sessionId) {
-        // Delete session globally
-        await request(`/sessions/${entityId}`, { method: "DELETE" });
+      let url = "";
+      if (viewType === "sessions") url = `/sessions/${entityId}`;
+      else if (viewType === "practices") url = `/practices/${entityId}`;
+      else url = `/game-tactics/${entityId}`;
 
-        // Remove from local state
-        setSessionsState((prev) => prev.filter((s) => s.id !== entityId));
-        setPractices((prev) =>
-          prev.map((p) => ({
-            ...p,
-            sessions: p.sessions.filter((s) => s.id !== entityId),
-          }))
-        );
-        setTactics((prev) =>
-          prev.map((t) => ({
-            ...t,
-            sessions: t.sessions.filter((s) => s.id !== entityId),
-          }))
-        );
-      } else if (sessionId) {
-        // Delete session from a specific practice/tactic
-        const url =
-          viewType === "practices"
-            ? `/practices/${entityId}/sessions/${sessionId}`
-            : `/gameTactics/${entityId}/sessions/${sessionId}`;
-        await request(url, { method: "DELETE" });
+      await request(url, { method: "DELETE" });
 
-        if (viewType === "practices") {
-          setPractices((prev) =>
-            prev.map((p) =>
-              p.id === entityId
-                ? {
-                    ...p,
-                    sessions: p.sessions.filter((s) => s.id !== sessionId),
-                  }
-                : p
-            )
-          );
-        } else {
-          setTactics((prev) =>
-            prev.map((t) =>
-              t.id === entityId
-                ? {
-                    ...t,
-                    sessions: t.sessions.filter((s) => s.id !== sessionId),
-                  }
-                : t
-            )
-          );
-        }
+      if (viewType === "sessions") {
+        const [, setState] = getItemsState<Session>();
+        setState((prev) => ({
+          ...prev,
+          [category]: prev[category].filter((item) => item.id !== entityId),
+        }));
       } else if (viewType === "practices") {
-        await request(`/practices/${entityId}`, { method: "DELETE" });
-        setPractices((prev) => prev.filter((p) => p.id !== entityId));
-      } else if (viewType === "game tactics") {
-        await request(`/gameTactics/${entityId}`, { method: "DELETE" });
-        setTactics((prev) => prev.filter((t) => t.id !== entityId));
+        const [, setState] = getItemsState<Practice>();
+        setState((prev) => ({
+          ...prev,
+          [category]: prev[category].filter((item) => item.id !== entityId),
+        }));
+      } else {
+        const [, setState] = getItemsState<GameTactic>();
+        setState((prev) => ({
+          ...prev,
+          [category]: prev[category].filter((item) => item.id !== entityId),
+        }));
       }
     } catch (err) {
       console.error("Failed to delete entity:", err);
     }
   };
 
-  const handleDeleteEntity = (id: number) => deleteEntity(id);
-
-  // ------------------------------
-  // Add Session to Practice/Tactic
-  // ------------------------------
   const handleAddSessionToEntity = async (
     type: "practice" | "tactic",
     entityId: number,
@@ -493,21 +503,28 @@ export const ApiTacticalEditor: React.FC = () => {
       const url =
         type === "practice"
           ? `/practices/${entityId}/sessions`
-          : `/gameTactics/${entityId}/sessions`;
+          : `/game-tactics/${entityId}/sessions`;
 
       const updatedEntity = await request<Practice | GameTactic>(url, {
         method: "POST",
         body: JSON.stringify({ sessionId: session.id }),
       });
 
-      if (type === "practice")
-        setPractices((prev) =>
-          prev.map((p) => (p.id === entityId ? updatedEntity : p))
-        );
-      else
-        setTactics((prev) =>
-          prev.map((t) => (t.id === entityId ? updatedEntity : t))
-        );
+      if (type === "practice") {
+        setPracticesState((prev) => ({
+          ...prev,
+          personal: prev.personal.map((p) =>
+            p.id === entityId ? updatedEntity : p
+          ),
+        }));
+      } else {
+        setTacticsState((prev) => ({
+          ...prev,
+          personal: prev.personal.map((t) =>
+            t.id === entityId ? updatedEntity : t
+          ),
+        }));
+      }
     } catch (err) {
       console.error("Failed to add session to entity:", err);
     }
@@ -523,8 +540,8 @@ export const ApiTacticalEditor: React.FC = () => {
           viewType={viewType}
           setViewType={setViewType}
           sessions={sessionsState}
-          practices={practices}
-          gameTactics={tactics}
+          practices={practicesState}
+          gameTactics={tacticsState}
           onSelectSession={(steps: Step[]) => {
             if (!steps.length) return;
             const firstStep = steps[0];
