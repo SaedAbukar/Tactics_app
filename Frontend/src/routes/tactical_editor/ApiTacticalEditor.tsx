@@ -210,21 +210,52 @@ export const ApiTacticalEditor: React.FC = () => {
   };
 
   const handleSaveStep = () => {
+    // Build a fully safe StepRequest-like object
     const newStep: Step = {
-      players: players.map((p) => ({ ...p })),
-      balls: balls.map((b) => ({ ...b })),
-      goals: goals.map((g) => ({ ...g })),
-      cones: cones.map((c) => ({ ...c })),
-      teams: teams.map((t) => ({ ...t })),
-      formations: formations.map((f) => ({ ...f })),
+      players: players.map((p) => ({ ...p })) || [],
+      balls: balls.map((b) => ({ ...b })) || [],
+      goals: goals.map((g) => ({ ...g })) || [],
+      cones: cones.map((c) => ({ ...c })) || [],
+      teams: teams.map((t) => ({ ...t })) || [],
+      formations:
+        formations.map((f) => ({ ...f, positions: f.positions || [] })) || [],
     };
-    if (currentStepIndex !== null) {
-      setSavedSteps((prev) =>
-        prev.map((s, i) => (i === currentStepIndex ? newStep : s))
-      );
-    } else {
-      setSavedSteps((prev) => [...prev, newStep]);
-    }
+
+    setSavedSteps((prev) => {
+      const updatedSteps =
+        currentStepIndex !== null
+          ? prev.map((s, i) => (i === currentStepIndex ? newStep : s))
+          : [...prev, newStep];
+
+      // Update the currently selected session if any
+      if (selectedSession) {
+        const safeSession: Session = {
+          ...selectedSession,
+          steps: updatedSteps,
+          name: selectedSession.name || "Untitled Session",
+          description: selectedSession.description || "No description",
+        };
+
+        setSelectedSession(safeSession);
+
+        // Also update in sessionsState (all categories)
+        setSessionsState((prevSessions) => ({
+          personal: prevSessions.personal.map((s) =>
+            s.id === safeSession.id ? safeSession : s
+          ),
+          userShared: prevSessions.userShared.map((s) =>
+            s.id === safeSession.id ? safeSession : s
+          ),
+          groupShared: prevSessions.groupShared.map((s) =>
+            s.id === safeSession.id ? safeSession : s
+          ),
+        }));
+      }
+
+      return updatedSteps;
+    });
+
+    // Reset current step selection
     setCurrentStepIndex(null);
   };
 
@@ -337,6 +368,26 @@ export const ApiTacticalEditor: React.FC = () => {
     ];
   }
 
+  // ------------------------------
+  // Utility: ensure all required fields are populated
+  // ------------------------------
+
+  const buildSafeStep = (step: Step): Step => ({
+    players: step.players ?? [],
+    balls: step.balls ?? [],
+    goals: step.goals ?? [],
+    cones: step.cones ?? [],
+    teams: step.teams ?? [],
+    formations: step.formations ?? [],
+  });
+
+  const buildSafeSession = (session: Session): Session => ({
+    id: session.id, // optional for new session
+    name: session.name || "Untitled Session",
+    description: session.description || "No description",
+    steps: (session.steps ?? []).map(buildSafeStep),
+  });
+
   const handleAddEntity = async (entity: Entity) => {
     try {
       let url = "";
@@ -344,22 +395,22 @@ export const ApiTacticalEditor: React.FC = () => {
 
       if (viewType === "sessions") {
         url = "/sessions";
-        payload = { ...entity, steps: savedSteps }; // include steps for sessions
+        payload = buildSafeSession(entity as Session);
       } else if (viewType === "practices") {
         url = "/practices";
         payload = {
-          name: entity.name,
-          description: entity.description,
+          name: entity.name || "Untitled Practice",
+          description: entity.description || "No description",
           isPremade: (entity as Practice).isPremade ?? false,
-          sessions: (entity as Practice).sessions ?? [],
+          sessions: (entity as Practice).sessions.map(buildSafeSession),
         };
       } else {
         url = "/game-tactics";
         payload = {
-          name: entity.name,
-          description: entity.description,
+          name: entity.name || "Untitled Tactic",
+          description: entity.description || "No description",
           isPremade: (entity as GameTactic).isPremade ?? false,
-          sessions: (entity as GameTactic).sessions ?? [],
+          sessions: (entity as GameTactic).sessions.map(buildSafeSession),
         };
       }
 
@@ -368,26 +419,11 @@ export const ApiTacticalEditor: React.FC = () => {
         body: JSON.stringify(payload),
       });
 
-      // --- Everything below stays exactly the same ---
-      if (viewType === "sessions") {
-        const [, setState] = getItemsState<Session>();
-        setState((prev) => ({
-          ...prev,
-          personal: [...prev.personal, saved as Session],
-        }));
-      } else if (viewType === "practices") {
-        const [, setState] = getItemsState<Practice>();
-        setState((prev) => ({
-          ...prev,
-          personal: [...prev.personal, saved as Practice],
-        }));
-      } else {
-        const [, setState] = getItemsState<GameTactic>();
-        setState((prev) => ({
-          ...prev,
-          personal: [...prev.personal, saved as GameTactic],
-        }));
-      }
+      const [, setState] = getItemsState<Entity>();
+      setState((prev) => ({
+        ...prev,
+        personal: [...prev.personal, saved],
+      }));
     } catch (err) {
       console.error("Failed to add entity:", err);
     }
@@ -403,22 +439,22 @@ export const ApiTacticalEditor: React.FC = () => {
 
       if (viewType === "sessions") {
         url = `/sessions/${updated.id}`;
-        payload = updated;
+        payload = buildSafeSession(updated as Session);
       } else if (viewType === "practices") {
         url = `/practices/${updated.id}`;
         payload = {
-          name: updated.name,
-          description: updated.description,
+          name: updated.name || "Untitled Practice",
+          description: updated.description || "No description",
           isPremade: (updated as Practice).isPremade ?? false,
-          sessions: (updated as Practice).sessions ?? [],
+          sessions: (updated as Practice).sessions.map(buildSafeSession),
         };
       } else {
         url = `/game-tactics/${updated.id}`;
         payload = {
-          name: updated.name,
-          description: updated.description,
+          name: updated.name || "Untitled Tactic",
+          description: updated.description || "No description",
           isPremade: (updated as GameTactic).isPremade ?? false,
-          sessions: (updated as GameTactic).sessions ?? [],
+          sessions: (updated as GameTactic).sessions.map(buildSafeSession),
         };
       }
 
@@ -427,32 +463,13 @@ export const ApiTacticalEditor: React.FC = () => {
         body: JSON.stringify(payload),
       });
 
-      // --- Everything below stays exactly the same ---
-      if (viewType === "sessions") {
-        const [, setState] = getItemsState<Session>();
-        setState((prev) => ({
-          ...prev,
-          [category]: prev[category].map((item) =>
-            item.id === saved.id ? (saved as Session) : item
-          ),
-        }));
-      } else if (viewType === "practices") {
-        const [, setState] = getItemsState<Practice>();
-        setState((prev) => ({
-          ...prev,
-          [category]: prev[category].map((item) =>
-            item.id === saved.id ? (saved as Practice) : item
-          ),
-        }));
-      } else {
-        const [, setState] = getItemsState<GameTactic>();
-        setState((prev) => ({
-          ...prev,
-          [category]: prev[category].map((item) =>
-            item.id === saved.id ? (saved as GameTactic) : item
-          ),
-        }));
-      }
+      const [, setState] = getItemsState<Entity>();
+      setState((prev) => ({
+        ...prev,
+        [category]: prev[category].map((item) =>
+          item.id === saved.id ? saved : item
+        ),
+      }));
     } catch (err) {
       console.error("Failed to update entity:", err);
     }
@@ -470,25 +487,11 @@ export const ApiTacticalEditor: React.FC = () => {
 
       await request(url, { method: "DELETE" });
 
-      if (viewType === "sessions") {
-        const [, setState] = getItemsState<Session>();
-        setState((prev) => ({
-          ...prev,
-          [category]: prev[category].filter((item) => item.id !== entityId),
-        }));
-      } else if (viewType === "practices") {
-        const [, setState] = getItemsState<Practice>();
-        setState((prev) => ({
-          ...prev,
-          [category]: prev[category].filter((item) => item.id !== entityId),
-        }));
-      } else {
-        const [, setState] = getItemsState<GameTactic>();
-        setState((prev) => ({
-          ...prev,
-          [category]: prev[category].filter((item) => item.id !== entityId),
-        }));
-      }
+      const [, setState] = getItemsState<Entity>();
+      setState((prev) => ({
+        ...prev,
+        [category]: prev[category].filter((item) => item.id !== entityId),
+      }));
     } catch (err) {
       console.error("Failed to delete entity:", err);
     }

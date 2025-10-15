@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import type { Team } from "../../types/types";
 import { useTranslation } from "react-i18next";
+import { useFetchWithAuth } from "../../hooks/useFetchWithAuth";
 import "./FormationSelector.css";
 
 interface Formation {
@@ -39,6 +40,8 @@ export const FormationSelector: React.FC<FormationSelectorProps> = ({
   onAddFormation,
 }) => {
   const { t } = useTranslation("tacticalEditor");
+  const { request } = useFetchWithAuth();
+
   const [formations, setFormations] = useState<Formation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,72 +50,68 @@ export const FormationSelector: React.FC<FormationSelectorProps> = ({
     undefined
   );
   const [selectedFormation, setSelectedFormation] = useState<string>("");
+  const [newFormationName, setNewFormationName] = useState<string>("");
 
-  useEffect(() => {
-    const fetchFormations = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = localStorage.getItem("jwtToken");
-        if (!token) throw new Error("No JWT token found");
+  // useEffect(() => {
+  //   const fetchFormations = async () => {
+  //     setLoading(true);
+  //     setError(null);
+  //     try {
+  //       const data: Formation[] = await request("/formations");
+  //       setFormations(data);
+  //     } catch (err: any) {
+  //       console.error("Failed to fetch formations:", err);
+  //       setFormations([]);
+  //       setError("Failed to load formations. You can still add manually.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-        const res = await fetch("/api/formations", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok)
-          throw new Error(`Failed to fetch formations: ${res.statusText}`);
-        const data: Formation[] = await res.json();
-        setFormations(data);
-      } catch (err: any) {
-        setError(err.message || "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFormations();
-  }, []);
+  //   fetchFormations();
+  // }, [request]);
 
   const handleAddFormation = () => {
-    if (!selectedFormation)
-      return alert(t("formationSelector.selectFormationAlert"));
-
-    const formation = formations.find((f) => f.name === selectedFormation);
-    if (!formation) return alert(t("formationSelector.invalidFormationAlert"));
-
     const teamObj = teams.find((t) => t.id === selectedTeamId);
     const defaultColor = "white";
 
-    const scaledPlayers = formation.teams.flatMap(() =>
-      formation.teams[0].positions.map((pos) => {
-        let x = pos.x * pitchWidth;
-        let y = pos.y * pitchHeight;
+    let scaledPlayers: any[] = [];
 
-        if (currentPlayersCount > 0) y = pitchHeight - y - 50;
+    // If a formation is selected, scale its players
+    const formation = formations.find((f) => f.name === selectedFormation);
+    if (formation) {
+      scaledPlayers = formation.teams.flatMap(() =>
+        formation.teams[0].positions.map((pos) => {
+          let x = pos.x * pitchWidth;
+          let y = pos.y * pitchHeight;
 
-        return {
-          id: generateId(),
-          number: playerNumber++,
-          x,
-          y,
-          color: teamObj?.color || defaultColor,
-          teamId: selectedTeamId,
-        };
-      })
-    );
+          if (currentPlayersCount > 0) y = pitchHeight - y - 50;
 
-    if (!scaledPlayers.length)
-      return alert(t("formationSelector.noPositionsAlert"));
+          return {
+            id: generateId(),
+            number: playerNumber++,
+            x,
+            y,
+            color: teamObj?.color || defaultColor,
+            teamId: selectedTeamId,
+          };
+        })
+      );
+    }
 
     onAddFormation(scaledPlayers);
-  };
 
-  if (loading) return <div>Loading formations...</div>;
-  if (error) return <div>Error loading formations: {error}</div>;
+    // If user gave a new formation name, save it locally
+    if (newFormationName.trim()) {
+      const newFormation: Formation = {
+        name: newFormationName.trim(),
+        teams: [], // initially empty
+      };
+      setFormations((prev) => [...prev, newFormation]);
+      setSelectedFormation(newFormation.name);
+      setNewFormationName("");
+    }
+  };
 
   return (
     <div className="formation-selector-container">
@@ -148,10 +147,29 @@ export const FormationSelector: React.FC<FormationSelectorProps> = ({
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="formation-row">
+        <label>New Formation Name:</label>
+        <input
+          type="text"
+          value={newFormationName}
+          onChange={(e) => setNewFormationName(e.target.value)}
+          placeholder="Enter formation name"
+        />
+      </div>
+
+      <div className="formation-row">
         <button className="light-button" onClick={handleAddFormation}>
           {t("formationSelector.addFormation")}
         </button>
       </div>
+
+      {loading && <div>Loading formations...</div>}
+      {error && <div className="error">{error}</div>}
+      {!loading && formations.length === 0 && !error && (
+        <div>No formations available. You can start manually.</div>
+      )}
     </div>
   );
 };

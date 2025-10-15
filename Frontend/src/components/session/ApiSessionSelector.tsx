@@ -18,7 +18,8 @@ interface Props {
   practices: ItemsState<Practice>;
   gameTactics: ItemsState<GameTactic>;
 
-  onSelectSession: (steps: Step[]) => void;
+  // Updated: pass full Session instead of just steps
+  onSelectSession: (session: Session) => void;
   onAddEntity: (entity: Session | Practice | GameTactic) => void;
   onUpdateEntity: (
     entity: Session | Practice | GameTactic,
@@ -100,14 +101,6 @@ export const ApiSessionSelector: React.FC<Props> = ({
   const handleSaveDraft = (draft: Session | Practice | GameTactic) => {
     if (!draft.name.trim() || !draft.description.trim()) {
       alert("Please fill all required fields.");
-      return;
-    }
-    if (
-      "steps" in draft &&
-      draft.steps.length === 0 &&
-      viewType === "sessions"
-    ) {
-      alert("Sessions must have at least one step before saving.");
       return;
     }
 
@@ -233,7 +226,8 @@ export const ApiSessionSelector: React.FC<Props> = ({
                     <strong>{item.name}</strong>
                     <div className="buttons">
                       {"steps" in item && (
-                        <button onClick={() => onSelectSession(item.steps)}>
+                        // Updated: pass full Session
+                        <button onClick={() => onSelectSession(item)}>
                           Load
                         </button>
                       )}
@@ -250,7 +244,6 @@ export const ApiSessionSelector: React.FC<Props> = ({
             </div>
           )
         )}
-        {/* Draft for newly created entity */}
         {newDraftId &&
           drafts
             .filter((d) => d.id === newDraftId)
