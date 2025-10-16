@@ -30,6 +30,13 @@ export default function Header() {
         {user ? (
           <>
             <NavLink
+              to="/exercises"
+              className={({ isActive }) => (isActive ? activeStyle : "")}
+            >
+              {" "}
+              Exercises{" "}
+            </NavLink>
+            <NavLink
               to="/tacticalEditor"
               className={({ isActive }) => (isActive ? activeStyle : "")}
             >

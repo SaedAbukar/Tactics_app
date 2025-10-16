@@ -5,6 +5,7 @@ import { ApiTacticalEditor } from "./routes/tactical_editor/ApiTacticalEditor";
 import ProtectedRoute from "./components/protectedRoute/ProtectedRoute";
 import Profile from "./routes/profile/Profile";
 import AuthForm from "./components/authForm/AuthForm";
+import { Exercises } from "./components/exercises/Exercises";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route element={<ProtectedRoute />}>
+            <Route path="exercises" element={<Exercises />} />
             <Route path="tacticalEditor" element={<ApiTacticalEditor />} />
             <Route path="profile" element={<Profile />} />
           </Route>
