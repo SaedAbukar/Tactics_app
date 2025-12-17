@@ -1,38 +1,108 @@
 :root {
+  /* ========================================= */
+  /* 1. LIGHT MODE (Default Definitions)       */
+  /* ========================================= */
+
+  /* Backgrounds */
+  --bg-primary: #ffffff; /* Main app background */
+  --bg-card: #f9fafb; /* Cards / Containers */
+  --bg-button: #f9f9f9; /* Buttons */
+  --bg-hover: #f3f4f6; /* Hover states */
+
+  /* Text */
+  --text-primary: #213547; /* Main Headings */
+  --text-secondary: #4b5563; /* Paragraphs */
+  --text-muted: #9ca3af; /* ID tags, unimportant text */
+
+  /* Borders & Shadows */
+  --border-color: #e5e7eb;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+
+  /* Accents (Brand Colors) */
+  --color-accent: #646cff; /* Your link color */
+  --color-accent-hover: #747bff;
+  --color-brand: #2563eb; /* Blue for tabs/buttons */
+  --color-green: #10b981;
+  --color-amber: #f59e0b;
+  --color-indigo: #6366f1;
+
+  /* Font Settings (Kept from your original) */
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+/* ========================================= */
+/* 2. DARK MODE OVERRIDES                    */
+/* ========================================= */
+/* These values trigger when <html data-theme="dark"> */
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-primary: #242424; /* Your original dark bg */
+  --bg-card: #1a1a1a; /* Slightly lighter than primary */
+  --bg-button: #1a1a1a;
+  --bg-hover: #2f2f2f;
+
+  /* Text */
+  --text-primary: rgba(255, 255, 255, 0.87); /* Your original dark text */
+  --text-secondary: #d1d5db;
+  --text-muted: #6b7280;
+
+  /* Borders & Shadows */
+  --border-color: #404040;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+
+  /* Accents */
+  --color-accent: #646cff;
+  --color-accent-hover: #535bf2;
 }
-a:hover {
-  color: #535bf2;
+
+/* ========================================= */
+/* 3. ELEMENT STYLES (Using Variables)       */
+/* ========================================= */
+/* ... existing code ... */
+
+/* FIX: Force #root to fill the screen and remove default constraints */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  text-align: left; /* specific override for some templates */
+  background-color: transparent; /* Let the body color show through */
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* CHANGE: Remove flex/place-items center. Use block for full layout. */
+  display: block;
   min-width: 320px;
   min-height: 100vh;
+
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+  font-weight: 500;
+  color: var(--color-accent); /* Variable */
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: var(--color-accent-hover); /* Variable */
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  color: var(--text-primary); /* Variable */
 }
 
 button {
@@ -42,27 +112,19 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, background-color 0.3s;
+
+  /* USE VARIABLES HERE */
+  background-color: var(--bg-button);
+  color: var(--text-primary);
 }
+
 button:hover {
-  border-color: #646cff;
+  border-color: var(--color-accent);
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }

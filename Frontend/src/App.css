@@ -1,10 +1,18 @@
-body {
-  display: flex;
-  justify-content: center; /* horizontal centering */
-  align-items: center; /* vertical centering */
-  background-color: #222; /* optional, just for dark background */
-}
 button {
   padding: 6px 12px;
   font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px; /* Keeps it consistent with other buttons */
+
+  /* --- THEME FIX --- */
+  background-color: var(--bg-button); /* Adapts to light/dark button bg */
+  color: var(--text-primary); /* Adapts text color */
+  border: 1px solid var(--border-color);
+
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--text-secondary);
 }

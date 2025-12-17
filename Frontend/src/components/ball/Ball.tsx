@@ -1,4 +1,5 @@
 import React from "react";
+import { observer } from "mobx-react-lite";
 import type { Ball, DragItem } from "../../types/types";
 
 interface BallsProps {
@@ -7,9 +8,9 @@ interface BallsProps {
   setBalls: React.Dispatch<React.SetStateAction<Ball[]>>;
 }
 
-const Balls: React.FC<BallsProps> = ({ balls, dragRef }) => {
+const Balls: React.FC<BallsProps> = observer(({ balls, dragRef }) => {
   const handleMouseDown = (id: number) => () => {
-    dragRef.current = { type: "ball", id };
+    if (dragRef) dragRef.current = { type: "ball", id };
   };
 
   return (
@@ -29,6 +30,6 @@ const Balls: React.FC<BallsProps> = ({ balls, dragRef }) => {
       ))}
     </>
   );
-};
+});
 
 export default Balls;

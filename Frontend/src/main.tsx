@@ -3,13 +3,25 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 import "./i18n";
-import { AuthProvider } from "./context/Auth/AuthContext.tsx"; // import AuthProvider
+import { AuthProvider } from "./context/Auth/AuthContext.tsx";
+import { ExercisesProvider } from "./context/ExercisesProvider.tsx";
+import { ThemeProvider } from "./context/ThemeContext.tsx";
 
-createRoot(document.getElementById("root")!).render(
+const rootElement = document.getElementById("root");
+
+if (!rootElement) {
+  throw new Error("Failed to find the root element");
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <Suspense fallback={<div>Loading...</div>}>
       <AuthProvider>
-        <App />
+        <ThemeProvider>
+          <ExercisesProvider>
+            <App />
+          </ExercisesProvider>
+        </ThemeProvider>
       </AuthProvider>
     </Suspense>
   </StrictMode>

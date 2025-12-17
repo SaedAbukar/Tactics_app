@@ -1,145 +1,128 @@
-import { useState, useEffect } from "react";
-import type {
-  Session,
-  Step,
-  Practice,
-  GameTactic,
-  ItemsState,
-} from "../../types/types";
-import { useFetchWithAuth } from "../../hooks/useFetchWithAuth";
+import { useEffect, useState } from "react";
+import { observer } from "mobx-react-lite";
 import { useAuth } from "../../context/Auth/AuthContext";
+import { useExercises } from "../../context/ExercisesProvider";
+import { type ItemsState } from "../../types/types";
 
-type ViewType = "sessions" | "practices" | "game tactics";
-type Category = "personal" | "userShared" | "groupShared";
+// Imports from new component files
+import { TabButton } from "./components/TabButton";
+import { SectionColumn } from "./components/SectionColumn";
+import { DetailView } from "./components/DetailView";
+import "./Exercises.css"; // Global styles for this feature
 
-export const Exercises = ({}) => {
+type TabType = "sessions" | "practices" | "tactics";
+
+export const Exercises = observer(() => {
   const { user } = useAuth();
-  const { request } = useFetchWithAuth();
+  const { exercisesViewModel } = useExercises();
+  const [activeTab, setActiveTab] = useState<TabType>("sessions");
 
-  const [sessionsState, setSessionsState] = useState<ItemsState<Session>>({
-    personal: [],
-    userShared: [],
-    groupShared: [],
-  });
-  const [practicesState, setPracticesState] = useState<ItemsState<Practice>>({
-    personal: [],
-    userShared: [],
-    groupShared: [],
-  });
-  const [tacticsState, setTacticsState] = useState<ItemsState<GameTactic>>({
-    personal: [],
-    userShared: [],
-    groupShared: [],
-  });
+  useEffect(() => {
+    if (user) {
+      exercisesViewModel.loadData();
+    }
+  }, [user, exercisesViewModel]);
 
-  const fetchUserData = async () => {
-    if (!user) return;
-    try {
-      const [sessionsData, practicesData, tacticsData] = await Promise.all([
-        request("/sessions"),
-        request("/practices"),
-        request("/game-tactics"),
-      ]);
+  if (exercisesViewModel.isLoading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner" />
+      </div>
+    );
+  }
 
-      setSessionsState({
-        personal: sessionsData.personalItems || [],
-        userShared: sessionsData.userSharedItems || [],
-        groupShared: sessionsData.groupSharedItems || [],
-      });
+  if (exercisesViewModel.error) {
+    return (
+      <div className="error-container">
+        <strong>Error:</strong> {exercisesViewModel.error}
+        <button
+          onClick={() => exercisesViewModel.loadData()}
+          style={{ marginLeft: "1rem" }}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
-      setPracticesState({
-        personal: practicesData.personalItems || [],
-        userShared: practicesData.userSharedItems || [],
-        groupShared: practicesData.groupSharedItems || [],
-      });
+  // --- LOGIC: Detail View ---
+  if (exercisesViewModel.selectedItem) {
+    return (
+      <DetailView
+        item={exercisesViewModel.selectedItem}
+        type={activeTab}
+        onBack={() => exercisesViewModel.clearSelection()}
+      />
+    );
+  }
 
-      setTacticsState({
-        personal: tacticsData.personalItems || [],
-        userShared: tacticsData.userSharedItems || [],
-        groupShared: tacticsData.groupSharedItems || [],
-      });
-    } catch (err) {
-      console.error("Failed to fetch user data:", err);
+  // --- LOGIC: Dashboard View ---
+  const getCurrentData = (): ItemsState<any> => {
+    switch (activeTab) {
+      case "practices":
+        return exercisesViewModel.practicesState;
+      case "tactics":
+        return exercisesViewModel.tacticsState;
+      case "sessions":
+      default:
+        return exercisesViewModel.sessionsState;
     }
   };
 
-  useEffect(() => {
-    fetchUserData();
-  }, [user]);
+  const currentData = getCurrentData();
 
   return (
-    <div style={{ padding: "1rem" }}>
-      <h2>Sessions</h2>
-      <div>
-        <h3>Personal</h3>
-        <ul>
-          {sessionsState.personal.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
-
-        <h3>User Shared</h3>
-        <ul>
-          {sessionsState.userShared.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
-
-        <h3>Group Shared</h3>
-        <ul>
-          {sessionsState.groupShared.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
+    <div className="exercises-container">
+      {/* Header */}
+      <div className="header-section">
+        <div>
+          <h1 className="page-title">Training Dashboard</h1>
+          <p className="page-subtitle">
+            Manage your personal and shared training resources.
+          </p>
+        </div>
       </div>
 
-      <h2>Practices</h2>
-      <div>
-        <h3>Personal</h3>
-        <ul>
-          {practicesState.personal.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
-
-        <h3>User Shared</h3>
-        <ul>
-          {practicesState.userShared.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
-
-        <h3>Group Shared</h3>
-        <ul>
-          {practicesState.groupShared.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
+      {/* Tabs */}
+      <div className="tabs-container">
+        <TabButton
+          active={activeTab === "sessions"}
+          onClick={() => setActiveTab("sessions")}
+          label="Sessions"
+        />
+        <TabButton
+          active={activeTab === "practices"}
+          onClick={() => setActiveTab("practices")}
+          label="Practices"
+        />
+        <TabButton
+          active={activeTab === "tactics"}
+          onClick={() => setActiveTab("tactics")}
+          label="Game Tactics"
+        />
       </div>
 
-      <h2>Game Tactics</h2>
-      <div>
-        <h3>Personal</h3>
-        <ul>
-          {tacticsState.personal.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
-
-        <h3>User Shared</h3>
-        <ul>
-          {tacticsState.userShared.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
-
-        <h3>Group Shared</h3>
-        <ul>
-          {tacticsState.groupShared.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
+      {/* Columns */}
+      <div className="columns-grid">
+        <SectionColumn
+          title="Personal"
+          items={currentData.personal}
+          color="var(--color-green)" // Using variable for consistency
+          onItemClick={(item) => exercisesViewModel.selectItem(item)}
+        />
+        <SectionColumn
+          title="Shared with Me"
+          items={currentData.userShared}
+          color="var(--color-amber)"
+          onItemClick={(item) => exercisesViewModel.selectItem(item)}
+        />
+        <SectionColumn
+          title="Group Library"
+          items={currentData.groupShared}
+          color="var(--color-indigo)"
+          onItemClick={(item) => exercisesViewModel.selectItem(item)}
+        />
       </div>
     </div>
   );
-};
+});

@@ -1,4 +1,5 @@
 import React from "react";
+import { observer } from "mobx-react-lite";
 import type { Cone, DragItem } from "../../types/types";
 
 interface ConeProps {
@@ -7,10 +8,10 @@ interface ConeProps {
   setCones: React.Dispatch<React.SetStateAction<Cone[]>>;
 }
 
-const ConeComponent: React.FC<ConeProps> = ({ cones, dragRef }) => {
+const ConeComponent: React.FC<ConeProps> = observer(({ cones, dragRef }) => {
   const handleMouseDown = (e: React.MouseEvent, coneId: number) => {
-    dragRef.current = { type: "cone", id: coneId };
     e.stopPropagation();
+    if (dragRef) dragRef.current = { type: "cone", id: coneId };
   };
 
   return (
@@ -24,10 +25,11 @@ const ConeComponent: React.FC<ConeProps> = ({ cones, dragRef }) => {
           fill={c.color || "orange"}
           stroke="black"
           onMouseDown={(e) => handleMouseDown(e, c.id)}
+          style={{ cursor: "grab" }}
         />
       ))}
     </>
   );
-};
+});
 
 export default ConeComponent;

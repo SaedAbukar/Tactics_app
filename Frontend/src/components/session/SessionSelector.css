@@ -1,156 +1,284 @@
-.session-selector-container {
+.session-selector {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  text-align: left;
-  background-color: #111;
-  padding: 20px;
-  border-radius: 8px;
-  width: 300px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #fff;
+  height: 100%;
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  font-family: "Inter", sans-serif;
 }
 
-.session-selector-container h3 {
-  margin: 0 0 10px 0;
-  font-size: 1.2rem;
-}
-
-.session-selector-container select {
-  padding: 6px 8px;
-  border-radius: 4px;
-  border: 1px solid #555;
-  background: #222;
-  color: #fff;
-  margin-bottom: 10px;
-  outline: none;
-}
-
-.session-selector-container select:focus {
-  border-color: #aaa;
-}
-
-.new-session {
+/* --- Tabs --- */
+.selector-tabs {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 15px;
+  background-color: var(--bg-hover);
+  border-bottom: 1px solid var(--border-color);
 }
 
-.new-session input,
-.new-session textarea {
-  padding: 6px 8px;
-  border-radius: 4px;
-  border: 1px solid #555;
-  outline: none;
-  font-family: inherit;
-  background-color: #222;
-  color: #fff;
-}
-
-.new-session input:focus,
-.new-session textarea:focus {
-  border-color: #aaa;
-}
-
-.new-session button {
-  background-color: #f5f5f5;
-  color: #111;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 6px 12px;
+.tab-btn {
+  flex: 1;
+  padding: 12px 8px;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: background 0.2s;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
 }
 
-.new-session button:hover:not(:disabled) {
-  background-color: #e0e0e0;
+.tab-btn:hover {
+  color: var(--text-primary);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
-.session-list {
+.tab-btn.active {
+  color: var(--color-brand);
+  border-bottom-color: var(--color-brand);
+  background-color: var(--bg-card);
+}
+
+/* --- Content Area --- */
+.selector-content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* --- Create/Edit Forms --- */
+.editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: var(--bg-primary);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.create-header {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  text-transform: capitalize;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.modern-btn.small {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+/* Attachment Section */
+.attachment-section {
+  border-top: 1px dashed var(--border-color);
+  padding-top: 0.5rem;
+}
+
+.sub-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.attached-list {
   list-style: none;
   padding: 0;
-  margin: 0;
-  max-height: 450px;
-  overflow-y: auto;
-  border-top: 1px solid #333;
-  border-bottom: 1px solid #333;
+  margin: 0 0 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
-.session-list li {
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 6px;
-  background: #222;
-  cursor: default;
+.attached-item {
+  background-color: var(--bg-hover);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-color);
+}
+
+/* --- Lists & Categories --- */
+.lists-container {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  transition: background 0.2s;
+  gap: 0.5rem;
 }
 
-.session-list li.selected {
-  background-color: #444;
+.category-group {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.session-list li strong {
-  font-size: 1rem;
-}
-
-.session-list li textarea {
-  resize: vertical;
-  min-height: 40px;
-  padding: 4px 6px;
-  border-radius: 4px;
-  border: 1px solid #555;
-  background: #111;
-  color: #fff;
-  outline: none;
-}
-
-.session-list li textarea:focus {
-  border-color: #aaa;
-}
-
-.session-list li select {
-  margin-top: 5px;
-  padding: 4px 6px;
-  border-radius: 4px;
-  border: 1px solid #555;
-  background: #222;
-  color: #fff;
-  outline: none;
-}
-
-.session-list li select:focus {
-  border-color: #aaa;
-}
-
-.session-list li ul {
-  list-style: disc;
-  padding-left: 20px;
-  margin: 5px 0;
-  max-height: 100px;
-  overflow-y: auto;
-}
-
-.session-list li .buttons {
+.category-header {
+  width: 100%;
   display: flex;
-  gap: 5px;
-  margin-top: 5px;
-}
-
-.session-list li .buttons button {
-  flex: 1;
-  background-color: #f5f5f5;
-  color: #111;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 5px 8px;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: var(--bg-hover);
+  border: none;
   cursor: pointer;
-  transition: background 0.2s;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
 }
 
-.session-list li .buttons button:hover:not(:disabled) {
-  background-color: #e0e0e0;
+.category-header .arrow {
+  font-size: 0.7rem;
+  margin-right: 8px;
+  color: var(--text-muted);
+  width: 12px;
+}
+
+.category-header .badge {
+  margin-left: auto;
+  background-color: var(--bg-card);
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.category-items {
+  padding: 0.5rem;
+  background-color: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.empty-text {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+/* --- Item Card --- */
+.list-item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  background-color: var(--bg-primary);
+}
+
+.list-item-card:hover {
+  border-color: var(--color-brand);
+  box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.list-item-card.editing {
+  display: block; /* Form takes full width */
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.item-main {
+  flex: 1;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.item-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.list-item-card:hover .item-actions {
+  opacity: 1;
+}
+
+/* Mini Buttons */
+.icon-btn-mini {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+}
+
+.icon-btn-mini:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.icon-btn-mini.danger:hover {
+  color: #ef4444;
+  background-color: #fee2e2;
+}
+
+/* Add to ApiSessionSelector.css */
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-muted);
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.spinner-small {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--color-brand);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

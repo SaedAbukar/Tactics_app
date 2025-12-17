@@ -4,7 +4,20 @@
 
 export type EntityType = "player" | "ball" | "goal" | "cone";
 
+export type DragItem = {
+  type: EntityType;
+  id: number;
+};
+
 export type Position = { x: number; y: number }; // x,y as percentages (0–1)
+
+export const ShareRole = {
+  OWNER: "OWNER",
+  VIEWER: "VIEWER",
+  EDITOR: "EDITOR",
+} as const;
+
+export type ShareRole = (typeof ShareRole)[keyof typeof ShareRole];
 
 // ------------------------------
 // Player / Ball / Goal / Cone / Team
@@ -125,7 +138,7 @@ export type JwtPayload = {
 };
 
 // ------------------------------
-// State
+// Frontend State (ViewModel)
 // ------------------------------
 
 export type ItemsState<T> = {
@@ -133,3 +146,20 @@ export type ItemsState<T> = {
   userShared: T[];
   groupShared: T[];
 };
+
+// ------------------------------
+// API Responses (Backend Contract)
+// ------------------------------
+
+// Corresponds to the shape returned by your backend endpoints
+export interface CategorizedItems<T> {
+  personalItems: T[];
+  userSharedItems: T[];
+  groupSharedItems: T[];
+}
+
+export interface AllUserData {
+  sessions: CategorizedItems<Session>;
+  practices: CategorizedItems<Practice>;
+  tactics: CategorizedItems<GameTactic>;
+}

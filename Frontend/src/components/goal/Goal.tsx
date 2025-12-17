@@ -1,4 +1,5 @@
 import React from "react";
+import { observer } from "mobx-react-lite";
 import type { Goal, DragItem } from "../../types/types";
 
 interface GoalProps {
@@ -7,10 +8,10 @@ interface GoalProps {
   setGoals: React.Dispatch<React.SetStateAction<Goal[]>>;
 }
 
-const GoalComponent: React.FC<GoalProps> = ({ goals, dragRef }) => {
+const GoalComponent: React.FC<GoalProps> = observer(({ goals, dragRef }) => {
   const handleMouseDown = (e: React.MouseEvent, goalId: number) => {
-    dragRef.current = { type: "goal", id: goalId };
     e.stopPropagation();
+    if (dragRef) dragRef.current = { type: "goal", id: goalId };
   };
 
   return (
@@ -27,7 +28,6 @@ const GoalComponent: React.FC<GoalProps> = ({ goals, dragRef }) => {
             onMouseDown={(e) => handleMouseDown(e, g.id)}
             style={{ cursor: "grab" }}
           >
-            {/* Goal frame */}
             <rect
               x={g.x}
               y={g.y}
@@ -37,7 +37,6 @@ const GoalComponent: React.FC<GoalProps> = ({ goals, dragRef }) => {
               stroke="white"
               strokeWidth={4}
             />
-            {/* Net lines */}
             {Array.from({ length: netRows + 1 }).map((_, i) => (
               <line
                 key={`row-${i}`}
@@ -65,6 +64,6 @@ const GoalComponent: React.FC<GoalProps> = ({ goals, dragRef }) => {
       })}
     </>
   );
-};
+});
 
 export default GoalComponent;

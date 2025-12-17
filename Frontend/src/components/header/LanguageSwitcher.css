@@ -1,0 +1,127 @@
+/* Container holds the button and the absolute menu */
+.lang-container {
+  position: relative;
+  font-family: "Inter", sans-serif;
+}
+
+/* --- The Main Button --- */
+.lang-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border: 1px solid transparent;
+
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-width: 80px;
+  justify-content: space-between;
+}
+
+.lang-trigger:hover {
+  background-color: var(--border-color);
+}
+
+.lang-trigger.open {
+  background-color: var(--bg-card);
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 2px var(--shadow-color);
+}
+
+.lang-flag {
+  font-size: 1.1em;
+}
+
+.lang-code {
+  font-size: 0.85em;
+  color: var(--text-primary);
+}
+
+/* Chevron Animation */
+.chevron-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.chevron-icon.rotate {
+  transform: rotate(180deg);
+}
+
+/* --- The Dropdown Menu --- */
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 8px); /* 8px spacing below button */
+  right: 0; /* Align to right edge */
+
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  min-width: 160px;
+  z-index: 1001;
+
+  /* Animation */
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Menu Items --- */
+.lang-menu li {
+  display: block;
+}
+
+.lang-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  transition: background-color 0.15s;
+}
+
+.lang-option:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.lang-option.active {
+  background-color: var(--bg-hover); /* Or brand color light variant */
+  color: var(--color-brand);
+  font-weight: 600;
+}
+
+.check-mark {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--color-brand);
+}

@@ -1,72 +1,27 @@
 import React, { useState } from "react";
-import type { Team } from "../../types/types";
-import "./Controls.css";
+import { observer } from "mobx-react-lite";
+import { runInAction } from "mobx";
 import { useTranslation } from "react-i18next";
+import { TacticalBoardViewModel } from "../../features/exercises/viewmodels/TacticalBoardViewModel";
+import "./Controls.css";
+import { CounterControl } from "./CounterControl";
 
 interface ControlsProps {
-  teams: Team[];
-  onAddPlayers: (count: number, color: string, teamId?: number) => void;
-  onAddBalls: (count: number) => void;
-  onAddGoals: (count: number) => void;
-  onAddCones: (count: number, color: string) => void;
-  onAddTeam: (name: string, color: string) => void;
-  onSaveStep: () => void;
-  onPlay: () => void;
-  onPause: () => void;
-  onContinue: () => void;
-  onStop: () => void;
-  onClearPitch: () => void;
-  onSpeedChange: (speed: number) => void;
-  playing: boolean;
-  paused: boolean;
-  stepsCount: number;
-  speed: number;
+  vm: TacticalBoardViewModel;
 }
-
-export const Controls: React.FC<ControlsProps> = ({
-  teams,
-  onAddPlayers,
-  onAddBalls,
-  onAddGoals,
-  onAddCones,
-  onAddTeam,
-  onSaveStep,
-  onPlay,
-  onPause,
-  onContinue,
-  onStop,
-  onClearPitch,
-  onSpeedChange,
-  playing,
-  paused,
-  stepsCount,
-  speed,
-}) => {
+export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
   const { t } = useTranslation("tacticalEditor");
+
+  // Local UI state
+  const [showCreateTeam, setShowCreateTeam] = useState(false); // Toggle for team form
   const [teamName, setTeamName] = useState("");
-  const [teamColor, setTeamColor] = useState(t("colors.black"));
-  const [playerCount, setPlayerCount] = useState(3);
-  const [ballCount, setBallCount] = useState(1);
-  const [goalCount, setGoalCount] = useState(1);
-  const [coneCount, setConeCount] = useState(1);
-  const [playerColor, setPlayerColor] = useState(t("colors.black"));
-  // const [ballColor, setBallColor] = useState(t("colors.black"));
-  // const [goalColor, setGoalColor] = useState(t("colors.black"));
-  const [coneColor, setConeColor] = useState("orange");
-  const [selectedTeamId, setSelectedTeamId] = useState<number | undefined>(
-    undefined
-  );
-  type ColorKeys =
-    | "black"
-    | "white"
-    | "blue"
-    | "red"
-    | "yellow"
-    | "purple"
-    | "orange"
-    | "cyan"
-    | "pink";
-  const colors1: ColorKeys[] = [
+  const [teamColor, setTeamColor] = useState("black");
+
+  // Settings for adding new items
+  const [selectedTeamId, setSelectedTeamId] = useState<number | string>("");
+  const [selectedColor, setSelectedColor] = useState("black");
+
+  const colors = [
     "black",
     "white",
     "blue",
@@ -78,197 +33,202 @@ export const Controls: React.FC<ControlsProps> = ({
     "pink",
   ];
 
+  // --- Helper to remove the last item of a type ---
+  const removeLast = (type: "player" | "ball" | "goal" | "cone") => {
+    runInAction(() => {
+      if (type === "player") vm.players.pop();
+      if (type === "ball") vm.balls.pop();
+      if (type === "goal") vm.goals.pop();
+      if (type === "cone") vm.cones.pop();
+    });
+  };
+
   return (
-    <div className="controls-container">
-      <div className="control-group">
-        {/* Teams */}
-        <label>{t("controls.createTeam")}</label>
-        <input
-          type="text"
-          placeholder={t("controls.teamNamePlaceholder")}
-          value={teamName}
-          onChange={(e) => setTeamName(e.target.value)}
-        />
-        <select
-          value={teamColor}
-          onChange={(e) => setTeamColor(e.target.value)}
-        >
-          {colors1.map((c) => (
-            <option key={c} value={c}>
-              {t(`colors.${c}`)}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={() => {
-            if (teamName.trim()) {
-              onAddTeam(teamName, teamColor);
-              setTeamName("");
-            }
-          }}
-        >
-          {t("controls.addTeam")}
-        </button>
-      </div>
+    <div className="controls-panel">
+      <h3 className="controls-title">{t("tools", "Tools")}</h3>
 
-      {/* Players */}
-      <div className="control-group">
-        <label>{t("controls.players")}</label>
-        <input
-          type="number"
-          min={1}
-          max={20}
-          value={playerCount}
-          onChange={(e) => setPlayerCount(Number(e.target.value))}
-        />
-        <select
-          value={playerColor}
-          onChange={(e) => setPlayerColor(e.target.value)}
-        >
-          {colors1.map((c) => (
-            <option key={c} value={c}>
-              {t(`colors.${c}`)}
-            </option>
-          ))}
-        </select>
-        <select
-          value={selectedTeamId}
-          onChange={(e) =>
-            setSelectedTeamId(Number(e.target.value) || undefined)
-          }
-        >
-          <option value="">{t("controls.createTeam")}</option>
-          {teams.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={() => onAddPlayers(playerCount, playerColor, selectedTeamId)}
-          disabled={playing}
-        >
-          {t("controls.addPlayers")}
-        </button>
-      </div>
+      {/* --- Section: Objects Control --- */}
+      <div className="control-section">
+        <label className="section-label">Objects</label>
 
-      {/* Balls */}
-      <div className="control-group">
-        <label>{t("controls.balls")}</label>
-        <input
-          type="number"
-          min={1}
-          max={10}
-          value={ballCount}
-          onChange={(e) => setBallCount(Number(e.target.value))}
-        />
-        {/*<select
-          value={ballColor}
-          onChange={(e) => setBallColor(e.target.value)}
-        >
-          {colors1.map((c) => (
-            <option key={c} value={c}>
-              {t(`colors.${c}`)}
-            </option>
-          ))}
-        </select>*/}
-        <button onClick={() => onAddBalls(ballCount)} disabled={playing}>
-          {t("controls.addBalls")}
-        </button>
-      </div>
+        {/* 1. Player Configuration (Team Selection) */}
+        <div className="settings-row">
+          <select
+            className="modern-select full-width"
+            value={selectedTeamId}
+            onChange={(e) => setSelectedTeamId(e.target.value)}
+          >
+            <option value="">No Team (Free Agent)</option>
+            {vm.teams.map((team) => (
+              <option key={team.id} value={team.id}>
+                {team.name}
+              </option>
+            ))}
+          </select>
 
-      {/* Goals */}
-      <div className="control-group">
-        <label>{t("controls.goals")}</label>
-        <input
-          type="number"
-          min={1}
-          max={10}
-          value={goalCount}
-          onChange={(e) => setGoalCount(Number(e.target.value))}
-        />
-        {/* <select
-          value={goalColor}
-          onChange={(e) => setGoalColor(e.target.value)}
-        >
-          {colors1.map((c) => (
-            <option key={c} value={c}>
-              {t(`colors.${c}`)}
-            </option>
-          ))}
-        </select> */}
-        <button onClick={() => onAddGoals(goalCount)} disabled={playing}>
-          {t("controls.addGoals")}
-        </button>
-      </div>
-
-      {/* Cones */}
-      <div className="control-group">
-        <label>{t("controls.cones")}</label>
-        <input
-          type="number"
-          min={1}
-          max={10}
-          value={coneCount}
-          onChange={(e) => setConeCount(Number(e.target.value))}
-        />
-        <select
-          value={coneColor}
-          onChange={(e) => setConeColor(e.target.value)}
-        >
-          {colors1.map((c) => (
-            <option key={c} value={c}>
-              {t(`colors.${c}`)}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={() => onAddCones(coneCount, coneColor)}
-          disabled={playing}
-        >
-          {t("controls.addCones")}
-        </button>
-      </div>
-
-      {/* Save / Play / Pause / Continue / Stop */}
-      <div className="control-group">
-        <label>{t("controls.animation")}</label>
-        <button onClick={onSaveStep} disabled={playing}>
-          {t("saveStep")}
-        </button>
-        {!playing ? (
-          <button onClick={onPlay} disabled={stepsCount === 0}>
-            {t("play")}
+          {/* Toggle Create Team Form */}
+          <button
+            className="icon-btn-mini"
+            title="Create New Team"
+            onClick={() => setShowCreateTeam(!showCreateTeam)}
+          >
+            {showCreateTeam ? "−" : "+"}
           </button>
-        ) : paused ? (
-          <button onClick={onContinue}>{t("continue")}</button>
-        ) : (
-          <button onClick={onPause}>{t("pause")}</button>
+        </div>
+
+        {/* 2. Create Team Form (Collapsible) */}
+        {showCreateTeam && (
+          <div className="create-team-panel">
+            <input
+              type="text"
+              className="modern-input"
+              placeholder="New Team Name"
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
+            />
+            <div className="color-picker-wrapper">
+              {colors.map((c) => (
+                <button
+                  key={c}
+                  className={`color-dot ${teamColor === c ? "active" : ""}`}
+                  style={{ backgroundColor: c }}
+                  onClick={() => setTeamColor(c)}
+                />
+              ))}
+            </div>
+            <button
+              className="modern-btn primary small full-width"
+              onClick={() => {
+                if (teamName.trim()) {
+                  vm.addTeam(teamName, teamColor);
+                  setTeamName("");
+                  setShowCreateTeam(false); // Close after creating
+                }
+              }}
+            >
+              Save Team
+            </button>
+          </div>
         )}
-        <button onClick={onStop} disabled={!playing && !paused}>
-          {t("stop")}
-        </button>
+
+        {/* 3. Color Picker for Free Agents */}
+        {!selectedTeamId && (
+          <div className="settings-row centered">
+            <span className="sub-label">Color:</span>
+            <div className="mini-color-picker">
+              {["black", "white", "red", "blue", "yellow"].map((c) => (
+                <div
+                  key={c}
+                  className={`mini-dot ${selectedColor === c ? "active" : ""}`}
+                  style={{ background: c }}
+                  onClick={() => setSelectedColor(c)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 4. Counters */}
+        <div className="counters-list">
+          <CounterControl
+            label="Players"
+            count={vm.players.length}
+            onRemove={() => removeLast("player")}
+            onAdd={() => {
+              const team = vm.teams.find(
+                (t) => t.id === Number(selectedTeamId)
+              );
+              vm.addEntity("player", 1, team ? undefined : selectedColor, team);
+            }}
+          />
+
+          <CounterControl
+            label="Balls"
+            count={vm.balls.length}
+            onRemove={() => removeLast("ball")}
+            onAdd={() => vm.addEntity("ball", 1)}
+          />
+
+          <CounterControl
+            label="Goals"
+            count={vm.goals.length}
+            onRemove={() => removeLast("goal")}
+            onAdd={() => vm.addEntity("goal", 1)}
+          />
+
+          <CounterControl
+            label="Cones"
+            count={vm.cones.length}
+            onRemove={() => removeLast("cone")}
+            onAdd={() => vm.addEntity("cone", 1)}
+          />
+        </div>
       </div>
 
-      {/* Speed */}
-      <div className="control-group speed-control">
-        <label>{t("controls.speed")}</label>
-        <input
-          type="range"
-          min={0.1}
-          max={5}
-          step={0.1}
-          value={speed}
-          onChange={(e) => onSpeedChange(Number(e.target.value))}
-        />
-        <span style={{ color: "white" }}>{speed.toFixed(1)}x</span>
-        <button onClick={() => onSpeedChange(1)} disabled={speed === 1}>
-          {t("controls.resetSpeed")}
-        </button>
+      {/* --- Section: Animation Control --- */}
+      <div className="control-section">
+        <label className="section-label">
+          Animation ({vm.savedSteps.length} Steps)
+        </label>
+
+        <div className="grid-buttons">
+          <button
+            className="modern-btn primary"
+            onClick={vm.saveStep}
+            disabled={vm.isPlaying}
+          >
+            Save Step
+          </button>
+
+          {!vm.isPlaying ? (
+            <button
+              className="modern-btn success"
+              onClick={vm.play}
+              disabled={vm.savedSteps.length === 0}
+            >
+              ▶ Play
+            </button>
+          ) : vm.isPaused ? (
+            <button className="modern-btn warning" onClick={vm.continue}>
+              ▶ Resume
+            </button>
+          ) : (
+            <button className="modern-btn warning" onClick={vm.pause}>
+              ⏸ Pause
+            </button>
+          )}
+
+          <button
+            className="modern-btn danger"
+            onClick={vm.stopAnimation}
+            disabled={!vm.isPlaying && !vm.isPaused}
+          >
+            ⏹ Stop
+          </button>
+        </div>
+
+        <div className="slider-container">
+          <label>Speed: {vm.speed.toFixed(1)}x</label>
+          <input
+            type="range"
+            min="0.5"
+            max="3"
+            step="0.1"
+            value={vm.speed}
+            onChange={(e) => vm.setSpeed(Number(e.target.value))}
+          />
+        </div>
       </div>
 
-      {/* Clear pitch */}
-      <button onClick={onClearPitch}>{t("controls.clearPitch")}</button>
+      {/* Footer Actions */}
+      <div className="control-footer">
+        <button
+          className="modern-btn danger full-width"
+          onClick={vm.clearPitch}
+        >
+          Clear Pitch
+        </button>
+      </div>
     </div>
   );
-};
+});

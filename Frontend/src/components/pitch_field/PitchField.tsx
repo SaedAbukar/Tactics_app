@@ -6,46 +6,52 @@ interface PitchFieldProps {
 }
 
 const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
+  // Padding to prevent border clipping (strokeWidth / 2 + safe margin)
+  const inset = 4;
+  const safeWidth = width - inset * 2;
+  const safeHeight = height - inset * 2;
+
   // ===== Scaling constants =====
-  const penaltyWidth = (width * 70) / 120; // 18-yard box width
-  const penaltyDepth = (height * 16) / 80;
-  const fiveYardWidth = (width * 40) / 120;
-  const fiveYardDepth = (height * 5) / 80;
+  // Use safeWidth/safeHeight for calculations to keep proportions inside the border
+  const penaltyWidth = (safeWidth * 70) / 120;
+  const penaltyDepth = (safeHeight * 16) / 80;
+  const fiveYardWidth = (safeWidth * 40) / 120;
+  const fiveYardDepth = (safeHeight * 5) / 80;
 
   const centerX = width / 2;
   const centerY = height / 2;
-  const centerCircleRadius = (height * 10) / 80;
+  const centerCircleRadius = (safeHeight * 10) / 80;
 
   // Penalty box positions
   const penaltyStartX = (width - penaltyWidth) / 2;
-  const penaltyStartY = 0;
+  const penaltyStartY = inset;
 
-  const penaltyEndY = penaltyDepth;
+  const penaltyEndY = penaltyDepth + inset;
 
   const fiveStartX = (width - fiveYardWidth) / 2;
-  const fiveEndY = fiveYardDepth;
+  const fiveEndY = fiveYardDepth + inset;
 
   // Penalty spot positions
-  const penaltySpotDistance = (height * 10) / 80; // scale 12 yards to your height
-  const penaltySpotRadius = 4; // small circle
+  const penaltySpotDistance = (safeHeight * 10) / 80;
+  const penaltySpotRadius = 4;
 
   return (
     <>
-      {/* Pitch Outline */}
+      {/* Pitch Outline (Inset to prevent clipping) */}
       <rect
-        x={0}
-        y={0}
-        width={width}
-        height={height}
+        x={inset}
+        y={inset}
+        width={safeWidth}
+        height={safeHeight}
         fill="none"
         stroke="white"
         strokeWidth={2}
       />
       {/* Center Line */}
       <line
-        x1={0}
+        x1={inset}
         y1={centerY}
-        x2={width}
+        x2={width - inset}
         y2={centerY}
         stroke="white"
         strokeWidth={2}
@@ -59,6 +65,9 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
         stroke="white"
         strokeWidth={2}
       />
+
+      {/* --- TOP HALF --- */}
+
       {/* Top Penalty Box */}
       <path
         d={`
@@ -83,13 +92,16 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
         strokeWidth={2}
         fill="transparent"
       />
-      {/* Top Penalty Spot*/}
+      {/* Top Penalty Spot */}
       <circle
         cx={centerX}
-        cy={penaltySpotDistance}
+        cy={inset + penaltySpotDistance}
         r={penaltySpotRadius}
         fill="white"
       />
+
+      {/* --- BOTTOM HALF --- */}
+
       {/* Bottom Penalty Box */}
       <path
         d={`
@@ -119,7 +131,7 @@ const PitchField: React.FC<PitchFieldProps> = ({ width, height }) => {
       {/* Bottom Penalty Spot */}
       <circle
         cx={centerX}
-        cy={height - penaltySpotDistance}
+        cy={height - (inset + penaltySpotDistance)}
         r={penaltySpotRadius}
         fill="white"
       />

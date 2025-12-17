@@ -1,4 +1,5 @@
 import React from "react";
+import { observer } from "mobx-react-lite"; // 1. Import observer
 import type { Player, DragItem } from "../../types/types";
 
 interface PlayersProps {
@@ -7,9 +8,13 @@ interface PlayersProps {
   setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
 }
 
-const Players: React.FC<PlayersProps> = ({ players, dragRef }) => {
+// 2. Wrap component
+const Players: React.FC<PlayersProps> = observer(({ players, dragRef }) => {
   const handleMouseDown = (id: number) => () => {
-    dragRef.current = { type: "player", id };
+    // If dragRef is a proxy object (from our VM bridge), this works perfectly
+    if (dragRef && dragRef.current !== undefined) {
+      dragRef.current = { type: "player", id };
+    }
   };
 
   return (
@@ -30,6 +35,7 @@ const Players: React.FC<PlayersProps> = ({ players, dragRef }) => {
             fontSize={12}
             fill={p.color === "white" ? "black" : "white"}
             textAnchor="middle"
+            style={{ pointerEvents: "none", userSelect: "none" }}
           >
             {p.number}
           </text>
@@ -37,6 +43,6 @@ const Players: React.FC<PlayersProps> = ({ players, dragRef }) => {
       ))}
     </>
   );
-};
+});
 
 export default Players;

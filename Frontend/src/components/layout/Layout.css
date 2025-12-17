@@ -1,0 +1,22 @@
+/* src/components/layout/Layout.css */
+
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  /* Theme Colors */
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  width: 100%;
+
+  /* CHANGE: Removed max-width: 1200px and margin: 0 auto */
+  max-width: 100%;
+  box-sizing: border-box;
+}

@@ -3,12 +3,24 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  border-bottom: 1px solid #333;
-  background-color: #1a1a1a; /* matches body background */
-  color: #fff;
+
+  /* Use CSS Variables for Colors */
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+
   position: sticky;
   top: 0;
   z-index: 1000;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.logo-link {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: color 0.2s;
 }
 
 .nav {
@@ -17,39 +29,77 @@
   gap: 16px;
 }
 
+/* Navigation Links */
 .nav a {
   text-decoration: none;
-  color: #ccc;
-  transition: color 0.2s;
+  font-weight: 500;
+  color: var(--text-secondary); /* Adapts to light/dark */
+  transition: color 0.2s, background-color 0.2s;
+  padding: 6px 12px;
+  border-radius: 8px;
 }
 
 .nav a:hover {
-  color: #ffffff;
+  color: var(--color-brand);
+  background-color: var(--bg-hover);
 }
 
 .active-link {
-  font-weight: bold;
-  text-decoration: underline;
-  color: #ffffff;
+  color: var(--color-brand) !important; /* Force brand color */
+  background-color: var(--bg-hover);
+  font-weight: 600;
 }
 
+/* User Email */
 .user-email {
-  margin-left: 12px;
-  font-size: 0.9rem;
-  color: #aaa;
+  margin-left: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
+/* Divider Line */
+.nav-separator {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border-color);
+  margin: 0 8px;
+}
+
+/* Logout Button */
 .logout-btn {
   margin-left: 8px;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border: none;
-  background-color: #ff4d4f;
+  background-color: #ef4444; /* Keep red consistent */
   color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .logout-btn:hover {
-  background-color: #d9363e;
+  background-color: #dc2626;
+  transform: translateY(-1px);
+}
+
+/* Icon Buttons (Theme Toggle) */
+.icon-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 6px;
+  font-size: 1.2rem;
+  line-height: 1;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  transition: background-color 0.2s;
+}
+
+.icon-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-color);
 }
