@@ -32,7 +32,9 @@ export const SectionColumn = ({
               onClick={() => onItemClick(item)}
             >
               <h4 className="card-title">{item.name}</h4>
-              <p className="card-id">ID: {item.id.toString().slice(0, 8)}...</p>
+              <p className="card-id">
+                {item.description?.toString().slice(0, 40)}...
+              </p>
             </div>
           ))
         )}

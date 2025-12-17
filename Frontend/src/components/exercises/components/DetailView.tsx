@@ -1,5 +1,11 @@
+import { observer } from "mobx-react-lite";
 import type { Session, Practice, GameTactic } from "../../../types/types";
 import "../Exercises.css";
+
+// Imports from the new 'detail' folder
+import { DetailHeader } from "./detail/DetailHeader";
+import { SessionPreview } from "./detail/SessionPreview";
+import { IncludedSessions } from "./detail/IncludedSessions";
 
 interface DetailViewProps {
   item: Session | Practice | GameTactic;
@@ -7,84 +13,42 @@ interface DetailViewProps {
   onBack: () => void;
 }
 
-export const DetailView = ({ item, type, onBack }: DetailViewProps) => {
-  return (
-    <div className="detail-container">
-      <button onClick={onBack} className="back-button">
-        <span style={{ fontSize: "1.2rem" }}>←</span> Back to Dashboard
-      </button>
+export const DetailView = observer(
+  ({ item, type, onBack }: DetailViewProps) => {
+    // Helper: Detect if drilled down into a Session
+    const isSession = "steps" in item;
 
-      <div className="detail-card">
-        {/* Header */}
-        <div className="detail-header">
-          <div>
-            <h1 className="detail-title">{item.name}</h1>
-            <p className="card-id" style={{ marginTop: "0.5rem" }}>
-              ID: {item.id}
+    // Helper: Badge Label
+    const displayLabel = isSession
+      ? "Session"
+      : type === "tactics"
+      ? "Game Tactic"
+      : "Practice";
+
+    return (
+      <div className="detail-container">
+        <button onClick={onBack} className="back-button">
+          <span style={{ fontSize: "1.2rem" }}>←</span> Back
+        </button>
+
+        <div className="detail-card">
+          {/* Header Component */}
+          <DetailHeader item={item} label={displayLabel} />
+
+          <div className="detail-body">
+            <h3 className="section-label">Description</h3>
+            <p className="description-text">
+              {item.description || "No description provided."}
             </p>
+
+            {/* Render Animation if Session */}
+            {isSession && <SessionPreview session={item as Session} />}
+
+            {/* Render List + Add Button if Practice/Tactic */}
+            {"sessions" in item && <IncludedSessions item={item as Practice} />}
           </div>
-          <span className="type-badge">{type.slice(0, -1)}</span>
-        </div>
-
-        {/* Body */}
-        <div className="detail-body">
-          <h3 className="section-label">Description</h3>
-          <p className="description-text">
-            {item.description || "No description provided."}
-          </p>
-
-          {/* Conditional Rendering */}
-          {"steps" in item && (
-            <div>
-              <h3 className="section-label">
-                Training Steps ({(item as Session).steps?.length || 0})
-              </h3>
-              <div className="placeholder-box">
-                [Canvas/Diagram Component would go here]
-              </div>
-            </div>
-          )}
-
-          {"sessions" in item && (
-            <div>
-              <h3 className="section-label">
-                Included Sessions ({(item as Practice).sessions?.length || 0})
-              </h3>
-              <div className="grid-list">
-                {(item as Practice).sessions?.map((s) => (
-                  <div
-                    key={s.id}
-                    className="item-card"
-                    style={{ cursor: "default" }}
-                  >
-                    <strong
-                      style={{ display: "block", color: "var(--text-primary)" }}
-                    >
-                      {s.name}
-                    </strong>
-                    <span
-                      style={{
-                        fontSize: "0.85rem",
-                        color: "var(--text-muted)",
-                      }}
-                    >
-                      {s.description?.slice(0, 50)}...
-                    </span>
-                  </div>
-                ))}
-                {(item as Practice).sessions?.length === 0 && (
-                  <div
-                    className="empty-state"
-                    style={{ border: "none", textAlign: "left", padding: 0 }}
-                  >
-                    No sessions linked.
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);

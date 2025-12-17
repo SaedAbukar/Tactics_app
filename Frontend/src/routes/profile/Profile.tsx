@@ -60,10 +60,6 @@ const Profile: React.FC = observer(() => {
         {/* --- Details Grid --- */}
         <div className="profile-details">
           <div className="detail-item">
-            <span className="label">User ID</span>
-            <span className="value">#{user.id}</span>
-          </div>
-          <div className="detail-item">
             <span className="label">Member Since</span>
             <span className="value">{formatDate(user.createdAt)}</span>
           </div>
