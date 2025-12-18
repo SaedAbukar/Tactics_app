@@ -25,7 +25,7 @@ export const ApiTacticalEditor: React.FC = observer(() => {
     vm.clearPitch();
     // We deep copy the steps to avoid modifying the library data directly during editing
     // until the user explicitly saves (if you implement save-back logic later)
-    vm.savedSteps = JSON.parse(JSON.stringify(steps));
+    vm.updateSavedSteps(JSON.parse(JSON.stringify(steps)));
 
     if (steps.length > 0) {
       vm.loadStep(0); // Load first step to canvas

@@ -172,6 +172,12 @@ export class TacticalBoardViewModel {
     this.cones = JSON.parse(JSON.stringify(step.cones));
   }
 
+  updateSavedSteps(steps: Step[]) {
+    runInAction(() => {
+      this.savedSteps = steps;
+    });
+  }
+
   clearPitch() {
     this.stopAnimation();
     this.players = [];

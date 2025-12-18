@@ -18,7 +18,9 @@ export const SessionPreview: React.FC<SessionPreviewProps> = observer(
       if (steps.length > 0) {
         // 1. Initialize Animation State
         tacticalBoardViewModel.stopAnimation();
-        tacticalBoardViewModel.savedSteps = JSON.parse(JSON.stringify(steps));
+        tacticalBoardViewModel.updateSavedSteps(
+          JSON.parse(JSON.stringify(steps))
+        );
         tacticalBoardViewModel.loadStep(0);
         tacticalBoardViewModel.play();
 
@@ -32,7 +34,7 @@ export const SessionPreview: React.FC<SessionPreviewProps> = observer(
             tacticalBoardViewModel.loadStep(0);
             tacticalBoardViewModel.play();
           }
-        }, 1000);
+        }, 500);
       }
 
       return () => {
@@ -43,21 +45,8 @@ export const SessionPreview: React.FC<SessionPreviewProps> = observer(
 
     return (
       <div className="session-preview">
-        <h3 className="section-label">
-          Tactical Preview ({steps.length} Steps)
-        </h3>
-        <div
-          className="pitch-container"
-          style={{
-            height: "500px",
-            width: "100%",
-            background: "#eee",
-            borderRadius: "8px",
-            overflow: "hidden",
-            border: "1px solid #ccc",
-            position: "relative",
-          }}
-        >
+        <h3 className="section-label">Preview ({steps.length} Steps)</h3>
+        <div className="pitch-container">
           <Pitch vm={tacticalBoardViewModel} width={700} height={900} />
         </div>
       </div>
