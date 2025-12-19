@@ -10,6 +10,10 @@
   color: var(--text-primary);
   font-family: "Inter", sans-serif;
   overflow-y: auto;
+
+  /* Prevent horizontal scroll inside controls */
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .controls-title {
@@ -66,7 +70,7 @@
   width: 100%;
 }
 
-/* Create Team Panel (Collapsible) */
+/* Create Team Panel */
 .create-team-panel {
   background-color: var(--bg-hover);
   padding: 10px;
@@ -171,6 +175,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 /* Slider */
@@ -264,6 +269,7 @@
 .mini-color-picker {
   display: flex;
   gap: 4px;
+  flex-wrap: wrap;
 }
 
 .mini-dot {
@@ -277,4 +283,25 @@
   border-color: var(--text-primary);
   transform: scale(1.1);
   box-shadow: 0 0 0 2px var(--bg-primary);
+}
+
+/* --- MOBILE OPTIMIZATIONS --- */
+@media (max-width: 600px) {
+  .controls-panel {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .modern-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  .counter-row {
+    padding: 6px 10px;
+  }
+
+  .section-label {
+    font-size: 0.8rem;
+  }
 }

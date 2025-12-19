@@ -1,64 +1,116 @@
+/* =========================================
+   DESKTOP LAYOUT (Default)
+   ========================================= */
 .tactical-container {
   display: flex;
-  height: calc(100vh - 80px); /* Fill screen minus header */
+  height: calc(100vh - 80px); /* Adjust based on your Header height */
   gap: 1rem;
   padding: 1rem;
   box-sizing: border-box;
+  background-color: var(--bg-primary);
+  overflow: hidden;
+  position: relative;
+  max-width: 100vw;
 }
 
+/* Hide Mobile Elements on Desktop */
+.mobile-editor-header,
+.mobile-selector-controls,
+.selector-backdrop {
+  display: none;
+}
+
+/* --- Left Column: Session Selector --- */
 .tactical-left {
-  flex: 1 1 25%;
+  flex: 0 0 280px;
   overflow-y: auto;
-
-  /* Hide vertical scrollbar */
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: transparent transparent; /* Firefox */
-}
-.tactical-left::-webkit-scrollbar {
-  width: 0px; /* Chrome, Safari, Edge */
+  border-right: 1px solid var(--border-color);
+  padding-right: 1rem;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
 }
 
+/* --- Middle Column: Pitch --- */
 .tactical-mid {
-  flex: 2 1 50%;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg-primary); /* Canvas background */
+  background-color: var(--bg-card);
   border-radius: 12px;
   border: 1px solid var(--border-color);
+  padding: 1rem;
   position: relative;
+  /* Critical for flex children (pitch) to size correctly */
+  min-width: 0;
+  min-height: 0;
+}
+
+.pitch-wrapper {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
+  position: relative;
 }
 
+/* --- Right Column: Tools --- */
 .tactical-right {
-  flex: 1 1 25%;
+  flex: 0 0 260px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-color);
+  padding-left: 1rem;
+  background-color: var(--bg-primary);
+  transition: all 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+/* --- DESKTOP CONTROLS VISIBILITY --- */
+/* Force Full Controls visible on Desktop */
+.full-controls-container {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
   overflow-y: auto;
-
-  /* Hide vertical scrollbar */
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: transparent transparent; /* Firefox */
-}
-.tactical-right::-webkit-scrollbar {
-  width: 0px; /* Chrome, Safari, Edge */
+  height: 100%;
 }
 
-/* Timeline Bubbles */
+.minimized-controls-container {
+  display: none !important;
+}
+
+.controls-header-actions {
+  display: none; /* Hide collapse button on desktop */
+}
+
+.tactical-right .controls-panel {
+  flex: 1;
+  overflow-y: auto;
+  border: none;
+  padding: 0;
+}
+
+/* --- Timeline Bubbles --- */
 .step-list {
   margin-top: 1rem;
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
   width: 100%;
-  padding: 0.5rem;
-  justify-content: center;
-
-  /* Hide horizontal scrollbar */
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: transparent transparent; /* Firefox */
+  padding: 0.5rem 0.25rem; /* Reduced horizontal padding */
+  justify-content: flex-start;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  flex-shrink: 0; /* Prevent list from being squashed */
+  scrollbar-width: none;
 }
 .step-list::-webkit-scrollbar {
-  height: 0px; /* Chrome, Safari, Edge */
+  display: none;
 }
 
 .step-bubble {
@@ -66,13 +118,14 @@
   height: 36px;
   border-radius: 50%;
   border: 1px solid var(--border-color);
-  background-color: var(--bg-card);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   cursor: pointer;
+  flex-shrink: 0;
   transition: all 0.2s;
 }
 
@@ -86,4 +139,280 @@
 .empty-steps-text {
   color: var(--text-muted);
   font-size: 0.9rem;
+  white-space: nowrap;
+  padding: 0 1rem;
+}
+
+/* =========================================
+   MOBILE LAYOUT (< 1024px)
+   ========================================= */
+@media (max-width: 1024px) {
+  .tactical-container {
+    flex-direction: column;
+    height: auto;
+    /* Use dvh for full mobile height */
+    min-height: calc(100dvh - 80px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  /* --- 1. TOP: Header --- */
+  .mobile-editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+  }
+  .mobile-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .current-selection-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .current-selection-info .label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .current-selection-info .value {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+  }
+
+  .save-changes-btn {
+    background-color: var(--color-brand);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .selector-toggle-btn {
+    background-color: var(--bg-button);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  /* --- 2. MODAL --- */
+  .tactical-left {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 85vh;
+    background-color: var(--bg-primary);
+    z-index: 2000;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+    transform: translateY(105%);
+    padding: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .tactical-left.open {
+    transform: translateY(0);
+  }
+  .mobile-selector-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+  }
+  .mobile-selector-controls h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+  .close-selector-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+  }
+  .selector-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1999;
+    backdrop-filter: blur(2px);
+  }
+  .tactical-left > :not(.mobile-selector-controls) {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  /* --- 3. MIDDLE: Pitch (RESTORED SIZE) --- */
+  .tactical-mid {
+    width: 100%;
+    order: 2;
+    /* Occupy significant screen space */
+    height: 65vh;
+    min-height: 400px;
+    padding: 0.25rem; /* Reduce padding to give SVG more room */
+    box-sizing: border-box;
+  }
+
+  .step-list {
+    margin-top: 0.5rem;
+    padding: 0.25rem;
+  }
+
+  /* Shrink bubbles on mobile */
+  .step-bubble {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+
+  /* --- 4. BOTTOM: Controls --- */
+  .tactical-right {
+    width: 100%;
+    flex: none;
+    order: 3;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: var(--bg-card);
+    box-sizing: border-box;
+    max-height: none;
+  }
+
+  /* Restore Mobile Toggle Logic */
+  .full-controls-container.closed {
+    display: none !important;
+  }
+  .full-controls-container.open {
+    display: flex !important;
+  }
+
+  .minimized-controls-container.closed {
+    display: none !important;
+  }
+  .minimized-controls-container.open {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  /* Show Collapse Button on Mobile */
+  .controls-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .toggle-controls-btn {
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: var(--text-primary);
+  }
+
+  /* Minimized Styling */
+  .mini-playback-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .mini-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    color: white;
+  }
+  .mini-btn.play {
+    background: var(--color-green);
+  }
+  .mini-btn.warning {
+    background: var(--color-amber);
+  }
+  .mini-btn.danger {
+    background: #ef4444;
+  }
+  .mini-btn.icon-only {
+    flex: 0 0 40px;
+    font-size: 1.2rem;
+  }
+
+  .mini-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-hover);
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .mini-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    width: 30px;
+  }
+  .mini-slider {
+    flex: 1;
+    height: 4px;
+    accent-color: var(--color-brand);
+  }
+
+  .toggle-controls-btn.expand {
+    width: 100%;
+    padding: 8px;
+    background: var(--bg-button);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+}
+
+/* Tiny Screen Tweaks */
+@media (max-width: 480px) {
+  .tactical-mid {
+    height: 55vh;
+    min-height: 350px;
+  }
+  .step-bubble {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
 }

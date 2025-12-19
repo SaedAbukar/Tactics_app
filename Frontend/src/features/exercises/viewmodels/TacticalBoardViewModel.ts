@@ -30,6 +30,7 @@ export class TacticalBoardViewModel {
 
   savedSteps: Step[] = [];
   currentStepIndex: number | null = null;
+  activeSessionId: number | null = null;
 
   // Animation State
   isPlaying = false;
@@ -48,6 +49,14 @@ export class TacticalBoardViewModel {
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
+  }
+
+  // --- Actions: Session Management ---
+
+  setActiveSessionId(id: number | null) {
+    runInAction(() => {
+      this.activeSessionId = id;
+    });
   }
 
   // --- Actions: Adding Entities ---

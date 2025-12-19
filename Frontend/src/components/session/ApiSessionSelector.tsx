@@ -13,12 +13,13 @@ type Category = "personal" | "userShared" | "groupShared";
 interface Props {
   viewType: ViewType;
   setViewType: (v: ViewType) => void;
-  onSelectSession: (steps: Step[]) => void;
+  // FIX: Update this line to accept the optional item parameter
+  onSelectSession: (steps: Step[], item?: any) => void;
 }
 
 export const ApiSessionSelector: React.FC<Props> = observer(
   ({ viewType, setViewType, onSelectSession }) => {
-    // Use our new Hook
+    // ... rest of the component remains the same
     const {
       vm,
       editingId,
@@ -31,6 +32,10 @@ export const ApiSessionSelector: React.FC<Props> = observer(
       handleDeleteCheck,
       handleSelect,
     } = useSessionSelector(viewType, onSelectSession);
+
+    // ... (rest of the file is unchanged) ...
+    // ... Copy the rest of the existing return statement ...
+    // For brevity, just ensure the interface Props above is updated.
 
     // Local View State
     const [expandedCategory, setExpandedCategory] = useState<Category | null>(

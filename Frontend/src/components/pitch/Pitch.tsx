@@ -9,8 +9,8 @@ import { TacticalBoardViewModel } from "../../features/exercises/viewmodels/Tact
 
 interface PitchProps {
   vm: TacticalBoardViewModel;
-  width?: number; // Logical width (coordinate system)
-  height?: number; // Logical height
+  width?: number;
+  height?: number;
 }
 
 export const Pitch: React.FC<PitchProps> = observer(
@@ -25,8 +25,6 @@ export const Pitch: React.FC<PitchProps> = observer(
       pt.x = e.clientX;
       pt.y = e.clientY;
 
-      // getScreenCTM automatically handles the scaling calculation
-      // so your logic remains correct even if the SVG shrinks
       const cursor = pt.matrixTransform(svg.getScreenCTM()!.inverse());
 
       vm.moveDrag(cursor.x, cursor.y);
@@ -52,23 +50,35 @@ export const Pitch: React.FC<PitchProps> = observer(
       <svg
         // 1. Define the coordinate system
         viewBox={`0 0 ${width} ${height}`}
-        // 2. Allow CSS to control physical size (responsive)
+        // 2. Responsive Styles [UPDATED]
         style={{
-          width: "100%",
-          height: "100%",
-          maxHeight: "100%", // Ensure it fits in the flex container
+          /* Allow dimensions to shrink */
+          width: "auto",
+          height: "auto",
+
+          /* CRITICAL: Never exceed the parent container's bounds */
+          maxWidth: "100%",
+          maxHeight: "100%",
+
+          /* Center the SVG within the flex container */
+          display: "block",
+          margin: "0 auto",
+
           background: "var(--color-green, #0b6623)",
-          marginTop: 10,
           borderRadius: "8px",
           boxShadow: "0 4px 6px var(--shadow-color)",
           cursor: vm.dragItem ? "grabbing" : "default",
           touchAction: "none",
         }}
-        // 3. Preserve aspect ratio so players don't get squashed
+        // 3. Ensure the pitch fits entirely inside the view
         preserveAspectRatio="xMidYMid meet"
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        // Add touch listener prevents scrolling while dragging on mobile
+        onTouchMove={(e) => {
+          if (vm.dragItem) e.preventDefault();
+        }}
       >
         <PitchField width={width} height={height} />
 

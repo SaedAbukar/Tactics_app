@@ -70,22 +70,31 @@ export const SessionList: React.FC<SessionListProps> = ({
             }
             return (
               <div key={item.id} className="list-item-card">
+                {/* Clicking the card body just loads the pitch (standard behavior) */}
                 <div className="item-main" onClick={() => onSelect(item)}>
                   <div className="item-name">{item.name}</div>
                   <div className="item-desc">
                     {item.description?.slice(0, 40)}...
                   </div>
                 </div>
+
                 <div className="item-actions">
                   <button
                     className="icon-btn-mini"
-                    onClick={() => setEditingId(item.id)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering the card body click twice
+                      setEditingId(item.id); // 1. Open Form
+                      onSelect(item); // 2. Load Pitch
+                    }}
                   >
                     ✎
                   </button>
                   <button
                     className="icon-btn-mini danger"
-                    onClick={() => onDelete(item.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(item.id);
+                    }}
                   >
                     🗑
                   </button>
