@@ -1,13 +1,27 @@
-button {
-  padding: 6px 12px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 8px; /* Keeps it consistent with other buttons */
+/* Global Button Styles 
+  Using REM units to respond to scaling logic in index.css
+  Base calculation: 16px = 1rem
+*/
 
-  /* --- THEME FIX --- */
-  background-color: var(--bg-button); /* Adapts to light/dark button bg */
-  color: var(--text-primary); /* Adapts text color */
+button {
+  /* padding: 6px 12px -> 0.375rem 0.75rem */
+  padding: 0.375rem 0.75rem;
+
+  /* font-size: 16px -> 1rem */
+  font-size: 1rem;
+
+  cursor: pointer;
+
+  /* border-radius: 8px -> 0.5rem */
+  border-radius: 0.5rem;
+
+  /* Theme Colors */
+  background-color: var(--bg-button);
+  color: var(--text-primary);
   border: 1px solid var(--border-color);
+
+  font-family: inherit;
+  font-weight: 500;
 
   transition: all 0.2s ease;
 }
@@ -15,4 +29,16 @@ button {
 button:hover {
   background-color: var(--bg-hover);
   border-color: var(--text-secondary);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--bg-hover);
+  color: var(--text-muted);
 }

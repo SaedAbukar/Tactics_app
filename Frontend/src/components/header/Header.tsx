@@ -1,85 +1,124 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/Auth/AuthContext";
-import { useTheme } from "../../context/ThemeContext"; // 1. Import Theme Context
+import { useTheme } from "../../context/ThemeContext";
 import "./Header.css";
 
 export default function Header() {
   const { t } = useTranslation("header");
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme(); // 2. Get theme state
+  const { theme, toggleTheme } = useTheme();
+
+  // State for mobile menu
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const activeStyle = "active-link";
 
+  // Helper to close menu when a link is clicked
+  const closeMenu = () => setIsMenuOpen(false);
+
   return (
     <header className="header">
-      {/* Logo Area */}
-      <NavLink
-        to="/"
-        className={({ isActive }) => `logo-link ${isActive ? activeStyle : ""}`}
-      >
-        {t("appName")}
-      </NavLink>
-
-      <nav className="nav">
+      <div className="header-content">
+        {/* --- Logo Area --- */}
         <NavLink
           to="/"
-          className={({ isActive }) => (isActive ? activeStyle : "")}
+          className={({ isActive }) =>
+            `logo-link ${isActive ? activeStyle : ""}`
+          }
+          onClick={closeMenu}
         >
-          {t("homeLink")}
+          {t("appName")}
         </NavLink>
 
-        {user ? (
-          <>
-            <NavLink
-              to="/exercises"
-              className={({ isActive }) => (isActive ? activeStyle : "")}
-            >
-              Exercises
-            </NavLink>
-            <NavLink
-              to="/tacticalEditor"
-              className={({ isActive }) => (isActive ? activeStyle : "")}
-            >
-              {t("tacticalBoardLink")}
-            </NavLink>
-            <NavLink
-              to="/profile"
-              className={({ isActive }) => (isActive ? activeStyle : "")}
-            >
-              {t("profile")}
-            </NavLink>
-
-            <span className="user-email">{user.email}</span>
-
-            <button onClick={logout} className="logout-btn">
-              {t("logout")}
-            </button>
-          </>
-        ) : (
-          <NavLink
-            to="/login"
-            className={({ isActive }) => (isActive ? activeStyle : "")}
-          >
-            {t("login")}
-          </NavLink>
-        )}
-
-        {/* Separator */}
-        <div className="nav-separator" />
-
-        {/* 3. Theme Toggle Button */}
+        {/* --- Mobile Menu Toggle Button (Visible only on mobile) --- */}
         <button
-          onClick={toggleTheme}
-          className="icon-btn theme-toggle"
-          title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+          className="mobile-menu-btn"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle navigation"
         >
-          {theme === "light" ? "🌙" : "☀️"}
+          <span className={`hamburger ${isMenuOpen ? "open" : ""}`}></span>
         </button>
 
-        <LanguageSwitcher />
-      </nav>
+        {/* --- Navigation Links --- */}
+        {/* The 'open' class determines visibility on mobile */}
+        <nav className={`nav ${isMenuOpen ? "nav-open" : ""}`}>
+          <NavLink
+            to="/"
+            className={({ isActive }) => (isActive ? activeStyle : "")}
+            onClick={closeMenu}
+          >
+            {t("homeLink")}
+          </NavLink>
+
+          {user ? (
+            <>
+              <NavLink
+                to="/exercises"
+                className={({ isActive }) => (isActive ? activeStyle : "")}
+                onClick={closeMenu}
+              >
+                Exercises
+              </NavLink>
+              <NavLink
+                to="/tacticalEditor"
+                className={({ isActive }) => (isActive ? activeStyle : "")}
+                onClick={closeMenu}
+              >
+                {t("tacticalBoardLink")}
+              </NavLink>
+              <NavLink
+                to="/profile"
+                className={({ isActive }) => (isActive ? activeStyle : "")}
+                onClick={closeMenu}
+              >
+                {t("profile")}
+              </NavLink>
+
+              {/* <span className="user-email">{user.email}</span> */}
+
+              <button
+                onClick={() => {
+                  logout();
+                  closeMenu();
+                }}
+                className="logout-btn"
+              >
+                {t("logout")}
+              </button>
+            </>
+          ) : (
+            <NavLink
+              to="/login"
+              className={({ isActive }) => (isActive ? activeStyle : "")}
+              onClick={closeMenu}
+            >
+              {t("login")}
+            </NavLink>
+          )}
+
+          {/* Separator (Hidden on mobile usually, or kept) */}
+          <div className="nav-separator" />
+
+          {/* Controls Container (Theme & Lang) */}
+          <div className="nav-controls">
+            <button
+              onClick={toggleTheme}
+              className="icon-btn theme-toggle"
+              title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            >
+              {theme === "light" ? "🌙" : "☀️"}
+            </button>
+
+            <LanguageSwitcher />
+          </div>
+        </nav>
+
+        {/* Backdrop for mobile (closes menu when clicking outside) */}
+        {isMenuOpen && <div className="mobile-backdrop" onClick={closeMenu} />}
+      </div>
     </header>
   );
 }

@@ -4,32 +4,33 @@
   /* ========================================= */
 
   /* Backgrounds */
-  --bg-primary: #ffffff; /* Main app background */
-  --bg-card: #f9fafb; /* Cards / Containers */
-  --bg-button: #f9f9f9; /* Buttons */
-  --bg-hover: #f3f4f6; /* Hover states */
+  --bg-primary: #ffffff;
+  --bg-card: #f9fafb;
+  --bg-button: #f9f9f9;
+  --bg-hover: #f3f4f6;
 
   /* Text */
-  --text-primary: #213547; /* Main Headings */
-  --text-secondary: #4b5563; /* Paragraphs */
-  --text-muted: #9ca3af; /* ID tags, unimportant text */
+  --text-primary: #213547;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
 
   /* Borders & Shadows */
   --border-color: #e5e7eb;
   --shadow-color: rgba(0, 0, 0, 0.1);
 
   /* Accents (Brand Colors) */
-  --color-accent: #646cff; /* Your link color */
+  --color-accent: #646cff;
   --color-accent-hover: #747bff;
-  --color-brand: #2563eb; /* Blue for tabs/buttons */
+  --color-brand: #2563eb;
   --color-green: #10b981;
   --color-amber: #f59e0b;
   --color-indigo: #6366f1;
 
-  /* Font Settings (Kept from your original) */
+  /* Font Settings */
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -39,16 +40,15 @@
 /* ========================================= */
 /* 2. DARK MODE OVERRIDES                    */
 /* ========================================= */
-/* These values trigger when <html data-theme="dark"> */
 [data-theme="dark"] {
   /* Backgrounds */
-  --bg-primary: #242424; /* Your original dark bg */
-  --bg-card: #1a1a1a; /* Slightly lighter than primary */
+  --bg-primary: #242424;
+  --bg-card: #1a1a1a;
   --bg-button: #1a1a1a;
   --bg-hover: #2f2f2f;
 
   /* Text */
-  --text-primary: rgba(255, 255, 255, 0.87); /* Your original dark text */
+  --text-primary: rgba(255, 255, 255, 0.87);
   --text-secondary: #d1d5db;
   --text-muted: #6b7280;
 
@@ -62,25 +62,82 @@
 }
 
 /* ========================================= */
-/* 3. ELEMENT STYLES (Using Variables)       */
+/* 3. ROOT SCALING LOGIC (Fluid Sizing)      */
 /* ========================================= */
-/* ... existing code ... */
+/* By changing font-size here, 1rem changes everywhere.
+   Default: 100% = 16px
+*/
 
-/* FIX: Force #root to fill the screen and remove default constraints */
+html {
+  font-size: 100%;
+}
+
+/* Level 1: Small Laptops / Tablets (< 1024px) */
+/* 1rem ≈ 15px */
+@media (max-width: 1024px) {
+  html {
+    font-size: 93.75%;
+  }
+}
+
+/* Level 2: Mobile Landscape / Large Phones (< 768px) */
+/* 1rem ≈ 14px */
+@media (max-width: 768px) {
+  html {
+    font-size: 87.5%;
+  }
+}
+
+/* Level 3: Standard Mobile (< 480px) */
+/* 1rem ≈ 13px */
+@media (max-width: 480px) {
+  html {
+    font-size: 81.25%;
+  }
+}
+
+/* Level 4: Small Mobile (Old iPhones, SE) (< 350px) */
+/* 1rem ≈ 12px */
+@media (max-width: 350px) {
+  html {
+    font-size: 75%;
+  }
+}
+
+/* Level 5: Tiny Screens / Wearables (< 250px) */
+/* 1rem ≈ 10px */
+@media (max-width: 250px) {
+  html {
+    font-size: 62.5%;
+  }
+}
+
+/* Landscape Mode (Short Screens) */
+@media (max-height: 600px) {
+  html {
+    font-size: 80%;
+  }
+}
+
+/* ========================================= */
+/* 4. GLOBAL RESET & BASE STYLES             */
+/* ========================================= */
+
 #root {
   width: 100%;
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  text-align: left; /* specific override for some templates */
-  background-color: transparent; /* Let the body color show through */
+  text-align: left;
+  background-color: transparent;
+  isolation: isolate;
 }
 
 body {
   margin: 0;
-  /* CHANGE: Remove flex/place-items center. Use block for full layout. */
   display: block;
-  min-width: 320px;
+  /* Allow shrinking down to 250px without horizontal scroll */
+  min-width: 250px;
   min-height: 100vh;
 
   background-color: var(--bg-primary);
@@ -89,42 +146,36 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-a {
-  font-weight: 500;
-  color: var(--color-accent); /* Variable */
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: var(--color-accent-hover); /* Variable */
-}
-
+/* Global Typography defaults using REM */
 h1 {
-  font-size: 3.2em;
+  font-size: 3.2rem;
   line-height: 1.1;
-  color: var(--text-primary); /* Variable */
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.25s, background-color 0.3s;
-
-  /* USE VARIABLES HERE */
-  background-color: var(--bg-button);
   color: var(--text-primary);
 }
 
-button:hover {
-  border-color: var(--color-accent);
+a {
+  font-weight: 500;
+  color: var(--color-accent);
+  text-decoration: inherit;
+  transition: color 0.2s;
 }
 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+a:hover {
+  color: var(--color-accent-hover);
+}
+
+/* Scrollbar Styling (Optional but nice) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
