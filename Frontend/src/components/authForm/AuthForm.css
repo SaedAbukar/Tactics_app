@@ -3,9 +3,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh; /* Takes up most of the screen */
+  min-height: 80vh;
   padding: 1rem;
   font-family: "Inter", sans-serif;
+  box-sizing: border-box; /* Ensure padding fits within width */
 }
 
 /* The Card Itself */
@@ -15,9 +16,13 @@
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 16px;
+
+  /* Desktop Padding */
   padding: 2.5rem;
+
   box-shadow: 0 4px 6px -1px var(--shadow-color);
   transition: transform 0.2s ease;
+  box-sizing: border-box; /* CRITICAL: Prevents overflow */
 }
 
 /* Typography */
@@ -31,6 +36,7 @@
   font-size: 1.75rem;
   font-weight: 800;
   color: var(--text-primary);
+  line-height: 1.2; /* Better wrapping on mobile */
 }
 
 .auth-subtitle {
@@ -60,10 +66,12 @@
 }
 
 .auth-input {
+  width: 100%; /* Ensure input takes full width */
+  box-sizing: border-box; /* Include padding in width calculation */
   padding: 12px 16px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
-  background-color: var(--bg-button); /* Subtle background contrast */
+  background-color: var(--bg-button);
   color: var(--text-primary);
   font-size: 1rem;
   transition: all 0.2s ease;
@@ -72,7 +80,7 @@
 
 .auth-input:focus {
   border-color: var(--color-brand);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); /* Subtle blue glow */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   background-color: var(--bg-card);
 }
 
@@ -154,4 +162,16 @@
   background-color: #d1fae5;
   color: #059669;
   border: 1px solid #a7f3d0;
+}
+
+/* --- RESPONSIVE FIXES --- */
+@media (max-width: 480px) {
+  .auth-card {
+    /* Reduce padding on mobile so content isn't squished */
+    padding: 1.5rem;
+  }
+
+  .auth-title {
+    font-size: 1.5rem;
+  }
 }

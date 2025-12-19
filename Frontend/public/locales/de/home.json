@@ -1,0 +1,24 @@
+{
+  "hero": {
+    "welcome_back": "Schön dich zu sehen, {{name}}",
+    "elevate_title": "Erwecke deine Taktik zum Leben",
+    "ready_desc": "Der Platz wartet. Geh zurück zum Dashboard oder entwirf jetzt eine neue Siegerformation.",
+    "logged_out_desc": "Schluss mit unordentlichen Whiteboards. Plane professionelle Einheiten, animiere deine Spielzüge und teile deine Vision ganz einfach mit dem Team.",
+    "cta_dashboard": "Zum Dashboard",
+    "cta_start": "Kostenlos starten",
+    "cta_login": "Anmelden"
+  },
+  "cards": {
+    "tactical_title": "Taktiktafel",
+    "tactical_desc": "Zeichne es, wie du es siehst. Erstelle animierte Standards und Spielszenarien auf einem realistischen Spielfeld.",
+    "session_title": "Trainingsplaner",
+    "session_desc": "Weg mit den losen Zetteln. Baue deine Übungsbibliothek auf und organisiere Trainingswochen an einem sicheren Ort.",
+    "session_sub": "Gespeicherte Einheiten",
+    "profile_title": "Trainerprofil",
+    "profile_desc_user": "Aktualisiere deine Teameinstellungen.",
+    "profile_desc_guest": "Erstelle ein Konto, um deine Arbeit zu speichern und Pro-Funktionen freizuschalten."
+  },
+  "items_one": "{{count}} Einheit ausstehend",
+  "items_other": "{{count}} Einheiten ausstehend",
+  "greeting": "Hallo, {{name}}"
+}

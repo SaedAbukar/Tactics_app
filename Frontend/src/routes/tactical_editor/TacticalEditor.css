@@ -92,7 +92,7 @@
   flex: 1;
   overflow-y: auto;
   border: none;
-  padding: 0;
+  padding: 1;
 }
 
 /* --- Timeline Bubbles --- */
@@ -407,7 +407,7 @@
 /* Tiny Screen Tweaks */
 @media (max-width: 480px) {
   .tactical-mid {
-    height: 55vh;
+    height: 65vh;
     min-height: 350px;
   }
   .step-bubble {

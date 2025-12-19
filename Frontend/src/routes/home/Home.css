@@ -4,8 +4,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Ensure it fills available space in your layout */
   flex: 1;
+  /* Prevent horizontal overflow on mobile */
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* --- Hero Section --- */
@@ -18,11 +20,13 @@
     var(--bg-hover) 0%,
     transparent 70%
   );
+  box-sizing: border-box; /* Important for padding */
 }
 
 .hero-content {
   max-width: 800px;
   margin: 0 auto;
+  padding: 0 1rem; /* Safety padding for text */
 }
 
 .hero-title {
@@ -32,7 +36,6 @@
   margin-bottom: 1.5rem;
   color: var(--text-primary);
 
-  /* Gradient Text Effect */
   background: linear-gradient(
     135deg,
     var(--text-primary) 30%,
@@ -55,16 +58,18 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
+  flex-wrap: wrap; /* Allows wrapping on very small screens */
 }
 
 .hero-btn {
   padding: 12px 32px;
   font-size: 1.1rem;
   font-weight: 600;
-  border-radius: 9999px; /* Pill shape */
+  border-radius: 9999px;
   border: none;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  white-space: nowrap; /* Prevent text wrapping inside button */
 }
 
 .hero-btn:hover {
@@ -88,12 +93,15 @@
   width: 100%;
   max-width: 1200px;
   padding: 4rem 2rem;
+  box-sizing: border-box;
 }
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  /* Responsive Grid: Auto-fit columns, minimum 280px width */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
+  width: 100%;
 }
 
 .feature-card {
@@ -102,15 +110,26 @@
   padding: 2rem;
   border-radius: 16px;
   box-shadow: 0 4px 6px -1px var(--shadow-color);
-  transition: transform 0.2s;
+  transition: transform 0.2s, border-color 0.2s;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  height: 100%; /* Equal height cards */
+}
+
+/* New class for clickable cards */
+.feature-card.clickable {
+  cursor: pointer;
 }
 
 .feature-card:hover {
   transform: translateY(-4px);
   border-color: var(--color-brand);
+}
+
+/* Active state for touch devices */
+.feature-card:active {
+  transform: translateY(-2px);
 }
 
 .icon-wrapper {
@@ -141,25 +160,52 @@
 .sub-text {
   font-size: 0.85rem;
   color: var(--text-muted) !important;
-  margin-top: 0.5rem !important;
+  margin-top: auto !important; /* Pushes to bottom if flex column */
+  padding-top: 1rem;
 }
 
-/* Mobile Adjustments */
-@media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.5rem;
-  }
+/* --- Mobile Adjustments --- */
 
+/* Tablet & Smaller Laptops */
+@media (max-width: 1024px) {
+  .features-section {
+    padding: 3rem 1.5rem;
+  }
+}
+
+/* Mobile Phones */
+@media (max-width: 768px) {
   .hero-section {
     padding: 4rem 1rem;
+  }
+
+  .hero-title {
+    font-size: 2.5rem; /* Smaller title */
+  }
+
+  .hero-description {
+    font-size: 1.1rem;
   }
 
   .cta-group {
     flex-direction: column;
     width: 100%;
+    align-items: center;
   }
 
   .hero-btn {
-    width: 100%;
+    width: 100%; /* Full width buttons */
+    max-width: 300px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr; /* Single column stack */
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    align-items: center; /* Center content on mobile */
+    text-align: center;
+    padding: 1.5rem;
   }
 }

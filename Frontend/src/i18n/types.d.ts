@@ -24,14 +24,28 @@ declare module "i18next" {
       };
       footer: { copyright: string };
       home: {
-        title: string;
-        description: string;
+        hero: {
+          welcome_back: string;
+          elevate_title: string;
+          ready_desc: string;
+          logged_out_desc: string;
+          cta_dashboard: string;
+          cta_start: string;
+          cta_login: string;
+        };
+        cards: {
+          tactical_title: string;
+          tactical_desc: string;
+          session_title: string;
+          session_desc: string;
+          session_sub: string;
+          profile_title: string;
+          profile_desc_user: string;
+          profile_desc_guest: string;
+        };
+        items_one: string;
+        items_other: string;
         greeting: string;
-        items: string;
-        items_plural: string;
-        welcome: string;
-        tactics_app: string;
-        explore: string;
       };
       tacticalEditor: {
         step: string;

@@ -1,10 +1,24 @@
 {
-  "title": "Welcome Home",
-  "description": "This is the home page",
-  "greeting": "Hello, {{name}}!",
-  "items": "You have {{count}} item",
-  "items_plural": "You have {{count}} items",
-  "welcome": "Welcome",
-  "tactics_app": "Tactics app",
-  "explore": "Explore"
+  "hero": {
+    "welcome_back": "Good to see you, {{name}}",
+    "elevate_title": "Bring Your Tactics to Life",
+    "ready_desc": "Your pitch is waiting. Jump back into your dashboard or sketch out a new winning formation right now.",
+    "logged_out_desc": "Stop struggling with messy whiteboards. Plan professional sessions, animate your best plays, and share your vision with the team easily.",
+    "cta_dashboard": "Open Dashboard",
+    "cta_start": "Start for Free",
+    "cta_login": "Sign In"
+  },
+  "cards": {
+    "tactical_title": "Tactical Board",
+    "tactical_desc": "Draw it like you see it. Create animated set-pieces and match scenarios on a pitch that looks real.",
+    "session_title": "Session Planner",
+    "session_desc": "Ditch the loose papers. Build your drill library and organize full training weeks in one secure place.",
+    "session_sub": "View saved sessions",
+    "profile_title": "Coach Profile",
+    "profile_desc_user": "Update your team settings and preferences.",
+    "profile_desc_guest": "Create an account to save your work and unlock pro features."
+  },
+  "items_one": "{{count}} session pending",
+  "items_other": "{{count}} sessions pending",
+  "greeting": "Hi, {{name}}"
 }

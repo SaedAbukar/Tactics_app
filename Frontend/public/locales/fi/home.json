@@ -1,10 +1,24 @@
 {
-  "title": "Tervetuloa kotiin",
-  "description": "Tämä on etusivu",
-  "greeting": "Hei, {{name}}!",
-  "items": "Sinulla on {{count}} esine",
-  "items_plural": "Sinulla on {{count}} esinettä",
-  "welcome": "Tervetuloa",
-  "tactics_app": "Taktiikkasovellus",
-  "explore": "Tutustu"
+  "hero": {
+    "welcome_back": "Hienoa nähdä sinut, {{name}}",
+    "elevate_title": "Herätä pelitapasi eloon",
+    "ready_desc": "Kenttä on valmis. Palaa hallintapaneeliin tai luonnostele uusi voittava muodostelma heti.",
+    "logged_out_desc": "Unohda suttuiset fläppitaulut. Suunnittele ammattimaiset harjoitukset, animoi parhaat kuviosi ja jaa visiosi joukkueelle helposti.",
+    "cta_dashboard": "Avaa kojelauta",
+    "cta_start": "Aloita ilmaiseksi",
+    "cta_login": "Kirjaudu"
+  },
+  "cards": {
+    "tactical_title": "Taktiikkataulu",
+    "tactical_desc": "Piirrä se niin kuin näet sen. Luo animoituja erikoistilanteita ja pelitilanteita aidon näköiselle kentälle.",
+    "session_title": "Harjoitussuunnittelija",
+    "session_desc": "Heitä irtopaperit pois. Rakenna harjoituskirjastosi ja organisoi treeniviikot yhteen turvalliseen paikkaan.",
+    "session_sub": "Katso tallennukset",
+    "profile_title": "Valmentajaprofiili",
+    "profile_desc_user": "Päivitä joukkueen asetukset ja mieltymykset.",
+    "profile_desc_guest": "Luo tili tallentaaksesi työsi ja avataksesi pro-ominaisuudet."
+  },
+  "items_one": "{{count}} harjoitus odottaa",
+  "items_other": "{{count}} harjoitusta odottaa",
+  "greeting": "Hei, {{name}}"
 }

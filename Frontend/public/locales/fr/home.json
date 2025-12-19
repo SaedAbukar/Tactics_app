@@ -1,0 +1,24 @@
+{
+  "hero": {
+    "welcome_back": "Ravi de vous revoir, {{name}}",
+    "elevate_title": "Donnez vie à vos tactiques",
+    "ready_desc": "Le terrain vous attend. Retournez à votre tableau de bord ou esquissez une nouvelle formation gagnante dès maintenant.",
+    "logged_out_desc": "Fini les tableaux blancs désordonnés. Planifiez des séances pro, animez vos meilleures actions et partagez votre vision avec l'équipe.",
+    "cta_dashboard": "Ouvrir le tableau de bord",
+    "cta_start": "Commencer gratuitement",
+    "cta_login": "Connexion"
+  },
+  "cards": {
+    "tactical_title": "Tableau Tactique",
+    "tactical_desc": "Dessinez ce que vous voyez. Créez des coups de pied arrêtés animés et des scénarios de match sur un terrain réaliste.",
+    "session_title": "Planificateur",
+    "session_desc": "Jetez les feuilles volantes. Construisez votre bibliothèque d'exercices et organisez vos semaines d'entraînement en un seul endroit.",
+    "session_sub": "Voir les séances",
+    "profile_title": "Profil Coach",
+    "profile_desc_user": "Mettez à jour les paramètres de votre équipe.",
+    "profile_desc_guest": "Créez un compte pour sauvegarder votre travail et débloquer les fonctions pro."
+  },
+  "items_one": "{{count}} séance en attente",
+  "items_other": "{{count}} séances en attente",
+  "greeting": "Salut, {{name}}"
+}

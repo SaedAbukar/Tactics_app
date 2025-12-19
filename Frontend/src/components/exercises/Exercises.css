@@ -3,9 +3,11 @@
 /* --- Layout --- */
 .exercises-container {
   max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0 auto; /* Centers the container */
   padding: 2rem 1rem;
   font-family: "Inter", sans-serif;
+  box-sizing: border-box;
 }
 
 .header-section {
@@ -13,6 +15,8 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 2rem;
+  flex-wrap: wrap; /* Allows wrapping on small screens */
+  gap: 1rem;
 }
 
 .page-title {
@@ -34,6 +38,19 @@
   margin-bottom: 2.5rem;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 1rem;
+
+  /* Make tabs scrollable on mobile */
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+
+  /* Hide scrollbar visually but keep functionality */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabs-container::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-button {
@@ -46,6 +63,7 @@
   transition: all 0.2s ease;
   background-color: var(--bg-hover);
   color: var(--text-secondary);
+  flex-shrink: 0; /* Prevent buttons from shrinking */
 }
 
 .tab-button.active {
@@ -59,11 +77,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
+  justify-content: center; /* Centers columns if they wrap */
 }
 
 .section-column {
   flex: 1;
-  min-width: 300px;
+  min-width: 300px; /* Maintains width before wrapping */
+  max-width: 400px; /* Prevents columns from getting too wide on huge screens */
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -80,7 +100,6 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  /* background-color is set inline */
 }
 
 .section-title {
@@ -142,9 +161,11 @@
 /* --- Detail View --- */
 .detail-container {
   max-width: 900px;
+  width: 100%;
   margin: 0 auto;
   padding: 2rem;
   font-family: "Inter", sans-serif;
+  box-sizing: border-box;
 }
 
 .back-button {
@@ -176,6 +197,8 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex-wrap: wrap; /* Allows header content to wrap */
+  gap: 1rem;
 }
 
 .detail-title {
@@ -194,6 +217,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .detail-body {
@@ -224,6 +248,7 @@
 .grid-list {
   display: grid;
   gap: 1rem;
+  /* Responsive grid columns */
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
 
@@ -249,15 +274,16 @@
   background-color: #fee2e2;
   border-radius: 8px;
   margin: 1rem;
+  text-align: center;
 }
 
 .pitch-container {
   height: 500px;
   width: 100%;
-  background-color: var(--bg-primary); /* reacts to theme */
+  background-color: var(--bg-primary);
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid var(--border-color); /* reacts to theme */
+  border: 1px solid var(--border-color);
   position: relative;
 }
 
@@ -267,5 +293,68 @@
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   MEDIA QUERIES
+   ========================================= */
+
+/* Tablet & Mobile (width < 768px) */
+@media (max-width: 768px) {
+  .exercises-container,
+  .detail-container {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Stack columns vertically on smaller screens */
+  .columns-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .section-column {
+    width: 100%;
+    min-width: 0; /* Reset min-width to allow shrinking */
+    max-width: 100%;
+  }
+
+  .detail-header {
+    padding: 1.5rem;
+    flex-direction: column-reverse; /* Badge on top or standard stack */
+    align-items: flex-start;
+  }
+
+  .detail-title {
+    font-size: 1.5rem;
+  }
+
+  .detail-body {
+    padding: 1.5rem;
+  }
+
+  .pitch-container {
+    height: 350px; /* Smaller pitch height on mobile */
+  }
+}
+
+/* Small Mobile (width < 480px) */
+@media (max-width: 480px) {
+  .tab-button {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .grid-list {
+    grid-template-columns: 1fr; /* Full width items */
   }
 }

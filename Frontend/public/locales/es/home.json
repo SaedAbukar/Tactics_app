@@ -1,10 +1,24 @@
 {
-  "title": "Bienvenido a casa",
-  "description": "Esta es la página de inicio",
-  "greeting": "¡Hola, {{name}}!",
-  "items": "Tienes {{count}} artículo",
-  "items_plural": "Tienes {{count}} artículos",
-  "welcome": "Bienvenido",
-  "tactics_app": "Aplicación de tácticas",
-  "explore": "Explorar"
+  "hero": {
+    "welcome_back": "Qué bueno verte, {{name}}",
+    "elevate_title": "Da vida a tus tácticas",
+    "ready_desc": "El campo te espera. Vuelve a tu panel o diseña una nueva formación ganadora ahora mismo.",
+    "logged_out_desc": "Olvídate de las pizarras desordenadas. Planifica sesiones profesionales, anima tus mejores jugadas y comparte tu visión con el equipo fácilmente.",
+    "cta_dashboard": "Abrir Panel",
+    "cta_start": "Empezar Gratis",
+    "cta_login": "Entrar"
+  },
+  "cards": {
+    "tactical_title": "Pizarra Táctica",
+    "tactical_desc": "Dibújalo tal como lo ves. Crea jugadas a balón parado animadas y escenarios de partido en un campo realista.",
+    "session_title": "Planificador",
+    "session_desc": "Adiós a los papeles sueltos. Construye tu biblioteca de ejercicios y organiza semanas de entrenamiento en un solo lugar.",
+    "session_sub": "Ver sesiones guardadas",
+    "profile_title": "Perfil",
+    "profile_desc_user": "Actualiza la configuración de tu equipo.",
+    "profile_desc_guest": "Crea una cuenta para guardar tu trabajo y acceder a funciones pro."
+  },
+  "items_one": "{{count}} sesión pendiente",
+  "items_other": "{{count}} sesiones pendientes",
+  "greeting": "Hola, {{name}}"
 }

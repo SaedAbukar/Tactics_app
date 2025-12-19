@@ -1,18 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/Auth/AuthContext";
+import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
 import "./AuthForm.css";
 
 const AuthForm: React.FC = () => {
-  const { user, loading, error, login, signup, logout } = useAuth();
+  const { user, loading, error, login, signup } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [isLoginView, setIsLoginView] = useState(true); // Toggle between Login/Signup view
+  const [isLoginView, setIsLoginView] = useState(true);
+
+  const navigate = useNavigate(); // 2. Initialize hook
+
+  // 3. Redirect to home if user is logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await login({ email, password });
+      // Navigation will happen automatically via the useEffect above
     } catch (err) {
       console.error(err);
     }
@@ -23,7 +34,7 @@ const AuthForm: React.FC = () => {
     try {
       await signup({ email, password });
       setMessage("Account created successfully! Please log in.");
-      setIsLoginView(true); // Switch back to login view
+      setIsLoginView(true);
       setEmail("");
       setPassword("");
     } catch (err: any) {
@@ -32,19 +43,8 @@ const AuthForm: React.FC = () => {
     }
   };
 
-  if (user) {
-    return (
-      <div className="auth-container">
-        <div className="auth-card">
-          <h2 className="auth-title">Welcome back!</h2>
-          <p className="auth-subtitle">You are logged in as {user.email}</p>
-          <button onClick={logout} className="auth-btn secondary">
-            Logout
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // 4. If user exists, return null (or a spinner) while redirecting
+  if (user) return null;
 
   return (
     <div className="auth-container">
