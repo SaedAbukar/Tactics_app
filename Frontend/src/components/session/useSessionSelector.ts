@@ -76,9 +76,10 @@ export const useSessionSelector = (
         await vm.updatePractice(editingId, payload);
       else await vm.updateTactic(editingId, payload);
     }
-
+    console.log("SessionSelector: ", payload);
     setEditingId(null);
     setIsCreating(false);
+    boardVM.clearPitch();
   };
 
   const handleDeleteCheck = (id: number) => {
@@ -156,12 +157,22 @@ export const useSessionSelector = (
     else if (item.sessions?.length > 0) onSelectSession(item.sessions[0].steps);
   };
 
+  const startCreating = (value: boolean) => {
+    if (value) {
+      // Only clear pitch when OPENING the modal (true)
+      boardVM.clearPitch();
+      setEditingId(null);
+    }
+    // Set the state to whatever was passed (true OR false)
+    setIsCreating(value);
+  };
+
   return {
     vm,
     editingId,
     setEditingId,
     isCreating,
-    setIsCreating,
+    setIsCreating: startCreating,
     modalConfig,
     setModalConfig,
     handleSave,

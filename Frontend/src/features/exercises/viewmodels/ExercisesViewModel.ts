@@ -109,6 +109,7 @@ export class ExercisesViewModel {
       this.handleError("Failed to create session.", err);
       this.setLoading(false);
     }
+    console.log("ExerciseVM: ", data);
   }
 
   async updateSession(id: number, data: Partial<Session>) {

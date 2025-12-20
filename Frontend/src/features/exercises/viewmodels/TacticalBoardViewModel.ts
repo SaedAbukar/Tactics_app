@@ -167,6 +167,8 @@ export class TacticalBoardViewModel {
       this.savedSteps.push(newStep);
     }
     this.currentStepIndex = null;
+
+    console.log("TacticalVM: ", newStep);
   }
 
   loadStep(index: number) {
@@ -252,6 +254,7 @@ export class TacticalBoardViewModel {
     const t = Math.min(elapsed / stepDuration, 1);
 
     const currentStep = this.savedSteps[this.stepIndex];
+    // Safety check: ensure next step exists, otherwise stick to current
     const nextStep = this.savedSteps[this.stepIndex + 1] ?? currentStep;
 
     // Linear Interpolation helper
@@ -259,19 +262,30 @@ export class TacticalBoardViewModel {
 
     // Batch updates to avoid React trashing
     runInAction(() => {
-      // Interpolate Players
+      // 1. Interpolate Players
       this.players = currentStep.players.map((p, i) => {
+        // If the next step has this player, move towards them. Else stay put.
         const nextP = nextStep.players[i] || p;
         return { ...p, x: lerp(p.x, nextP.x), y: lerp(p.y, nextP.y) };
       });
 
-      // Interpolate Balls
+      // 2. Interpolate Balls
       this.balls = currentStep.balls.map((b, i) => {
         const nextB = nextStep.balls[i] || b;
         return { ...b, x: lerp(b.x, nextB.x), y: lerp(b.y, nextB.y) };
       });
 
-      // (Repeat for cones/goals if they move, usually they don't, but here is the logic)
+      // 3. ✅ ADD THIS: Interpolate Goals
+      this.goals = currentStep.goals.map((g, i) => {
+        const nextG = nextStep.goals[i] || g;
+        return { ...g, x: lerp(g.x, nextG.x), y: lerp(g.y, nextG.y) };
+      });
+
+      // 4. ✅ ADD THIS: Interpolate Cones
+      this.cones = currentStep.cones.map((c, i) => {
+        const nextC = nextStep.cones[i] || c;
+        return { ...c, x: lerp(c.x, nextC.x), y: lerp(c.y, nextC.y) };
+      });
     });
 
     if (t < 1) {
@@ -282,6 +296,12 @@ export class TacticalBoardViewModel {
         this.stepIndex++;
         this.startTime = 0;
         this.elapsedBeforePause = 0;
+
+        // CRITICAL: Explicitly load the full state of the new step here
+        // This ensures that if a cone was ADDED in the new step, it appears now.
+        // (The interpolation above only mapped items that existed in the previous step)
+        this.loadStep(this.stepIndex);
+
         this.animFrameId = requestAnimationFrame(this.animateFrame);
       } else {
         this.stopAnimation();
