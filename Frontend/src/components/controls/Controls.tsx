@@ -58,7 +58,7 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
             value={selectedTeamId}
             onChange={(e) => setSelectedTeamId(e.target.value)}
           >
-            <option value="">No Team (Free Agent)</option>
+            <option value="">No Team</option>
             {vm.teams.map((team) => (
               <option key={team.id} value={team.id}>
                 {team.name}
@@ -186,15 +186,15 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
               onClick={vm.play}
               disabled={vm.savedSteps.length === 0}
             >
-              ▶ Play
+              Play
             </button>
           ) : vm.isPaused ? (
             <button className="modern-btn warning" onClick={vm.continue}>
-              ▶ Resume
+              Resume
             </button>
           ) : (
             <button className="modern-btn warning" onClick={vm.pause}>
-              ⏸ Pause
+              Pause
             </button>
           )}
 
@@ -203,7 +203,7 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
             onClick={vm.stopAnimation}
             disabled={!vm.isPlaying && !vm.isPaused}
           >
-            ⏹ Stop
+            Stop
           </button>
         </div>
 
