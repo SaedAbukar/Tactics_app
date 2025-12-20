@@ -1,0 +1,13 @@
+{
+  "save": "Enregistrer",
+  "add": "Ajouter",
+  "delete": "Supprimer",
+  "cancel": "Annuler",
+  "loading": {
+    "initWorkspace": "Initialisation de l'espace de travail...",
+    "app": "Chargement de l'application..."
+  },
+  "errors": {
+    "initFailed": "Échec de l'initialisation"
+  }
+}

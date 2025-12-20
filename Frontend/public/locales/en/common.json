@@ -2,5 +2,12 @@
   "save": "Save",
   "add": "Add",
   "delete": "Delete",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "loading": {
+    "initWorkspace": "Initializing Workspace...",
+    "app": "Loading App..."
+  },
+  "errors": {
+    "initFailed": "Initialization Failed"
+  }
 }

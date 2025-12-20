@@ -1,0 +1,77 @@
+/* Container Logic */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  width: 100%;
+  height: 100%;
+  min-height: 200px; /* Minimum height for inline usage */
+  box-sizing: border-box;
+}
+
+/* Full Screen Overlay Mode */
+.spinner-container.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-primary); /* Matches your theme background */
+  z-index: 9999; /* On top of everything */
+}
+
+/* The Rotating Ring */
+.spinner-ring {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--border-color); /* Subtle track color */
+  border-top-color: var(--color-brand); /* Brand color for the spinner */
+  border-radius: 50%;
+  animation: spin 0.8s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+/* Optional Text */
+.spinner-message {
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary); /* Muted text color */
+  margin: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Mobile Adjustment (Make it smaller on phones) */
+@media (max-width: 480px) {
+  .spinner-ring {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+
+  .spinner-message {
+    font-size: 0.9rem;
+  }
+}

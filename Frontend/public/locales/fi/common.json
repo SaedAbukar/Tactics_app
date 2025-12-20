@@ -2,5 +2,12 @@
   "save": "Tallenna",
   "add": "Lisää",
   "delete": "Poista",
-  "cancel": "Peruuta"
+  "cancel": "Peruuta",
+  "loading": {
+    "initWorkspace": "Alustetaan työtilaa...",
+    "app": "Ladataan sovellusta..."
+  },
+  "errors": {
+    "initFailed": "Alustus epäonnistui"
+  }
 }

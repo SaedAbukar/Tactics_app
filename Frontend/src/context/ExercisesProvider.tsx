@@ -6,9 +6,11 @@ import {
   useRef,
   type ReactNode,
 } from "react";
+import { useTranslation } from "react-i18next"; // 1. Import hook
 import { useFetchWithAuth } from "../hooks/useFetchWithAuth";
 import { ExercisesContainer } from "../features/exercises/di/Container";
 import { useAuth } from "../context/Auth/AuthContext";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
 // 1. The Context
 const ExercisesContext = createContext<ExercisesContainer | null>(null);
@@ -24,6 +26,7 @@ export const useExercises = (): ExercisesContainer => {
 
 // 3. The Provider
 export const ExercisesProvider = ({ children }: { children: ReactNode }) => {
+  const { t } = useTranslation("common"); // 2. Initialize translation hook
   const { user } = useAuth();
   const { request } = useFetchWithAuth();
 
@@ -74,7 +77,8 @@ export const ExercisesProvider = ({ children }: { children: ReactNode }) => {
   if (error) {
     return (
       <div style={{ padding: "2rem", color: "red" }}>
-        <h3>Initialization Failed</h3>
+        {/* 3. Use translation for error title */}
+        <h3>{t("errors.initFailed", "Initialization Failed")}</h3>
         <p>{error.message}</p>
       </div>
     );
@@ -86,11 +90,11 @@ export const ExercisesProvider = ({ children }: { children: ReactNode }) => {
 
   if (isLoading) {
     return (
-      <div
-        style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
-      >
-        Setting up Exercises...
-      </div>
+      <LoadingSpinner
+        fullScreen={true}
+        // 4. Use translation for loading message
+        message={t("loading.initWorkspace", "Initializing Workspace...")}
+      />
     );
   }
 

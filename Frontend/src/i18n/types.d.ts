@@ -13,6 +13,13 @@ declare module "i18next" {
         back: string;
         retry: string;
         error: string;
+        loading: {
+          initWorkspace: string;
+          app: string;
+        };
+        errors: {
+          initFailed: string;
+        };
       };
       header: {
         appName: string;

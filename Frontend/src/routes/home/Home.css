@@ -20,13 +20,13 @@
     var(--bg-hover) 0%,
     transparent 70%
   );
-  box-sizing: border-box; /* Important for padding */
+  box-sizing: border-box;
 }
 
 .hero-content {
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 1rem; /* Safety padding for text */
+  padding: 0 1rem;
 }
 
 .hero-title {
@@ -58,7 +58,7 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
-  flex-wrap: wrap; /* Allows wrapping on very small screens */
+  flex-wrap: wrap;
 }
 
 .hero-btn {
@@ -69,7 +69,7 @@
   border: none;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  white-space: nowrap; /* Prevent text wrapping inside button */
+  white-space: nowrap;
 }
 
 .hero-btn:hover {
@@ -114,7 +114,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  height: 100%; /* Equal height cards */
+  height: 100%;
 }
 
 /* New class for clickable cards */
@@ -127,7 +127,6 @@
   border-color: var(--color-brand);
 }
 
-/* Active state for touch devices */
 .feature-card:active {
   transform: translateY(-2px);
 }
@@ -160,7 +159,7 @@
 .sub-text {
   font-size: 0.85rem;
   color: var(--text-muted) !important;
-  margin-top: auto !important; /* Pushes to bottom if flex column */
+  margin-top: auto !important;
   padding-top: 1rem;
 }
 
@@ -180,7 +179,7 @@
   }
 
   .hero-title {
-    font-size: 2.5rem; /* Smaller title */
+    font-size: 2.5rem;
   }
 
   .hero-description {
@@ -194,18 +193,29 @@
   }
 
   .hero-btn {
-    width: 100%; /* Full width buttons */
+    width: 100%;
     max-width: 300px;
   }
 
+  .features-section {
+    padding: 2rem 1rem;
+  }
+
   .features-grid {
-    grid-template-columns: 1fr; /* Single column stack */
-    gap: 1.5rem;
+    /* Switch to Flex Column for strictly vertical stacking with gap */
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* ✅ Enforced Gap */
+    width: 100%;
   }
 
   .feature-card {
-    align-items: center; /* Center content on mobile */
+    align-items: center;
     text-align: center;
     padding: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    /* Reset any potential margins interfering with gap */
+    margin: 0;
   }
 }

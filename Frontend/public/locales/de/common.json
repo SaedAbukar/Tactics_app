@@ -1,0 +1,13 @@
+{
+  "save": "Speichern",
+  "add": "Hinzufügen",
+  "delete": "Löschen",
+  "cancel": "Abbrechen",
+  "loading": {
+    "initWorkspace": "Arbeitsbereich wird initialisiert...",
+    "app": "App wird geladen..."
+  },
+  "errors": {
+    "initFailed": "Initialisierung fehlgeschlagen"
+  }
+}

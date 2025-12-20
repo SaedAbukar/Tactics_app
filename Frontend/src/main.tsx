@@ -6,6 +6,8 @@ import "./i18n";
 import { AuthProvider } from "./context/Auth/AuthContext.tsx";
 import { ExercisesProvider } from "./context/ExercisesProvider.tsx";
 import { ThemeProvider } from "./context/ThemeContext.tsx";
+// Import the new component
+import { LoadingSpinner } from "./components/ui/LoadingSpinner";
 
 const rootElement = document.getElementById("root");
 
@@ -15,14 +17,14 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <Suspense fallback={<div>Loading...</div>}>
-      <AuthProvider>
-        <ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <Suspense fallback={<LoadingSpinner fullScreen={true} message="" />}>
           <ExercisesProvider>
             <App />
           </ExercisesProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    </Suspense>
+        </Suspense>
+      </ThemeProvider>
+    </AuthProvider>
   </StrictMode>
 );
