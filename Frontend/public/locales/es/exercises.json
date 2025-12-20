@@ -1,0 +1,25 @@
+{
+  "title": "Panel de Entrenamiento",
+  "subtitle": "Gestiona tus recursos de entrenamiento personales y compartidos.",
+  "tabs": {
+    "sessions": "Sesiones",
+    "practices": "Prácticas",
+    "tactics": "Tácticas de Juego"
+  },
+  "columns": {
+    "personal": "Personal",
+    "shared": "Compartido conmigo",
+    "group": "Biblioteca de Grupo",
+    "empty": "No se encontraron elementos"
+  },
+  "detail": {
+    "preview": "Vista previa ({{count}} Pasos)",
+    "description": "Descripción",
+    "included": "Sesiones Incluidas ({{count}})",
+    "addSession": "Añadir Sesión",
+    "noDescription": "Sin descripción.",
+    "noSessions": "No hay sesiones vinculadas. Haz clic en \"Añadir Sesión\" para comenzar.",
+    "selectPrompt": "Selecciona una sesión para añadir",
+    "choose": "-- Elegir de la Biblioteca --"
+  }
+}

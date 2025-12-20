@@ -1,0 +1,25 @@
+{
+  "title": "Trainings-Dashboard",
+  "subtitle": "Verwalte deine persönlichen und geteilten Trainingsressourcen.",
+  "tabs": {
+    "sessions": "Sitzungen",
+    "practices": "Übungen",
+    "tactics": "Spieltaktiken"
+  },
+  "columns": {
+    "personal": "Persönlich",
+    "shared": "Mit mir geteilt",
+    "group": "Gruppenbibliothek",
+    "empty": "Keine Elemente gefunden"
+  },
+  "detail": {
+    "preview": "Vorschau ({{count}} Schritte)",
+    "description": "Beschreibung",
+    "included": "Enthaltene Sitzungen ({{count}})",
+    "addSession": "Sitzung hinzufügen",
+    "noDescription": "Keine Beschreibung verfügbar.",
+    "noSessions": "Noch keine Sitzungen verknüpft. Klicke auf \"Sitzung hinzufügen\".",
+    "selectPrompt": "Wähle eine Sitzung zum Hinzufügen",
+    "choose": "-- Aus Bibliothek wählen --"
+  }
+}

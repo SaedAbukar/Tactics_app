@@ -1,0 +1,25 @@
+{
+  "title": "Tableau de Bord Entraînement",
+  "subtitle": "Gérez vos ressources d'entraînement personnelles et partagées.",
+  "tabs": {
+    "sessions": "Sessions",
+    "practices": "Exercices",
+    "tactics": "Tactiques de Jeu"
+  },
+  "columns": {
+    "personal": "Personnel",
+    "shared": "Partagé avec moi",
+    "group": "Bibliothèque de Groupe",
+    "empty": "Aucun élément trouvé"
+  },
+  "detail": {
+    "preview": "Aperçu ({{count}} Étapes)",
+    "description": "Description",
+    "included": "Sessions Incluses ({{count}})",
+    "addSession": "Ajouter Session",
+    "noDescription": "Aucune description fournie.",
+    "noSessions": "Aucune session liée. Cliquez sur \"Ajouter Session\" pour commencer.",
+    "selectPrompt": "Sélectionnez une session à ajouter",
+    "choose": "-- Choisir dans la bibliothèque --"
+  }
+}

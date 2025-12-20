@@ -1,0 +1,25 @@
+{
+  "title": "Harjoittelun hallintapaneeli",
+  "subtitle": "Hallitse omia ja jaettuja harjoitusmateriaaleja.",
+  "tabs": {
+    "sessions": "Harjoitukset",
+    "practices": "Harjoitus Setit",
+    "tactics": "Pelitaktiikat"
+  },
+  "columns": {
+    "personal": "Henkilökohtaiset",
+    "shared": "Jaettu minulle",
+    "group": "Ryhmän kirjasto",
+    "empty": "Ei kohteita"
+  },
+  "detail": {
+    "preview": "Esikatselu ({{count}} vaihetta)",
+    "description": "Kuvaus",
+    "included": "Sisältyvät istunnot ({{count}})",
+    "addSession": "Lisää istunto",
+    "noDescription": "Ei kuvausta.",
+    "noSessions": "Ei liitettyjä istuntoja. Klikkaa \"Lisää istunto\" aloittaaksesi.",
+    "selectPrompt": "Valitse lisättävä istunto",
+    "choose": "-- Valitse kirjastosta --"
+  }
+}

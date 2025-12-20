@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import "../Exercises.css";
 
 interface SectionColumnProps {
@@ -13,6 +14,8 @@ export const SectionColumn = ({
   color,
   onItemClick,
 }: SectionColumnProps) => {
+  const { t } = useTranslation("exercises");
+
   return (
     <div className="section-column">
       <div className="section-header">
@@ -23,7 +26,9 @@ export const SectionColumn = ({
 
       <div className="card-list">
         {items.length === 0 ? (
-          <div className="empty-state">No items found</div>
+          <div className="empty-state">
+            {t("columns.empty", "No items found")}
+          </div>
         ) : (
           items.map((item) => (
             <div

@@ -1,0 +1,25 @@
+{
+  "title": "Training Dashboard",
+  "subtitle": "Manage your personal and shared training resources.",
+  "tabs": {
+    "sessions": "Sessions",
+    "practices": "Practices",
+    "tactics": "Game Tactics"
+  },
+  "columns": {
+    "personal": "Personal",
+    "shared": "Shared with Me",
+    "group": "Group Library",
+    "empty": "No items found"
+  },
+  "detail": {
+    "preview": "Preview ({{count}} Steps)",
+    "description": "Description",
+    "included": "Included Sessions ({{count}})",
+    "addSession": "Add Session",
+    "noDescription": "No description provided.",
+    "noSessions": "No sessions linked yet. Click \"Add Session\" to start building.",
+    "selectPrompt": "Select a session to add",
+    "choose": "-- Choose from Library --"
+  }
+}

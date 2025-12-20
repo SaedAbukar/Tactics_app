@@ -17,19 +17,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>({
-    id: 1,
-    email: "test@example.com",
-    role: "USER", // or whatever your AuthUser type expects
-  });
-  const [token, setToken] = useState<string | null>("test-access-token");
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [refreshTokenValue, setRefreshTokenValue] = useState<string | null>(
-    "test-refresh-token"
+    null
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
-  // ... rest of your AuthProvider code remains unchanged
 
   // ------------------------------
   // Token helpers

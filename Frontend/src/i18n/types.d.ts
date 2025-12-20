@@ -10,6 +10,9 @@ declare module "i18next" {
         delete: string;
         cancel: string;
         logout: string;
+        back: string;
+        retry: string;
+        error: string;
       };
       header: {
         appName: string;
@@ -66,6 +69,31 @@ declare module "i18next" {
         na: string; // For "N/A" dates
       };
       footer: { copyright: string };
+      exercises: {
+        title: string;
+        subtitle: string;
+        tabs: {
+          sessions: string;
+          practices: string;
+          tactics: string;
+        };
+        columns: {
+          personal: string;
+          shared: string;
+          group: string;
+          empty: string;
+        };
+        detail: {
+          preview: string;
+          description: string;
+          included: string;
+          addSession: string;
+          noDescription: string;
+          noSessions: string;
+          selectPrompt: string;
+          choose: string;
+        };
+      };
       tacticalEditor: {
         step: string;
         editing: string;
