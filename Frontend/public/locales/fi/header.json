@@ -1,9 +1,15 @@
 {
-  "appName": "Taktiikka sovellus",
+  "appName": "Taktiikkasovellus",
   "homeLink": "Etusivu",
+  "exercises": "Harjoitukset",
   "tacticalBoardLink": "Taktiikkataulu",
   "language": "Kieli",
   "english": "Englanti",
   "finnish": "Suomi",
-  "spanish": "Espanja"
+  "spanish": "Espanja",
+  "french": "Ranska",
+  "german": "Saksa",
+  "login": "Kirjaudu",
+  "logout": "Kirjaudu ulos",
+  "profile": "Profiili"
 }

@@ -4,13 +4,15 @@ import "./LanguageSwitcher.css";
 
 const LANGUAGES: {
   code: string;
-  key: "english" | "finnish" | "spanish";
+  key: "english" | "finnish" | "spanish" | "german" | "french";
   dir: "ltr" | "rtl";
-  flag: string; // Added emoji flags for better visual
+  flag: string;
 }[] = [
   { code: "en", key: "english", dir: "ltr", flag: "🇬🇧" },
   { code: "fi", key: "finnish", dir: "ltr", flag: "🇫🇮" },
   { code: "es", key: "spanish", dir: "ltr", flag: "🇪🇸" },
+  { code: "de", key: "german", dir: "ltr", flag: "🇩🇪" },
+  { code: "fr", key: "french", dir: "ltr", flag: "🇫🇷" },
 ];
 
 const ChevronDown = ({ className }: { className?: string }) => (
@@ -68,6 +70,7 @@ export default function LanguageSwitcher() {
         aria-label="Select Language"
         aria-expanded={isOpen}
       >
+        {/* <span className="lang-flag">{currentLang.flag}</span> */}
         <span className="lang-code">{currentLang.code.toUpperCase()}</span>
         <ChevronDown className={`chevron-icon ${isOpen ? "rotate" : ""}`} />
       </button>
@@ -83,6 +86,7 @@ export default function LanguageSwitcher() {
                 }`}
                 onClick={() => handleLanguageChange(lang.code)}
               >
+                {/* <span className="option-flag">{lang.flag}</span> */}
                 <span className="option-label">{t(lang.key)}</span>
                 {i18n.language === lang.code && (
                   <span className="check-mark">✓</span>

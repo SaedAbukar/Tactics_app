@@ -1,0 +1,15 @@
+{
+  "appName": "Appli Tactique",
+  "homeLink": "Accueil",
+  "exercises": "Exercices",
+  "tacticalBoardLink": "Tableau Tactique",
+  "language": "Langue",
+  "english": "Anglais",
+  "finnish": "Finnois",
+  "spanish": "Espagnol",
+  "french": "Français",
+  "german": "Allemand",
+  "login": "Connexion",
+  "logout": "Déconnexion",
+  "profile": "Profil"
+}

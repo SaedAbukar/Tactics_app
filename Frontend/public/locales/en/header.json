@@ -1,11 +1,14 @@
 {
   "appName": "Tactics App",
   "homeLink": "Home",
-  "tacticalBoardLink": "Tactical board",
+  "exercises": "Exercises",
+  "tacticalBoardLink": "Tactical Board",
   "language": "Language",
   "english": "English",
   "finnish": "Finnish",
   "spanish": "Spanish",
+  "french": "French",
+  "german": "German",
   "login": "Login",
   "logout": "Logout",
   "profile": "Profile"

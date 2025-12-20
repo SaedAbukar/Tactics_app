@@ -13,11 +13,14 @@ declare module "i18next" {
       header: {
         appName: string;
         homeLink: string;
+        exercises: string;
         tacticalBoardLink: string;
         language: string;
         english: string;
         finnish: string;
         spanish: string;
+        german: string;
+        french: string;
         login: string;
         logout: string;
         profile: string;

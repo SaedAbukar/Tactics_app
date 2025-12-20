@@ -1,9 +1,15 @@
 {
-  "appName": "Aplicación de Tácticas",
+  "appName": "App de Tácticas",
   "homeLink": "Inicio",
-  "tacticalBoardLink": "Tablero táctico",
+  "exercises": "Ejercicios",
+  "tacticalBoardLink": "Pizarra Táctica",
   "language": "Idioma",
   "english": "Inglés",
   "finnish": "Finés",
-  "spanish": "Español"
+  "spanish": "Español",
+  "french": "Francés",
+  "german": "Alemán",
+  "login": "Entrar",
+  "logout": "Salir",
+  "profile": "Perfil"
 }

@@ -1,0 +1,15 @@
+{
+  "appName": "Taktik-App",
+  "homeLink": "Startseite",
+  "exercises": "Übungen",
+  "tacticalBoardLink": "Taktiktafel",
+  "language": "Sprache",
+  "english": "Englisch",
+  "finnish": "Finnisch",
+  "spanish": "Spanisch",
+  "french": "Französisch",
+  "german": "Deutsch",
+  "login": "Anmelden",
+  "logout": "Abmelden",
+  "profile": "Profil"
+}

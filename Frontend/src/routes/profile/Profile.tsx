@@ -99,7 +99,7 @@ const Profile: React.FC = observer(() => {
 
         {/* --- Actions --- */}
         <div className="profile-actions">
-          <button className="btn secondary">Edit Profile</button>
+          {/* <button className="btn secondary">Edit Profile</button> */}
           <button onClick={logout} className="btn danger">
             Logout
           </button>

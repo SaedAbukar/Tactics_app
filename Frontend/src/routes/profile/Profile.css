@@ -1,20 +1,26 @@
-/* Container Layout */
+/* Container Layout - Centers card on ALL screens */
 .profile-container {
   display: flex;
   justify-content: center;
-  padding: 2rem 1rem;
+  align-items: center; /* Vertically center */
   width: 100%;
+  min-height: calc(100vh - 80px); /* Full viewport height minus header */
+  padding: 0rem;
+  box-sizing: border-box; /* Ensures padding doesn't cause scrollbar */
 }
 
 .profile-card {
   width: 100%;
-  max-width: 500px;
+  max-width: 900px;
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 20px;
   box-shadow: 0 10px 15px -3px var(--shadow-color);
   overflow: hidden;
   text-align: center;
+
+  /* Ensure card itself doesn't have weird margins */
+  margin: 0 auto;
 }
 
 /* --- Header --- */
@@ -169,6 +175,8 @@
 .profile-loading {
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-height: 50vh; /* Centers spinner vertically too */
   padding: 4rem;
 }
 .spinner {
@@ -187,8 +195,6 @@
     transform: rotate(360deg);
   }
 }
-
-/* Add this to your src/components/profile/Profile.css */
 
 .stat-loading {
   font-size: 1.5rem;

@@ -43,7 +43,6 @@ export default function Header() {
         </button>
 
         {/* --- Navigation Links --- */}
-        {/* The 'open' class determines visibility on mobile */}
         <nav className={`nav ${isMenuOpen ? "nav-open" : ""}`}>
           <NavLink
             to="/"
@@ -60,7 +59,7 @@ export default function Header() {
                 className={({ isActive }) => (isActive ? activeStyle : "")}
                 onClick={closeMenu}
               >
-                Exercises
+                {t("exercises")}
               </NavLink>
               <NavLink
                 to="/tacticalEditor"
@@ -76,8 +75,6 @@ export default function Header() {
               >
                 {t("profile")}
               </NavLink>
-
-              {/* <span className="user-email">{user.email}</span> */}
 
               <button
                 onClick={() => {
@@ -99,11 +96,12 @@ export default function Header() {
             </NavLink>
           )}
 
-          {/* Separator (Hidden on mobile usually, or kept) */}
+          {/* Separator */}
           <div className="nav-separator" />
 
-          {/* Controls Container (Theme & Lang) */}
+          {/* Controls Container */}
           <div className="nav-controls">
+            <LanguageSwitcher />
             <button
               onClick={toggleTheme}
               className="icon-btn theme-toggle"
@@ -111,12 +109,10 @@ export default function Header() {
             >
               {theme === "light" ? "🌙" : "☀️"}
             </button>
-
-            <LanguageSwitcher />
           </div>
         </nav>
 
-        {/* Backdrop for mobile (closes menu when clicking outside) */}
+        {/* Backdrop for mobile */}
         {isMenuOpen && <div className="mobile-backdrop" onClick={closeMenu} />}
       </div>
     </header>
