@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite"; // 1. Wrap component in observer
+import { observer } from "mobx-react-lite";
+import { useTranslation } from "react-i18next"; // 1. Import hook
 import { useAuth } from "../../context/Auth/AuthContext";
-import { useExercises } from "../../context/ExercisesProvider"; // 2. Import Exercises Context
+import { useExercises } from "../../context/ExercisesProvider";
 import "./Profile.css";
 
 const Profile: React.FC = observer(() => {
   const { user, logout } = useAuth();
-
-  // 3. Get the ViewModel
+  const { t, i18n } = useTranslation(["profile", "common"]); // 2. Init hook
   const { exercisesViewModel } = useExercises();
 
-  // 4. Load data when profile mounts (to ensure stats are fresh)
+  // Load data when profile mounts
   useEffect(() => {
     if (user) {
       exercisesViewModel.loadData();
@@ -29,17 +29,16 @@ const Profile: React.FC = observer(() => {
     return email.substring(0, 2).toUpperCase();
   };
 
+  // 3. Updated date formatter to use current i18n language
   const formatDate = (dateString?: string) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString(undefined, {
+    if (!dateString) return t("na", { defaultValue: "N/A" });
+    return new Date(dateString).toLocaleDateString(i18n.language, {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
   };
 
-  // 5. Calculate stats dynamically from the ViewModel
-  // We typically count "Personal" items as the user's created content
   const sessionCount = exercisesViewModel.sessionsState.personal.length;
   const practiceCount = exercisesViewModel.practicesState.personal.length;
   const tacticCount = exercisesViewModel.tacticsState.personal.length;
@@ -60,16 +59,20 @@ const Profile: React.FC = observer(() => {
         {/* --- Details Grid --- */}
         <div className="profile-details">
           <div className="detail-item">
-            <span className="label">Member Since</span>
+            <span className="label">
+              {t("memberSince", { defaultValue: "Member Since" })}
+            </span>
             <span className="value">{formatDate(user.createdAt)}</span>
           </div>
           <div className="detail-item">
-            <span className="label">Last Login</span>
+            <span className="label">
+              {t("lastLogin", { defaultValue: "Last Login" })}
+            </span>
             <span className="value">{formatDate(user.lastLogin)}</span>
           </div>
         </div>
 
-        {/* --- Stats Section (Powered by ViewModel) --- */}
+        {/* --- Stats Section --- */}
         <div className="profile-stats">
           <div className="stat-box">
             {exercisesViewModel.isLoading ? (
@@ -77,7 +80,9 @@ const Profile: React.FC = observer(() => {
             ) : (
               <span className="stat-count">{sessionCount}</span>
             )}
-            <span className="stat-label">Sessions</span>
+            <span className="stat-label">
+              {t("stats.sessions", { defaultValue: "Sessions" })}
+            </span>
           </div>
           <div className="stat-box">
             {exercisesViewModel.isLoading ? (
@@ -85,7 +90,9 @@ const Profile: React.FC = observer(() => {
             ) : (
               <span className="stat-count">{practiceCount}</span>
             )}
-            <span className="stat-label">Practices</span>
+            <span className="stat-label">
+              {t("stats.practices", { defaultValue: "Practices" })}
+            </span>
           </div>
           <div className="stat-box">
             {exercisesViewModel.isLoading ? (
@@ -93,15 +100,19 @@ const Profile: React.FC = observer(() => {
             ) : (
               <span className="stat-count">{tacticCount}</span>
             )}
-            <span className="stat-label">Tactics</span>
+            <span className="stat-label">
+              {t("stats.tactics", { defaultValue: "Tactics" })}
+            </span>
           </div>
         </div>
 
         {/* --- Actions --- */}
         <div className="profile-actions">
-          {/* <button className="btn secondary">Edit Profile</button> */}
+          {/* <button className="btn secondary">
+            {t("actions.edit", { defaultValue: "Edit Profile" })}
+          </button> */}
           <button onClick={logout} className="btn danger">
-            Logout
+            {t("actions.logout", { defaultValue: "Logout" })}
           </button>
         </div>
       </div>

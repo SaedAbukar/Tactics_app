@@ -9,6 +9,7 @@ declare module "i18next" {
         add: string;
         delete: string;
         cancel: string;
+        logout: string;
       };
       header: {
         appName: string;
@@ -48,6 +49,21 @@ declare module "i18next" {
         items_one: string;
         items_other: string;
         greeting: string;
+      };
+      profile: {
+        memberSince: string;
+        lastLogin: string;
+        stats: {
+          sessions: string;
+          practices: string;
+          tactics: string;
+        };
+        actions: {
+          edit: string;
+          logout: string;
+        };
+        loading: string;
+        na: string; // For "N/A" dates
       };
       footer: { copyright: string };
       tacticalEditor: {

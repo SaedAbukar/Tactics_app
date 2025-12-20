@@ -1,0 +1,15 @@
+{
+  "memberSince": "Liittynyt",
+  "lastLogin": "Viimeksi paikalla",
+  "stats": {
+    "sessions": "Istunnot",
+    "practices": "Harjoitteet",
+    "tactics": "Taktiikat"
+  },
+  "actions": {
+    "edit": "Muokkaa profiilia",
+    "logout": "Kirjaudu ulos"
+  },
+  "loading": "Ladataan profiilia...",
+  "na": "Ei saatavilla"
+}

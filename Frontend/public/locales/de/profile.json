@@ -1,0 +1,15 @@
+{
+  "memberSince": "Mitglied seit",
+  "lastLogin": "Letzter Login",
+  "stats": {
+    "sessions": "Sitzungen",
+    "practices": "Übungen",
+    "tactics": "Taktiken"
+  },
+  "actions": {
+    "edit": "Profil bearbeiten",
+    "logout": "Abmelden"
+  },
+  "loading": "Lade Profil...",
+  "na": "N/V"
+}

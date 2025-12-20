@@ -1,0 +1,15 @@
+{
+  "memberSince": "Member Since",
+  "lastLogin": "Last Login",
+  "stats": {
+    "sessions": "Sessions",
+    "practices": "Practices",
+    "tactics": "Tactics"
+  },
+  "actions": {
+    "edit": "Edit Profile",
+    "logout": "Logout"
+  },
+  "loading": "Loading profile...",
+  "na": "N/A"
+}
