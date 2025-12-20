@@ -33,7 +33,7 @@ export const SessionPreview: React.FC<SessionPreviewProps> = observer(
             tacticalBoardViewModel.loadStep(0);
             tacticalBoardViewModel.play();
           }
-        }, 500);
+        }, 200);
       }
 
       return () => {

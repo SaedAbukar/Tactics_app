@@ -29,7 +29,7 @@
   },
   "sessionSelector": {
     "manageViewType": "Kirjasto",
-    "namePlaceholder": "Nimetön istunto",
+    "namePlaceholder": "Valitse",
     "descriptionPlaceholder": "Kuvaus...",
     "add": "Lisää istunto",
     "saveUpdate": "Tallenna muutokset",

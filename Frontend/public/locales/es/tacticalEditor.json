@@ -29,7 +29,7 @@
   },
   "sessionSelector": {
     "manageViewType": "Biblioteca",
-    "namePlaceholder": "Sesión sin título",
+    "namePlaceholder": "Elegir Sesión",
     "descriptionPlaceholder": "Descripción...",
     "add": "Añadir Sesión",
     "saveUpdate": "Guardar Cambios",

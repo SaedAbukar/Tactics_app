@@ -23,9 +23,6 @@ export const ApiTacticalEditor: React.FC = observer(() => {
     "sessions" | "practices" | "game tactics"
   >("sessions");
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
-  const [currentName, setCurrentName] = useState<string>(
-    t("sessionSelector.select", { defaultValue: "Select Session" })
-  );
 
   // Default to true. CSS forces it visible on desktop regardless.
   const [isControlsOpen, setIsControlsOpen] = useState(true);
@@ -40,16 +37,6 @@ export const ApiTacticalEditor: React.FC = observer(() => {
     vm.updateSavedSteps(JSON.parse(JSON.stringify(steps)));
 
     if (steps.length > 0) vm.loadStep(0);
-
-    if (item && item.name) {
-      setCurrentName(item.name);
-    } else {
-      setCurrentName(
-        t("sessionSelector.namePlaceholder", {
-          defaultValue: "Untitled Session",
-        })
-      );
-    }
 
     if (item && item.id) {
       vm.setActiveSessionId(item.id);
@@ -83,9 +70,13 @@ export const ApiTacticalEditor: React.FC = observer(() => {
       <div className="mobile-editor-header">
         <div className="current-selection-info">
           <span className="label">
-            {t("sessionSelector.update", { defaultValue: "Editing" })}:
+            {/* {t("sessionSelector.update", { defaultValue: "Editing" })}: */}
           </span>
-          <span className="value">{currentName}</span>
+          <span className="value">
+            {t("sessionSelector.namePlaceholder", {
+              defaultValue: "Untitled Session",
+            })}
+          </span>
         </div>
 
         <div className="mobile-actions">
@@ -204,7 +195,7 @@ export const ApiTacticalEditor: React.FC = observer(() => {
                 disabled={vm.savedSteps.length === 0}
                 aria-label={t("play", { defaultValue: "Play" })}
               >
-                ▶
+                {t("play", { defaultValue: "Play" })}
               </button>
             ) : vm.isPaused ? (
               <button
@@ -212,7 +203,7 @@ export const ApiTacticalEditor: React.FC = observer(() => {
                 onClick={vm.continue}
                 aria-label={t("continue", { defaultValue: "Continue" })}
               >
-                ▶
+                {t("continue", { defaultValue: "Continue" })}
               </button>
             ) : (
               <button
@@ -220,7 +211,7 @@ export const ApiTacticalEditor: React.FC = observer(() => {
                 onClick={vm.pause}
                 aria-label={t("pause", { defaultValue: "Pause" })}
               >
-                ⏸
+                {t("pause", { defaultValue: "Pause" })}
               </button>
             )}
             <button
@@ -228,7 +219,7 @@ export const ApiTacticalEditor: React.FC = observer(() => {
               onClick={vm.stopAnimation}
               aria-label={t("stop", { defaultValue: "Stop" })}
             >
-              ⏹
+              {t("stop", { defaultValue: "Stop" })}
             </button>
           </div>
 
