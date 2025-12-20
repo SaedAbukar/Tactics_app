@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useExercises } from "../../context/ExercisesProvider";
 import type { Step } from "../../types/types";
 
@@ -10,8 +11,8 @@ export const useSessionSelector = (
 ) => {
   const { exercisesViewModel: vm, tacticalBoardViewModel: boardVM } =
     useExercises();
+  const { t } = useTranslation("tacticalEditor");
 
-  // Local UI State
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [modalConfig, setModalConfig] = useState<any>({ isOpen: false });
@@ -25,7 +26,6 @@ export const useSessionSelector = (
   const handleSave = async (formData: any) => {
     let payload = { ...formData };
 
-    // 1. Merge Board Steps (if Session)
     if (viewType === "sessions") {
       if (boardVM.savedSteps.length > 0) {
         payload.steps = JSON.parse(JSON.stringify(boardVM.savedSteps));
@@ -34,7 +34,6 @@ export const useSessionSelector = (
       }
     }
 
-    // 2. Validation
     let error = null;
     if (viewType === "sessions") {
       error = vm.validateSessionInput(
@@ -43,7 +42,10 @@ export const useSessionSelector = (
         payload.steps
       );
     } else {
-      const typeLabel = viewType === "practices" ? "Practice" : "Tactic";
+      const typeLabel =
+        viewType === "practices"
+          ? t("sessionSelector.practiceLabel", "Practice")
+          : t("sessionSelector.tacticLabel", "Tactic");
       error = vm.validateCollectionInput(
         payload.name,
         payload.description,
@@ -55,16 +57,15 @@ export const useSessionSelector = (
     if (error) {
       setModalConfig({
         isOpen: true,
-        title: "Validation Error",
+        title: t("sessionSelector.validationError", "Validation Error"),
         message: error,
-        confirmText: "OK",
+        confirmText: t("sessionSelector.ok", "OK"),
         onConfirm: () =>
           setModalConfig((prev: any) => ({ ...prev, isOpen: false })),
       });
       return;
     }
 
-    // 3. Save to API
     if (isCreating) {
       if (viewType === "sessions") await vm.createSession(payload);
       else if (viewType === "practices") await vm.createPractice(payload);
@@ -81,7 +82,6 @@ export const useSessionSelector = (
   };
 
   const handleDeleteCheck = (id: number) => {
-    // 1. Check Dependencies (only for sessions)
     if (viewType === "sessions") {
       const dependencies: string[] = [];
 
@@ -90,9 +90,14 @@ export const useSessionSelector = (
         ...vm.practicesState.userShared,
         ...vm.practicesState.groupShared,
       ];
-      allPractices.forEach((p) => {
-        if (p.sessions?.some((s) => s.id === id))
-          dependencies.push(`Practice: ${p.name}`);
+      // Renamed 'p' to 'practice' for clarity, though 'p' was fine
+      allPractices.forEach((practice) => {
+        if (practice.sessions?.some((s) => s.id === id))
+          dependencies.push(
+            `${t("sessionSelector.practiceLabel", "Practice")}: ${
+              practice.name
+            }`
+          );
       });
 
       const allTactics = [
@@ -100,31 +105,43 @@ export const useSessionSelector = (
         ...vm.tacticsState.userShared,
         ...vm.tacticsState.groupShared,
       ];
-      allTactics.forEach((t) => {
-        if (t.sessions?.some((s) => s.id === id))
-          dependencies.push(`Tactic: ${t.name}`);
+
+      // FIX: Changed (t) to (tactic) to avoid shadowing the translation function 't'
+      allTactics.forEach((tactic) => {
+        if (tactic.sessions?.some((s) => s.id === id))
+          dependencies.push(
+            `${t("sessionSelector.tacticLabel", "Tactic")}: ${tactic.name}`
+          );
       });
 
       if (dependencies.length > 0) {
         setModalConfig({
           isOpen: true,
-          title: "Cannot Delete Session",
-          message: `This session is used by: ${dependencies.join(
-            ", "
-          )}. Please remove it first.`,
+          title: t(
+            "sessionSelector.cannotDeleteTitle",
+            "Cannot Delete Session"
+          ),
+          message: t("sessionSelector.cannotDeleteMessage", {
+            dependencies: dependencies.join(", "),
+            defaultValue: `This session is used by: ${dependencies.join(
+              ", "
+            )}. Please remove it first.`,
+          }),
           onConfirm: undefined,
         });
         return;
       }
     }
 
-    // 2. Confirm Delete
     setModalConfig({
       isOpen: true,
-      title: "Delete Item",
-      message: "Are you sure? This cannot be undone.",
+      title: t("sessionSelector.deleteTitle", "Delete Item"),
+      message: t(
+        "sessionSelector.deleteMessage",
+        "Are you sure? This cannot be undone."
+      ),
       isDanger: true,
-      confirmText: "Delete",
+      confirmText: t("sessionSelector.deleteConfirm", "Delete"),
       onConfirm: async () => {
         if (viewType === "sessions") await vm.deleteSession(id);
         else if (viewType === "practices") await vm.deletePractice(id);

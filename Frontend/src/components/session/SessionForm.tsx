@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import type { Session, Practice, GameTactic } from "../../types/types";
 
 interface SessionFormProps {
@@ -16,14 +17,13 @@ export const SessionForm: React.FC<SessionFormProps> = ({
   onSave,
   onCancel,
 }) => {
+  const { t } = useTranslation("tacticalEditor");
   const [form, setForm] = useState(initialData);
 
-  // Update local state when initialData changes
   useEffect(() => {
     setForm(initialData);
   }, [initialData]);
 
-  // --- Attach/Detach Logic ---
   const attachSession = (sessionId: number) => {
     const current = (form as Practice).sessions || [];
     if (current.find((s) => s.id === sessionId)) return;
@@ -46,14 +46,14 @@ export const SessionForm: React.FC<SessionFormProps> = ({
     <div className="editor-form">
       <input
         className="modern-input"
-        placeholder="Name"
+        placeholder={t("sessionSelector.namePlaceholder", "Name")}
         value={form.name || ""}
         onChange={(e) => setForm({ ...form, name: e.target.value })}
         autoFocus
       />
       <textarea
         className="modern-input"
-        placeholder="Description"
+        placeholder={t("sessionSelector.descriptionPlaceholder", "Description")}
         rows={2}
         value={form.description || ""}
         onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -61,7 +61,9 @@ export const SessionForm: React.FC<SessionFormProps> = ({
 
       {viewType !== "sessions" && (
         <div className="attachment-section">
-          <label className="sub-label">Attached Sessions:</label>
+          <label className="sub-label">
+            {t("sessionSelector.attachedSessions", "Attached Sessions:")}
+          </label>
           <ul className="attached-list">
             {(form as Practice).sessions?.map((s) => (
               <li key={s.id} className="attached-item">
@@ -82,7 +84,9 @@ export const SessionForm: React.FC<SessionFormProps> = ({
               e.target.value = "";
             }}
           >
-            <option value="">+ Add Session</option>
+            <option value="">
+              {t("sessionSelector.addAttached", "+ Add Session")}
+            </option>
             {availableSessions.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -98,10 +102,10 @@ export const SessionForm: React.FC<SessionFormProps> = ({
           disabled={!form.name}
           onClick={() => onSave(form)}
         >
-          Save
+          {t("sessionSelector.save", "Save")}
         </button>
         <button className="modern-btn outline small" onClick={onCancel}>
-          Cancel
+          {t("sessionSelector.cancel", "Cancel")}
         </button>
       </div>
     </div>

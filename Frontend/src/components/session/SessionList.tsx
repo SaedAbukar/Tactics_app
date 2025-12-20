@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import type { Session, Practice, GameTactic } from "../../types/types";
 import { SessionForm } from "./SessionForm";
 
@@ -10,17 +11,11 @@ interface SessionListProps {
   category: Category;
   expandedCategory: Category | null;
   setExpandedCategory: (c: Category | null) => void;
-
-  // Editing State passed down
   editingId: number | null;
   setEditingId: (id: number | null) => void;
-
-  // Handlers
   onSelect: (item: any) => void;
   onSave: (data: any) => void;
   onDelete: (id: number) => void;
-
-  // Context info
   viewType: string;
   availableSessions: Session[];
 }
@@ -39,6 +34,7 @@ export const SessionList: React.FC<SessionListProps> = ({
   viewType,
   availableSessions,
 }) => {
+  const { t } = useTranslation("tacticalEditor");
   const isExpanded = expandedCategory === category;
 
   return (
@@ -54,7 +50,11 @@ export const SessionList: React.FC<SessionListProps> = ({
 
       {isExpanded && (
         <div className="category-items">
-          {items.length === 0 && <div className="empty-text">No items</div>}
+          {items.length === 0 && (
+            <div className="empty-text">
+              {t("sessionSelector.empty", "No items")}
+            </div>
+          )}
           {items.map((item) => {
             if (editingId === item.id) {
               return (
@@ -70,7 +70,6 @@ export const SessionList: React.FC<SessionListProps> = ({
             }
             return (
               <div key={item.id} className="list-item-card">
-                {/* Clicking the card body just loads the pitch (standard behavior) */}
                 <div className="item-main" onClick={() => onSelect(item)}>
                   <div className="item-name">{item.name}</div>
                   <div className="item-desc">
@@ -82,9 +81,9 @@ export const SessionList: React.FC<SessionListProps> = ({
                   <button
                     className="icon-btn-mini"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent triggering the card body click twice
-                      setEditingId(item.id); // 1. Open Form
-                      onSelect(item); // 2. Load Pitch
+                      e.stopPropagation();
+                      setEditingId(item.id);
+                      onSelect(item);
                     }}
                   >
                     ✎

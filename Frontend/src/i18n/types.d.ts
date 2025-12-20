@@ -25,7 +25,6 @@ declare module "i18next" {
         logout: string;
         profile: string;
       };
-      footer: { copyright: string };
       home: {
         hero: {
           welcome_back: string;
@@ -50,8 +49,13 @@ declare module "i18next" {
         items_other: string;
         greeting: string;
       };
+      footer: { copyright: string };
       tacticalEditor: {
         step: string;
+        editing: string;
+        noSteps: string;
+        editorTools: string;
+        tools: string;
         sessionAlreadyAdded: string;
         stepAdded: string;
         stepUpdated: string;
@@ -59,6 +63,7 @@ declare module "i18next" {
         play: string;
         pause: string;
         continue: string;
+        resume: string;
         stop: string;
         clearPitch: string;
         useUserData: string;
@@ -84,8 +89,36 @@ declare module "i18next" {
           addSessionPlaceholder: string;
           update: string;
           delete: string;
+          loading: string;
+          create: string;
+          new: string;
+          personal: string;
+          shared: string;
+          group: string;
+          empty: string;
+          attachedSessions: string;
+          addAttached: string;
+          save: string;
+          cancel: string;
+          validationError: string;
+          practiceLabel: string;
+          tacticLabel: string;
+          cannotDeleteTitle: string;
+          cannotDeleteMessage: string;
+          deleteTitle: string;
+          deleteMessage: string;
+          deleteConfirm: string;
+          ok: string;
+          tabSessions: string;
+          tabPractices: string;
+          tabTactics: string;
         };
         controls: {
+          objects: string;
+          noTeam: string;
+          saveTeam: string;
+          color: string;
+          animationLabel: string;
           createTeam: string;
           teamNamePlaceholder: string;
           addTeam: string;

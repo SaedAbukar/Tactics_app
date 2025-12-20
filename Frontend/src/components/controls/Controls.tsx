@@ -4,16 +4,19 @@ import { runInAction } from "mobx";
 import { useTranslation } from "react-i18next";
 import { TacticalBoardViewModel } from "../../features/exercises/viewmodels/TacticalBoardViewModel";
 import "./Controls.css";
+
+// Separate file or defined here, ensure it accepts 'label' as string
 import { CounterControl } from "./CounterControl";
 
 interface ControlsProps {
   vm: TacticalBoardViewModel;
 }
+
 export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
-  const { t } = useTranslation("tacticalEditor");
+  const { t } = useTranslation(["tacticalEditor", "common"]);
 
   // Local UI state
-  const [showCreateTeam, setShowCreateTeam] = useState(false); // Toggle for team form
+  const [showCreateTeam, setShowCreateTeam] = useState(false);
   const [teamName, setTeamName] = useState("");
   const [teamColor, setTeamColor] = useState("black");
 
@@ -45,12 +48,8 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
 
   return (
     <div className="controls-panel">
-      <h3 className="controls-title">{t("tools", "Tools")}</h3>
-
       {/* --- Section: Objects Control --- */}
       <div className="control-section">
-        <label className="section-label">Objects</label>
-
         {/* 1. Player Configuration (Team Selection) */}
         <div className="settings-row">
           <select
@@ -58,7 +57,9 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
             value={selectedTeamId}
             onChange={(e) => setSelectedTeamId(e.target.value)}
           >
-            <option value="">No Team</option>
+            <option value="">
+              {t("controls.noTeam", { defaultValue: "No Team" })}
+            </option>
             {vm.teams.map((team) => (
               <option key={team.id} value={team.id}>
                 {team.name}
@@ -69,7 +70,9 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
           {/* Toggle Create Team Form */}
           <button
             className="icon-btn-mini"
-            title="Create New Team"
+            title={t("controls.createTeam", {
+              defaultValue: "Create New Team",
+            })}
             onClick={() => setShowCreateTeam(!showCreateTeam)}
           >
             {showCreateTeam ? "−" : "+"}
@@ -82,7 +85,9 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
             <input
               type="text"
               className="modern-input"
-              placeholder="New Team Name"
+              placeholder={t("controls.teamNamePlaceholder", {
+                defaultValue: "New Team Name",
+              })}
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
             />
@@ -102,11 +107,11 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
                 if (teamName.trim()) {
                   vm.addTeam(teamName, teamColor);
                   setTeamName("");
-                  setShowCreateTeam(false); // Close after creating
+                  setShowCreateTeam(false);
                 }
               }}
             >
-              Save Team
+              {t("controls.saveTeam", { defaultValue: "Save Team" })}
             </button>
           </div>
         )}
@@ -114,7 +119,9 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
         {/* 3. Color Picker for Free Agents */}
         {!selectedTeamId && (
           <div className="settings-row centered">
-            <span className="sub-label">Color:</span>
+            <span className="sub-label">
+              {t("controls.color", { defaultValue: "Color:" })}
+            </span>
             <div className="mini-color-picker">
               {["black", "white", "red", "blue", "yellow"].map((c) => (
                 <div
@@ -131,7 +138,7 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
         {/* 4. Counters */}
         <div className="counters-list">
           <CounterControl
-            label="Players"
+            label={t("controls.players", { defaultValue: "Players" })}
             count={vm.players.length}
             onRemove={() => removeLast("player")}
             onAdd={() => {
@@ -143,21 +150,21 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
           />
 
           <CounterControl
-            label="Balls"
+            label={t("controls.balls", { defaultValue: "Balls" })}
             count={vm.balls.length}
             onRemove={() => removeLast("ball")}
             onAdd={() => vm.addEntity("ball", 1)}
           />
 
           <CounterControl
-            label="Goals"
+            label={t("controls.goals", { defaultValue: "Goals" })}
             count={vm.goals.length}
             onRemove={() => removeLast("goal")}
             onAdd={() => vm.addEntity("goal", 1)}
           />
 
           <CounterControl
-            label="Cones"
+            label={t("controls.cones", { defaultValue: "Cones" })}
             count={vm.cones.length}
             onRemove={() => removeLast("cone")}
             onAdd={() => vm.addEntity("cone", 1)}
@@ -168,7 +175,10 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
       {/* --- Section: Animation Control --- */}
       <div className="control-section">
         <label className="section-label">
-          Animation ({vm.savedSteps.length} Steps)
+          {t("controls.animationLabel", {
+            count: vm.savedSteps.length,
+            defaultValue: `Animation (${vm.savedSteps.length} Steps)`,
+          })}
         </label>
 
         <div className="grid-buttons">
@@ -177,7 +187,7 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
             onClick={vm.saveStep}
             disabled={vm.isPlaying}
           >
-            Save Step
+            {t("saveStep", { defaultValue: "Save Step" })}
           </button>
 
           {!vm.isPlaying ? (
@@ -186,15 +196,15 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
               onClick={vm.play}
               disabled={vm.savedSteps.length === 0}
             >
-              Play
+              {t("play", { defaultValue: "Play" })}
             </button>
           ) : vm.isPaused ? (
             <button className="modern-btn warning" onClick={vm.continue}>
-              Resume
+              {t("resume", { defaultValue: "Resume" })}
             </button>
           ) : (
             <button className="modern-btn warning" onClick={vm.pause}>
-              Pause
+              {t("pause", { defaultValue: "Pause" })}
             </button>
           )}
 
@@ -203,12 +213,15 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
             onClick={vm.stopAnimation}
             disabled={!vm.isPlaying && !vm.isPaused}
           >
-            Stop
+            {t("stop", { defaultValue: "Stop" })}
           </button>
         </div>
 
         <div className="slider-container">
-          <label>Speed: {vm.speed.toFixed(1)}x</label>
+          <label>
+            {t("controls.speed", { defaultValue: "Speed" })}:{" "}
+            {vm.speed.toFixed(1)}x
+          </label>
           <input
             type="range"
             min="0.5"
@@ -226,7 +239,7 @@ export const Controls: React.FC<ControlsProps> = observer(({ vm }) => {
           className="modern-btn danger full-width"
           onClick={vm.clearPitch}
         >
-          Clear Pitch
+          {t("clearPitch", { defaultValue: "Clear Pitch" })}
         </button>
       </div>
     </div>

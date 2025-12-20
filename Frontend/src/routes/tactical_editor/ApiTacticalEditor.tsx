@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
+import { useTranslation } from "react-i18next";
 import "./TacticalEditor.css";
 
 // Components
@@ -14,12 +15,17 @@ export const ApiTacticalEditor: React.FC = observer(() => {
   const { tacticalBoardViewModel: vm, exercisesViewModel: dbVM } =
     useExercises();
 
+  // Initialize translation hook
+  const { t } = useTranslation(["tacticalEditor", "common"]);
+
   // Local State
   const [viewType, setViewType] = useState<
     "sessions" | "practices" | "game tactics"
   >("sessions");
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
-  const [currentName, setCurrentName] = useState<string>("Select Session");
+  const [currentName, setCurrentName] = useState<string>(
+    t("sessionSelector.select", { defaultValue: "Select Session" })
+  );
 
   // Default to true. CSS forces it visible on desktop regardless.
   const [isControlsOpen, setIsControlsOpen] = useState(true);
@@ -38,7 +44,11 @@ export const ApiTacticalEditor: React.FC = observer(() => {
     if (item && item.name) {
       setCurrentName(item.name);
     } else {
-      setCurrentName("Untitled Session");
+      setCurrentName(
+        t("sessionSelector.namePlaceholder", {
+          defaultValue: "Untitled Session",
+        })
+      );
     }
 
     if (item && item.id) {
@@ -72,7 +82,9 @@ export const ApiTacticalEditor: React.FC = observer(() => {
       {/* MOBILE HEADER */}
       <div className="mobile-editor-header">
         <div className="current-selection-info">
-          <span className="label">Editing:</span>
+          <span className="label">
+            {t("sessionSelector.update", { defaultValue: "Editing" })}:
+          </span>
           <span className="value">{currentName}</span>
         </div>
 
@@ -83,14 +95,14 @@ export const ApiTacticalEditor: React.FC = observer(() => {
               onClick={handleSaveChanges}
               disabled={isSaving}
             >
-              {isSaving ? "..." : "Save"}
+              {isSaving ? "..." : t("common:save", { defaultValue: "Save" })}
             </button>
           )}
           <button
             className="selector-toggle-btn"
             onClick={() => setIsSelectorOpen(true)}
           >
-            Change ▼
+            {t("sessionSelector.select", { defaultValue: "Change" })} ▼
           </button>
         </div>
       </div>
@@ -98,7 +110,9 @@ export const ApiTacticalEditor: React.FC = observer(() => {
       {/* LEFT: Library Modal */}
       <div className={`tactical-left ${isSelectorOpen ? "open" : ""}`}>
         <div className="mobile-selector-controls">
-          <h3>Library</h3>
+          <h3>
+            {t("sessionSelector.manageViewType", { defaultValue: "Library" })}
+          </h3>
           <button
             className="close-selector-btn"
             onClick={() => setIsSelectorOpen(false)}
@@ -131,7 +145,9 @@ export const ApiTacticalEditor: React.FC = observer(() => {
             </button>
           ))}
           {vm.savedSteps.length === 0 && (
-            <span className="empty-steps-text">No steps</span>
+            <span className="empty-steps-text">
+              {t("noSteps", { defaultValue: "No steps" })}
+            </span>
           )}
         </div>
       </div>
@@ -145,7 +161,8 @@ export const ApiTacticalEditor: React.FC = observer(() => {
           }`}
         >
           <div className="controls-header-actions">
-            <span>Editor Tools</span>
+            {/* FIXED KEY HERE: editorTools instead of controls.createTeam */}
+            <span>{t("editorTools", { defaultValue: "Editor Tools" })}</span>
             <button
               className="toggle-controls-btn"
               onClick={() => setIsControlsOpen(false)}
@@ -162,7 +179,11 @@ export const ApiTacticalEditor: React.FC = observer(() => {
               disabled={isSaving}
               style={{ marginBottom: "1rem" }}
             >
-              {isSaving ? "Saving..." : "💾 Save Changes"}
+              {isSaving
+                ? "..."
+                : `💾 ${t("sessionSelector.saveUpdate", {
+                    defaultValue: "Save Changes",
+                  })}`}
             </button>
           )}
 
@@ -181,21 +202,31 @@ export const ApiTacticalEditor: React.FC = observer(() => {
                 className="mini-btn play"
                 onClick={vm.play}
                 disabled={vm.savedSteps.length === 0}
+                aria-label={t("play", { defaultValue: "Play" })}
               >
                 ▶
               </button>
             ) : vm.isPaused ? (
-              <button className="mini-btn warning" onClick={vm.continue}>
+              <button
+                className="mini-btn warning"
+                onClick={vm.continue}
+                aria-label={t("continue", { defaultValue: "Continue" })}
+              >
                 ▶
               </button>
             ) : (
-              <button className="mini-btn warning" onClick={vm.pause}>
+              <button
+                className="mini-btn warning"
+                onClick={vm.pause}
+                aria-label={t("pause", { defaultValue: "Pause" })}
+              >
                 ⏸
               </button>
             )}
             <button
               className="mini-btn danger icon-only"
               onClick={vm.stopAnimation}
+              aria-label={t("stop", { defaultValue: "Stop" })}
             >
               ⏹
             </button>
@@ -211,6 +242,7 @@ export const ApiTacticalEditor: React.FC = observer(() => {
               value={vm.speed}
               onChange={(e) => vm.setSpeed(Number(e.target.value))}
               className="mini-slider"
+              aria-label={t("controls.speed", { defaultValue: "Speed" })}
             />
           </div>
 
@@ -218,7 +250,8 @@ export const ApiTacticalEditor: React.FC = observer(() => {
             className="toggle-controls-btn expand"
             onClick={() => setIsControlsOpen(true)}
           >
-            Tools ▼
+            {/* Using editorTools key here as well for consistency */}
+            {t("editorTools", { defaultValue: "Tools" })} ▼
           </button>
         </div>
       </div>
