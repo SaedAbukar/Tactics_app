@@ -1,13 +1,23 @@
-import React from "react";
 import { useTranslation } from "react-i18next";
+import { Copyright } from "lucide-react";
+import "./Footer.css";
 
 export default function Footer() {
-  const { t } = useTranslation("footer");
+  // 1. Load both 'footer' and 'header' namespaces
+  const { t } = useTranslation(["footer", "header"]);
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer
-      style={{ textAlign: "center", padding: 16, borderTop: "1px solid #ddd" }}
-    >
-      <p>{t("copyright")}</p>
+    <footer className="footer">
+      <div className="footer-content">
+        <div className="footer-copyright">
+          <Copyright size={14} className="copyright-icon" />
+          <span>
+            {currentYear} {/* 2. Access appName from the header namespace */}
+            {t("appName", { ns: "header" })}
+          </span>
+        </div>
+      </div>
     </footer>
   );
 }

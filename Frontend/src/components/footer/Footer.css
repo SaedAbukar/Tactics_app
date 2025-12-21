@@ -1,0 +1,59 @@
+.footer {
+  background-color: var(
+    --bg-card,
+    #fff
+  ); /* Uses your theme variable or white */
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  padding: 1.5rem 0;
+  margin-top: auto; /* Pushes footer to bottom if page content is short */
+  width: 100%;
+}
+
+.footer-content {
+  max-width: 87.5rem; /* Matches your Header max-width */
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.footer-copyright {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500;
+}
+
+.copyright-icon {
+  color: var(--text-muted, #9ca3af);
+}
+
+/* Optional: If you add links later */
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--color-brand);
+}
+
+/* Tablet/Desktop: Row layout if you add links */
+@media (min-width: 640px) {
+  .footer-content {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
