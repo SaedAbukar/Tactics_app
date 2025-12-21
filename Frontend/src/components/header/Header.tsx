@@ -24,8 +24,8 @@ export default function Header() {
           <img
             src={
               theme === "dark"
-                ? "/public/images/tacticflow-dark.png"
-                : "/public/images/tacticflow-light.png"
+                ? "/images/tacticflow-dark.png"
+                : "/images/tacticflow-light.png"
             }
             alt={t("appName")}
             className="app-logo"
