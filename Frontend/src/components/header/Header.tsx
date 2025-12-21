@@ -4,6 +4,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/Auth/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
+import { Moon, Sun, Menu, X } from "lucide-react";
 import "./Header.css";
 
 export default function Header() {
@@ -11,12 +12,8 @@ export default function Header() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  // State for mobile menu
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const activeStyle = "active-link";
-
-  // Helper to close menu when a link is clicked
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
@@ -36,16 +33,16 @@ export default function Header() {
           <span className="logo-text">{t("appName")}</span>
         </NavLink>
 
-        {/* --- Mobile Menu Toggle Button (Visible only on mobile) --- */}
+        {/* --- Mobile Menu Toggle --- */}
         <button
           className="mobile-menu-btn"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle navigation"
         >
-          <span className={`hamburger ${isMenuOpen ? "open" : ""}`}></span>
+          {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
 
-        {/* --- Navigation Links --- */}
+        {/* --- Navigation --- */}
         <nav className={`nav ${isMenuOpen ? "nav-open" : ""}`}>
           <NavLink
             to="/"
@@ -99,23 +96,25 @@ export default function Header() {
             </NavLink>
           )}
 
-          {/* Separator */}
           <div className="nav-separator" />
 
-          {/* Controls Container */}
+          {/* Controls */}
           <div className="nav-controls">
             <LanguageSwitcher />
+
+            {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
               className="icon-btn theme-toggle"
-              title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+              aria-label={`Switch to ${
+                theme === "light" ? "dark" : "light"
+              } mode`}
             >
-              {theme === "light" ? "🌙" : "☀️"}
+              {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
             </button>
           </div>
         </nav>
 
-        {/* Backdrop for mobile */}
         {isMenuOpen && <div className="mobile-backdrop" onClick={closeMenu} />}
       </div>
     </header>

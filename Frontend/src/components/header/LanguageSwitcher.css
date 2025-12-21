@@ -64,10 +64,8 @@
   top: calc(100% + 8px);
   right: 0;
 
-  /* FIX: Remove fixed 160px width. 
-     Use max-content to wrap text tightly. */
-  min-width: 100%; /* Never narrower than the button */
-  width: max-content; /* Grow to fit language names like "Spanish" */
+  min-width: 100%;
+  width: max-content;
 
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -101,7 +99,7 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px; /* Slight gap for visual separation */
+  gap: 12px;
 
   padding: 8px 12px;
   border: none;
@@ -113,7 +111,7 @@
   font-size: 0.95rem;
   transition: background-color 0.15s;
 
-  white-space: nowrap; /* Prevent names from wrapping */
+  white-space: nowrap;
 }
 
 .lang-option:hover {
@@ -128,7 +126,46 @@
 }
 
 .check-mark {
-  margin-left: 12px; /* Space between text and checkmark */
+  margin-left: 12px;
   font-size: 0.8rem;
   color: var(--color-brand);
+}
+
+/* =========================================
+   MOBILE FIXES (< 900px)
+   ========================================= */
+@media (max-width: 900px) {
+  .lang-container {
+    width: 100%; /* Switcher takes full available width in sidebar */
+  }
+
+  .lang-trigger {
+    width: 100%; /* Button fills container */
+    justify-content: space-between;
+  }
+
+  /* ✅ Open Menu UPWARDS on Mobile so it isn't clipped */
+  .lang-menu {
+    top: auto; /* Unset default top position */
+    bottom: 100%; /* Anchor to bottom of the button */
+    margin-bottom: 8px; /* Add spacing above button */
+
+    width: 100%; /* Match button width */
+    right: 0;
+    left: 0;
+
+    /* Reverse animation for upward opening */
+    animation: fadeInMobile 0.15s ease-out;
+  }
+}
+
+@keyframes fadeInMobile {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
