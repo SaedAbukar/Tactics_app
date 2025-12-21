@@ -4,7 +4,7 @@
   /* ========================================= */
 
   /* Backgrounds */
-  --bg-primary: #ffffff;
+  --bg-primary: #f8f8f8;
   --bg-card: #f9fafb;
   --bg-button: #f9f9f9;
   --bg-hover: #f3f4f6;
@@ -42,7 +42,7 @@
 /* ========================================= */
 [data-theme="dark"] {
   /* Backgrounds */
-  --bg-primary: #242424;
+  --bg-primary: #262525;
   --bg-card: #1a1a1a;
   --bg-button: #1a1a1a;
   --bg-hover: #2f2f2f;

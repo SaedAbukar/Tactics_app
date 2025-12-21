@@ -21,13 +21,41 @@
   margin: 0 auto;
 }
 
+/* --- Logo Section --- */
 .logo-link {
-  font-size: 1.5rem;
-  font-weight: 800;
+  display: flex; /* Ensures image is centered vertically */
+  align-items: center;
   text-decoration: none;
-  color: var(--text-primary);
-  transition: color 0.2s;
-  z-index: 1005;
+  z-index: 1005; /* Keeps logo above mobile menu backdrop */
+  transition: opacity 0.2s;
+  gap: 0.2rem; /* Space between Icon and Text */
+
+  /* ✅ Force text color to respect theme (Black/White) */
+  color: var(--text-primary) !important;
+
+  /* ✅ Ensure background is always transparent */
+  background-color: transparent !important;
+}
+
+.logo-link:hover {
+  opacity: 0.8;
+  color: var(--text-primary) !important;
+}
+
+/* The Logo Image */
+.app-logo {
+  height: 4rem; /* ~40px - Adjust based on preference */
+  width: auto; /* Maintains aspect ratio */
+  object-fit: contain; /* Ensures logo isn't stretched */
+  display: block;
+  border-radius: 50%;
+}
+
+/* The Text "CoachPro" (or whatever app name) */
+.logo-text {
+  font-weight: 750;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
 }
 
 /* --- Navigation (Desktop) --- */
@@ -48,7 +76,8 @@
   white-space: nowrap;
 }
 
-.nav a:hover {
+/* Only navigation links get the background hover, not the logo */
+.nav a:not(.logo-link):hover {
   color: var(--color-brand);
   background-color: var(--bg-hover);
 }
@@ -165,11 +194,19 @@
 /* =================================================================
    MOBILE & TABLET STYLES (< 900px)
    ================================================================= */
-/* We keep this media query because it changes the LAYOUT (Sidebar),
-   but we use REM units so it scales with global logic. */
 @media (max-width: 900px) {
   .mobile-menu-btn {
     display: block;
+  }
+
+  /* Slightly smaller logo on mobile */
+  .app-logo {
+    height: 2rem; /* ~32px */
+  }
+
+  .logo-text {
+    font-weight: 800;
+    font-size: 1.25rem;
   }
 
   .nav {
@@ -262,16 +299,9 @@
   }
 }
 
-/* NOTE: I removed the @media (max-width: 480px) query.
-   The root font scaling in index.css will automatically shrink 
-   the 1.1rem fonts and 17.5rem width defined above.
-*/
-
 /* =================================================================
    TINY MODE / LANDSCAPE (Height < 600px)
    ================================================================= */
-/* We keep this for vertical squashing, as root scaling only handles 
-   overall size, not vertical layout density. */
 @media (max-height: 600px) {
   .nav {
     padding-top: 3.75rem; /* 60px */

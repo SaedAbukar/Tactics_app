@@ -23,14 +23,17 @@ export default function Header() {
     <header className="header">
       <div className="header-content">
         {/* --- Logo Area --- */}
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `logo-link ${isActive ? activeStyle : ""}`
-          }
-          onClick={closeMenu}
-        >
-          {t("appName")}
+        <NavLink to="/" className="logo-link" onClick={closeMenu}>
+          <img
+            src={
+              theme === "dark"
+                ? "/public/images/tacticflow-dark.png"
+                : "/public/images/tacticflow-light.png"
+            }
+            alt={t("appName")}
+            className="app-logo"
+          />
+          <span className="logo-text">{t("appName")}</span>
         </NavLink>
 
         {/* --- Mobile Menu Toggle Button (Visible only on mobile) --- */}
