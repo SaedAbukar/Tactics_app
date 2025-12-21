@@ -49,10 +49,8 @@ const Profile: React.FC = observer(() => {
         {/* --- Header Section --- */}
         <div className="profile-header">
           <div className="avatar-circle">{getInitials(user.email)}</div>
-          <h2 className="profile-name">{user.name || "User"}</h2>
-          <p className="profile-email">{user.email}</p>
           <span className={`role-badge ${user.role.toLowerCase()}`}>
-            {user.role}
+            {user.email}
           </span>
         </div>
 
