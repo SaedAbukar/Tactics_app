@@ -1,4 +1,10 @@
-import { createContext, useState, useContext, type ReactNode } from "react";
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  type ReactNode,
+} from "react";
 import type { AuthUser } from "../../types/types";
 import * as authService from "./AuthService";
 import * as tokenUtils from "./tokenUtils";
@@ -22,7 +28,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [refreshTokenValue, setRefreshTokenValue] = useState<string | null>(
     null
   );
-  const [loading, setLoading] = useState(false);
+
+  // FIX 1: Start loading as TRUE. The app is "loading" until we prove otherwise.
+  const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState<Error | null>(null);
 
   // ------------------------------
@@ -44,13 +53,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // ------------------------------
+  // FIX 2: Restore Session on Refresh
+  // ------------------------------
+  useEffect(() => {
+    const initAuth = async () => {
+      const storedToken = sessionStorage.getItem("token");
+      const storedRefresh = sessionStorage.getItem("refreshToken");
+
+      if (!storedToken || !storedRefresh) {
+        setLoading(false); // No token found, we are done loading (user is guest)
+        return;
+      }
+
+      try {
+        // 1. Restore tokens to state immediately
+        setToken(storedToken);
+        setRefreshTokenValue(storedRefresh);
+
+        // 2. Schedule the silent refresh
+        tokenUtils.scheduleTokenRefresh(storedToken, refreshAccessToken);
+
+        // 3. Fetch the user profile to verify token validity
+        const userData = await authService.fetchUser(storedToken);
+        setUser(userData);
+      } catch (err) {
+        console.error("Session restoration failed:", err);
+        clearAuth(); // Token was invalid/expired
+      } finally {
+        setLoading(false); // ALWAYS release the loading gate
+      }
+    };
+
+    initAuth();
+  }, []);
+
+  // ------------------------------
   // Refresh access token
   // ------------------------------
   const refreshAccessToken = async () => {
-    if (!refreshTokenValue) return null;
+    // Fallback to storage if state is empty (e.g. during a race condition)
+    const currentRefresh =
+      refreshTokenValue || sessionStorage.getItem("refreshToken");
+
+    if (!currentRefresh) return null;
 
     try {
-      const data = await authService.refreshToken(refreshTokenValue);
+      const data = await authService.refreshToken(currentRefresh);
 
       if (!data.accessToken || !data.refreshToken)
         throw new Error("Invalid refresh token response");
@@ -133,7 +181,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// HMR-safe hook export
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
