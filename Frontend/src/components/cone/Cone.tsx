@@ -19,8 +19,7 @@ const ConeComponent: React.FC<ConeProps> = observer(
       return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // Calculate dimensions
-    const OFFSET = isMobile ? 25 : 12; // Half width
+    const HALF_WIDTH = isMobile ? 25 : 12;
     const HEIGHT = isMobile ? 35 : 20;
 
     const handleMouseDown = (e: React.MouseEvent, coneId: number) => {
@@ -39,13 +38,22 @@ const ConeComponent: React.FC<ConeProps> = observer(
           const isSelected =
             selectedItem?.type === "cone" && selectedItem.id === c.id;
 
+          // Center-Based Triangle Calculation
+          // c.x, c.y is the geometric center
+
+          const topX = c.x;
+          const topY = c.y - HEIGHT / 2;
+
+          const bottomLeftX = c.x - HALF_WIDTH;
+          const bottomLeftY = c.y + HEIGHT / 2;
+
+          const bottomRightX = c.x + HALF_WIDTH;
+          const bottomRightY = c.y + HEIGHT / 2;
+
           return (
             <polygon
               key={c.id}
-              // ✅ Dynamic Points Calculation
-              points={`${c.x},${c.y} ${c.x + OFFSET},${c.y + HEIGHT} ${
-                c.x - OFFSET
-              },${c.y + HEIGHT}`}
+              points={`${topX},${topY} ${bottomRightX},${bottomRightY} ${bottomLeftX},${bottomLeftY}`}
               fill={c.color || "orange"}
               stroke={isSelected ? "yellow" : "black"}
               strokeWidth={isSelected ? 3 : 1}

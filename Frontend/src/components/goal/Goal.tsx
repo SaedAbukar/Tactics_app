@@ -19,8 +19,7 @@ const GoalComponent: React.FC<GoalProps> = observer(
       return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // ✅ Dynamic Scale Factor
-    const SCALE = isMobile ? 2.0 : 1.0;
+    const SCALE = isMobile ? 2.0 : 1.5;
 
     const handleMouseDown = (e: React.MouseEvent, goalId: number) => {
       e.stopPropagation();
@@ -41,7 +40,19 @@ const GoalComponent: React.FC<GoalProps> = observer(
           const renderWidth = g.width * SCALE;
           const renderDepth = g.depth * SCALE;
 
-          // Reduce net density on small screens to prevent clutter
+          // [Diagram of Center-Based Rendering]
+          // The stored (g.x, g.y) is the CENTER (Red Dot)
+          // We calculate the drawing start point (Top-Left) by subtracting half width/height
+          //
+          // (drawX, drawY) ┌──────────────┐
+          //                │              │
+          //                │      • (x,y) │
+          //                │              │
+          //                └──────────────┘
+
+          const drawX = g.x - renderWidth / 2;
+          const drawY = g.y - renderDepth / 2;
+
           const netRows = isMobile ? 4 : 8;
           const netCols = isMobile ? 6 : 12;
 
@@ -55,9 +66,10 @@ const GoalComponent: React.FC<GoalProps> = observer(
               onTouchStart={(e) => handleTouchStart(e, g.id)}
               style={{ cursor: "grab" }}
             >
+              {/* Main Goal Frame */}
               <rect
-                x={g.x}
-                y={g.y}
+                x={drawX}
+                y={drawY}
                 width={renderWidth}
                 height={renderDepth}
                 fill="transparent"
@@ -65,26 +77,28 @@ const GoalComponent: React.FC<GoalProps> = observer(
                 strokeWidth={isSelected ? 6 : 4}
               />
 
+              {/* Net Horizontal Lines */}
               {Array.from({ length: netRows + 1 }).map((_, i) => (
                 <line
                   key={`row-${i}`}
-                  x1={g.x}
-                  y1={g.y + i * rowSpacing}
-                  x2={g.x + renderWidth}
-                  y2={g.y + i * rowSpacing}
+                  x1={drawX}
+                  y1={drawY + i * rowSpacing}
+                  x2={drawX + renderWidth}
+                  y2={drawY + i * rowSpacing}
                   stroke="black"
                   strokeWidth={1}
                   pointerEvents="none"
                 />
               ))}
 
+              {/* Net Vertical Lines */}
               {Array.from({ length: netCols + 1 }).map((_, i) => (
                 <line
                   key={`col-${i}`}
-                  x1={g.x + i * colSpacing}
-                  y1={g.y}
-                  x2={g.x + i * colSpacing}
-                  y2={g.y + renderDepth}
+                  x1={drawX + i * colSpacing}
+                  y1={drawY}
+                  x2={drawX + i * colSpacing}
+                  y2={drawY + renderDepth}
                   stroke="black"
                   strokeWidth={1}
                   pointerEvents="none"

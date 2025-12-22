@@ -4,7 +4,6 @@ import type { JwtPayload } from "../../types/types";
 export function isTokenValid(token: string | null): boolean {
   if (!token) return false;
   try {
-    // Correctly uses the generic type <JwtPayload>
     const decoded = jwtDecode<JwtPayload>(token);
     return Date.now() / 1000 < decoded.exp;
   } catch {
@@ -18,9 +17,25 @@ export function scheduleTokenRefresh(
 ) {
   try {
     const decoded = jwtDecode<JwtPayload>(token);
-    const timeout = decoded.exp * 1000 - Date.now() - 30_000; // 30s before expiry
-    if (timeout > 0) setTimeout(refreshCallback, timeout);
-  } catch {
-    // ignore invalid token
+    const expiresAt = decoded.exp * 1000;
+    const now = Date.now();
+
+    // Schedule 30 seconds before expiry
+    const timeout = expiresAt - now - 30_000;
+
+    if (timeout > 0) {
+      setTimeout(refreshCallback, timeout);
+    } else {
+      refreshCallback();
+    }
+  } catch (error) {
+    // MEANINGFUL HANDLING:
+    // The token is unreadable (corrupt/malformed).
+    // We treat this as "Expired" and attempt to get a new one immediately
+
+    // This triggers the AuthContext refresh logic.
+    // If successful -> Session is repaired.
+    // If fails -> User is logged out.
+    refreshCallback();
   }
 }
