@@ -25,7 +25,7 @@ export const ApiTacticalEditor: React.FC = observer(() => {
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
 
   // Default to true. CSS forces it visible on desktop regardless.
-  const [isControlsOpen, setIsControlsOpen] = useState(true);
+  const [isControlsOpen, setIsControlsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // --- HANDLERS ---

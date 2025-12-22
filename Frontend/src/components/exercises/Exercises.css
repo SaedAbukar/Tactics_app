@@ -176,13 +176,13 @@
   max-width: 800px;
   width: 100%;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 0rem 10rem 0rem 10rem;
   font-family: "Inter", sans-serif;
   box-sizing: border-box;
 }
 
 .back-button {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   background: none;
   border: none;
   color: var(--text-secondary);
@@ -216,7 +216,7 @@
 
 .detail-title {
   margin: 0;
-  font-size: 1.15rem; /* ~18px */
+  font-size: 1rem; /* ~18px */
   color: var(--text-primary);
   font-weight: 800;
 }
@@ -226,7 +226,7 @@
   color: #ffffff;
   padding: 3px 10px;
   border-radius: 99px;
-  font-size: 0.65rem;
+  font-size: 0.5rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -238,7 +238,7 @@
 }
 
 .section-label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 0.35rem;
@@ -247,8 +247,8 @@
 .description-text {
   color: var(--text-secondary);
   line-height: 1.5;
-  margin-bottom: 1.25rem;
-  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.75rem;
 }
 
 /* --- INCLUDED SESSIONS --- */
@@ -430,8 +430,8 @@
     gap: 0.75rem;
   }
   .tab-button {
-    padding: 10px 20px;
-    font-size: 0.95rem;
+    padding: 10px 15px;
+    font-size: 0.85rem;
   }
 
   .columns-grid {

@@ -39,6 +39,7 @@ export const SessionList: React.FC<SessionListProps> = ({
 
   return (
     <div className="category-group">
+      {/* Category Header */}
       <button
         className={`category-header ${isExpanded ? "active" : ""}`}
         onClick={() => setExpandedCategory(isExpanded ? null : category)}
@@ -48,6 +49,7 @@ export const SessionList: React.FC<SessionListProps> = ({
         <span className="badge">{items.length}</span>
       </button>
 
+      {/* Expanded List */}
       {isExpanded && (
         <div className="category-items">
           {items.length === 0 && (
@@ -55,7 +57,9 @@ export const SessionList: React.FC<SessionListProps> = ({
               {t("sessionSelector.empty", "No items")}
             </div>
           )}
+
           {items.map((item) => {
+            // 1. Render Edit Form if in editing mode
             if (editingId === item.id) {
               return (
                 <SessionForm
@@ -68,15 +72,54 @@ export const SessionList: React.FC<SessionListProps> = ({
                 />
               );
             }
+
+            // 2. Determine if item has attached sessions (Practice or Tactic)
+            const attachedSessions = (item as Practice).sessions;
+            const hasAttachments =
+              attachedSessions && attachedSessions.length > 0;
+
             return (
               <div key={item.id} className="list-item-card">
+                {/* Main Item Click Area */}
                 <div className="item-main" onClick={() => onSelect(item)}>
-                  <div className="item-name">{item.name}</div>
+                  <div className="item-header-row">
+                    <div className="item-name">{item.name}</div>
+                    {hasAttachments && (
+                      <span className="count-badge">
+                        {attachedSessions.length}
+                      </span>
+                    )}
+                  </div>
                   <div className="item-desc">
                     {item.description?.slice(0, 40)}...
                   </div>
                 </div>
 
+                {/* 3. Sub-Sessions List (The "Chips") */}
+                {hasAttachments && (
+                  <div className="sub-sessions-list">
+                    <div className="sub-sessions-label">
+                      {t("sessionSelector.includes", "Includes:")}
+                    </div>
+                    <div className="sub-sessions-grid">
+                      {attachedSessions.map((subSession) => (
+                        <button
+                          key={subSession.id}
+                          className="sub-session-chip"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Don't trigger parent select
+                            onSelect(subSession); // Load this specific session
+                          }}
+                        >
+                          <span>▶</span>
+                          {subSession.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions (Edit / Delete) */}
                 <div className="item-actions">
                   <button
                     className="icon-btn-mini"

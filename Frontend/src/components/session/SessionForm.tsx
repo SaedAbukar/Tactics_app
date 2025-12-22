@@ -22,10 +22,11 @@ export const SessionForm: React.FC<SessionFormProps> = ({
 
   useEffect(() => {
     setForm(initialData);
-  }, [initialData]);
+  }, [initialData.id]);
 
   const attachSession = (sessionId: number) => {
     const current = (form as Practice).sessions || [];
+    // Double check to prevent duplicates logic
     if (current.find((s) => s.id === sessionId)) return;
 
     const toAdd = availableSessions.find((s) => s.id === sessionId);
@@ -41,6 +42,14 @@ export const SessionForm: React.FC<SessionFormProps> = ({
       sessions: current.filter((s) => s.id !== sessionId),
     } as any);
   };
+
+  // Helper: Get sessions currently attached
+  const currentSessions = (form as Practice).sessions || [];
+
+  // Logic: Filter available sessions to exclude those already attached
+  const selectableSessions = availableSessions.filter(
+    (s) => !currentSessions.some((attached) => attached.id === s.id)
+  );
 
   return (
     <div className="editor-form">
@@ -65,7 +74,7 @@ export const SessionForm: React.FC<SessionFormProps> = ({
             {t("sessionSelector.attachedSessions", "Attached Sessions:")}
           </label>
           <ul className="attached-list">
-            {(form as Practice).sessions?.map((s) => (
+            {currentSessions.map((s) => (
               <li key={s.id} className="attached-item">
                 <span>{s.name}</span>
                 <button
@@ -77,22 +86,41 @@ export const SessionForm: React.FC<SessionFormProps> = ({
               </li>
             ))}
           </ul>
-          <select
-            className="modern-select"
-            onChange={(e) => {
-              if (e.target.value) attachSession(Number(e.target.value));
-              e.target.value = "";
-            }}
-          >
-            <option value="">
-              {t("sessionSelector.addAttached", "+ Add Session")}
-            </option>
-            {availableSessions.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
+
+          {/* Only show select if there are sessions left to add */}
+          {selectableSessions.length > 0 ? (
+            <select
+              className="modern-select"
+              onChange={(e) => {
+                if (e.target.value) attachSession(Number(e.target.value));
+                e.target.value = "";
+              }}
+            >
+              <option value="">
+                {t("sessionSelector.addAttached", "+ Add Session")}
               </option>
-            ))}
-          </select>
+              {selectableSessions.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div
+              className="empty-text"
+              style={{ fontSize: "0.7rem", padding: "4px" }}
+            >
+              {availableSessions.length === 0
+                ? t(
+                    "sessionSelector.noSessionsAvailable",
+                    "No sessions in library"
+                  )
+                : t(
+                    "sessionSelector.allSessionsAttached",
+                    "All available sessions attached"
+                  )}
+            </div>
+          )}
         </div>
       )}
 

@@ -1,13 +1,15 @@
+/* SessionSelector.css */
+
 .session-selector {
   display: flex;
   flex-direction: column;
   height: 100%;
   background-color: var(--bg-card);
-  border-radius: 8px; /* Tighter radius */
+  border-radius: 8px;
   border: 1px solid var(--border-color);
   overflow: hidden;
   font-family: "Inter", sans-serif;
-  font-size: 0.8rem; /* Base font size set very small */
+  font-size: 0.8rem;
 }
 
 /* --- Tabs (Slim Strip) --- */
@@ -16,16 +18,14 @@
   background-color: var(--bg-hover);
   border-bottom: 1px solid var(--border-color);
   border-radius: 8px 8px 0 0;
-  min-height: 36px; /* Force compact height */
+  min-height: 36px;
 }
 
 .tab-btn {
   flex: 1;
-  /* WAS: 12px 8px -> NOW: 8px 4px */
   padding: 8px 4px;
   background: none;
   border: none;
-  /* WAS: 0.9rem -> NOW: 0.8rem */
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-secondary);
@@ -51,14 +51,11 @@
 /* --- Content Area --- */
 .selector-content {
   flex: 1;
-  /* WAS: 1rem -> NOW: 0.75rem */
   padding: 0.75rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-
-  /* Custom scrollbar for this specific tiny area */
   scrollbar-width: thin;
 }
 
@@ -66,9 +63,9 @@
 .editor-form {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* Tighter gap */
+  gap: 0.5rem;
   background-color: var(--bg-primary);
-  padding: 0.75rem; /* Compact padding */
+  padding: 0.75rem;
   border-radius: 6px;
   border: 1px solid var(--border-color);
 }
@@ -88,13 +85,12 @@
 }
 
 .modern-btn.small {
-  /* Tiny buttons */
   padding: 4px 8px;
   font-size: 0.75rem;
   border-radius: 4px;
 }
 
-/* Attachment Section */
+/* Attachment Section (Inside Form) */
 .attachment-section {
   border-top: 1px dashed var(--border-color);
   padding-top: 0.4rem;
@@ -102,7 +98,7 @@
 }
 
 .sub-label {
-  font-size: 0.7rem; /* Tiny label */
+  font-size: 0.7rem;
   color: var(--text-muted);
   display: block;
   margin-bottom: 2px;
@@ -126,13 +122,14 @@
   align-items: center;
   gap: 4px;
   border: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 /* --- Lists & Categories --- */
 .lists-container {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem; /* Very tight list spacing */
+  gap: 0.25rem;
 }
 
 .category-group {
@@ -145,7 +142,6 @@
   width: 100%;
   display: flex;
   align-items: center;
-  /* WAS: 10px 12px -> NOW: 6px 8px */
   padding: 6px 8px;
   background-color: var(--bg-hover);
   border: none;
@@ -193,9 +189,8 @@
 /* --- Item Card (Micro List Item) --- */
 .list-item-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  /* WAS: 8px 10px -> NOW: 5px 8px */
+  flex-direction: column; /* Changed to column to stack chips below */
+  align-items: stretch;
   padding: 5px 8px;
   border-radius: 4px;
   border: 1px solid transparent;
@@ -209,25 +204,22 @@
   box-shadow: 0 1px 2px var(--shadow-color);
 }
 
-.list-item-card.editing {
-  display: block;
-  padding: 0;
-  border: none;
-  background: none;
-  box-shadow: none;
-}
-
+/* The top row containing name/actions */
 .item-main {
-  flex: 1;
   cursor: pointer;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 0px;
 }
 
+.item-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
 .item-name {
-  /* WAS: 0.9rem -> NOW: 0.8rem */
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--text-primary);
@@ -238,7 +230,6 @@
 }
 
 .item-desc {
-  /* WAS: 0.75rem -> NOW: 0.65rem */
   font-size: 0.65rem;
   color: var(--text-muted);
   white-space: nowrap;
@@ -247,16 +238,76 @@
   line-height: 1.2;
 }
 
+.count-badge {
+  font-size: 0.65rem;
+  background-color: var(--bg-hover);
+  color: var(--text-secondary);
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  margin-left: 6px;
+}
+
 .item-actions {
   display: flex;
   gap: 2px;
   opacity: 0.6;
   transition: opacity 0.2s;
-  margin-left: 4px;
+  align-self: flex-end; /* Align actions to right */
+  margin-top: 4px; /* Small gap above actions */
 }
 
+/* Make actions visible on hover */
 .list-item-card:hover .item-actions {
   opacity: 1;
+}
+
+/* --- Sub-Session Chips (The "Includes" section) --- */
+.sub-sessions-list {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-color);
+}
+
+.sub-sessions-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  font-style: italic;
+}
+
+.sub-sessions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sub-session-chip {
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+  /* Reset button styles */
+  font-family: inherit;
+  line-height: 1.2;
+}
+
+.sub-session-chip:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.sub-session-chip span {
+  font-size: 0.6rem;
+  color: var(--text-muted);
 }
 
 /* Mini Buttons */
@@ -273,7 +324,6 @@
 }
 
 .icon-btn-mini svg {
-  /* Enforce tiny icon size */
   width: 14px;
   height: 14px;
 }
@@ -285,7 +335,7 @@
 
 .icon-btn-mini.danger:hover {
   color: #ef4444;
-  background-color: #fee2e2;
+  background-color: rgba(239, 68, 68, 0.1); /* Red with transparency */
 }
 
 /* Loading State */
@@ -294,7 +344,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 120px; /* Reduced height */
+  height: 120px;
   color: var(--text-muted);
   gap: 8px;
   font-size: 0.8rem;
