@@ -5,25 +5,29 @@
   width: fit-content;
 }
 
-/* --- The Main Button --- */
+/* --- The Main Button (Ultra-Compact Desktop) --- */
 .lang-trigger {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px; /* Tighter gap */
 
   background-color: var(--bg-hover);
   color: var(--text-primary);
   border: 1px solid transparent;
 
-  padding: 6px 10px;
-  border-radius: 8px;
+  /* WAS: 6px 10px -> NOW: 4px 8px (Slimmer) */
+  padding: 4px 8px;
+  /* WAS: 8px -> NOW: 6px radius */
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 0.9rem;
+
+  /* WAS: 0.9rem -> NOW: 0.85rem */
+  font-size: 0.85rem;
   font-weight: 600;
 
-  /* Base width for the button */
-  min-width: 80px;
+  /* WAS: 80px -> NOW: 65px (Compact width) */
+  min-width: 65px;
   justify-content: space-between;
 }
 
@@ -38,7 +42,7 @@
 }
 
 .lang-flag {
-  font-size: 1.1em;
+  font-size: 1rem; /* Slightly smaller flag */
 }
 
 .lang-code {
@@ -46,10 +50,10 @@
   color: var(--text-primary);
 }
 
-/* Chevron Animation */
+/* Chevron Icon */
 .chevron-icon {
-  width: 14px;
-  height: 14px;
+  width: 12px; /* Smaller icon */
+  height: 12px;
   color: var(--text-muted);
   transition: transform 0.2s ease;
 }
@@ -58,10 +62,10 @@
   transform: rotate(180deg);
 }
 
-/* --- The Dropdown Menu --- */
+/* --- The Dropdown Menu (Compact) --- */
 .lang-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 6px); /* Closer to trigger */
   right: 0;
 
   min-width: 100%;
@@ -69,11 +73,11 @@
 
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 8px; /* Tighter radius */
   box-shadow: 0 4px 12px var(--shadow-color);
 
   list-style: none;
-  padding: 6px;
+  padding: 4px; /* Tighter internal padding */
   margin: 0;
   z-index: 1001;
   animation: fadeIn 0.15s ease-out;
@@ -99,16 +103,17 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 
-  padding: 8px 12px;
+  /* WAS: 8px 12px -> NOW: 6px 10px */
+  padding: 6px 10px;
   border: none;
   background: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   text-align: left;
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.85rem; /* Smaller text */
   transition: background-color 0.15s;
 
   white-space: nowrap;
@@ -126,8 +131,8 @@
 }
 
 .check-mark {
-  margin-left: 12px;
-  font-size: 0.8rem;
+  margin-left: 8px;
+  font-size: 0.75rem;
   color: var(--color-brand);
 }
 
@@ -139,9 +144,15 @@
     width: 100%; /* Switcher takes full available width in sidebar */
   }
 
+  /* --- RESTORE LARGE TOUCH TARGETS --- */
   .lang-trigger {
     width: 100%; /* Button fills container */
     justify-content: space-between;
+
+    /* Restore bigger padding for fingers */
+    padding: 10px 12px;
+    min-width: unset;
+    font-size: 0.95rem;
   }
 
   /* ✅ Open Menu UPWARDS on Mobile so it isn't clipped */
@@ -154,8 +165,16 @@
     right: 0;
     left: 0;
 
+    /* Restore bigger padding for options */
+    padding: 6px;
+
     /* Reverse animation for upward opening */
     animation: fadeInMobile 0.15s ease-out;
+  }
+
+  .lang-option {
+    padding: 10px 12px; /* Bigger touch target */
+    font-size: 1rem;
   }
 }
 

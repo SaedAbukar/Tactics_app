@@ -5,37 +5,45 @@
   flex-direction: column;
   align-items: center;
   flex: 1;
-  /* Prevent horizontal overflow on mobile */
-  max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Prevents horizontal scroll */
+
+  /* --- HIDE SCROLLBAR UI (Keep functionality) --- */
+
+  /* Firefox */
+  scrollbar-width: none;
+
+  /* IE and Edge */
+  -ms-overflow-style: none;
 }
 
-/* --- Hero Section --- */
+/* Chrome, Safari, and Opera */
+.home-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Hero Section (Ultra-Compact Desktop) --- */
 .hero-section {
   width: 100%;
-  padding: 6rem 1rem;
+  /* Very tight vertical spacing */
+  padding: 0.7rem;
   text-align: center;
-  background: radial-gradient(
-    circle at center,
-    var(--bg-hover) 0%,
-    transparent 70%
-  );
   box-sizing: border-box;
 }
 
 .hero-content {
-  max-width: 800px;
+  /* Restrict width to keep text dense */
+  max-width: 650px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
 .hero-title {
-  font-size: 3.5rem;
-  line-height: 1.1;
-  font-weight: 900;
-  margin-bottom: 1.5rem;
+  /* ~30px Title - Very sleek */
+  font-size: 1.85rem;
+  line-height: 1.2;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
   color: var(--text-primary);
-
   background: linear-gradient(
     135deg,
     var(--text-primary) 30%,
@@ -47,23 +55,27 @@
 }
 
 .hero-description {
-  font-size: 1.25rem;
+  /* ~15px Text */
+  font-size: 0.95rem;
   color: var(--text-secondary);
-  margin-bottom: 2.5rem;
-  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* --- CTA Buttons --- */
+/* --- CTA Buttons (Compact) --- */
 .cta-group {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
 .hero-btn {
-  padding: 12px 32px;
-  font-size: 1.1rem;
+  padding: 8px 20px;
+  font-size: 0.9rem;
   font-weight: 600;
   border-radius: 9999px;
   border: none;
@@ -88,82 +100,88 @@
   border: 1px solid var(--border-color);
 }
 
-/* --- Features Grid --- */
+/* --- Features Grid (Compact) --- */
 .features-section {
   width: 100%;
-  max-width: 1200px;
-  padding: 4rem 2rem;
+  max-width: 900px; /* Tighter container width */
+  padding: 1.5rem;
   box-sizing: border-box;
 }
 
 .features-grid {
   display: grid;
-  /* Responsive Grid: Auto-fit columns, minimum 280px width */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  /* Smaller columns */
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
   width: 100%;
 }
 
 .feature-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px var(--shadow-color);
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px -1px var(--shadow-color);
   transition: transform 0.2s, border-color 0.2s;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  height: 100%;
+  height: 90%;
 }
 
-/* New class for clickable cards */
 .feature-card.clickable {
   cursor: pointer;
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   border-color: var(--color-brand);
 }
 
 .feature-card:active {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .icon-wrapper {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+  /* Tiny icon box for desktop */
+  width: 36px;
+  height: 36px;
+  margin-bottom: 0.75rem;
   background-color: var(--bg-hover);
-  width: 60px;
-  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 8px;
+  color: var(--color-brand);
+}
+
+.icon-wrapper svg {
+  width: 18px;
+  height: 18px;
 }
 
 .feature-card h3 {
-  font-size: 1.25rem;
+  font-size: 0.85rem;
   color: var(--text-primary);
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.4rem 0;
   font-weight: 700;
 }
 
 .feature-card p {
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.4;
   margin: 0;
+  font-size: 0.75rem;
 }
 
 .sub-text {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   color: var(--text-muted) !important;
   margin-top: auto !important;
-  padding-top: 1rem;
+  padding-top: 0.5rem;
 }
 
-/* --- Mobile Adjustments --- */
+/* --- Mobile Adjustments (Restoring Original Size) --- */
 
 /* Tablet & Smaller Laptops */
 @media (max-width: 1024px) {
@@ -174,16 +192,21 @@
 
 /* Mobile Phones */
 @media (max-width: 768px) {
+  /* Because we made the base styles above very small, 
+     we must explicitly RESET these values to be BIGGER 
+     here to match your original mobile look.
+  */
+
   .hero-section {
     padding: 4rem 1rem;
   }
 
   .hero-title {
-    font-size: 2.5rem;
+    font-size: 2.5rem; /* Restored Big Size */
   }
 
   .hero-description {
-    font-size: 1.1rem;
+    font-size: 1.1rem; /* Restored Big Size */
   }
 
   .cta-group {
@@ -195,6 +218,8 @@
   .hero-btn {
     width: 100%;
     max-width: 300px;
+    padding: 12px 32px; /* Restored Padding */
+    font-size: 1.1rem; /* Restored Font */
   }
 
   .features-section {
@@ -202,20 +227,39 @@
   }
 
   .features-grid {
-    /* Switch to Flex Column for strictly vertical stacking with gap */
     display: flex;
     flex-direction: column;
-    gap: 2rem; /* ✅ Enforced Gap */
+    gap: 2rem;
     width: 100%;
   }
 
   .feature-card {
     align-items: center;
     text-align: center;
-    padding: 1.5rem;
+    padding: 1.5rem; /* Restored Padding */
     width: 100%;
     box-sizing: border-box;
-    /* Reset any potential margins interfering with gap */
     margin: 0;
+  }
+
+  /* Restore Icon Sizes for Mobile */
+  .icon-wrapper {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+  }
+
+  .icon-wrapper svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Restore Text Sizes for Mobile */
+  .feature-card h3 {
+    font-size: 1.25rem;
+  }
+
+  .feature-card p {
+    font-size: 1rem;
   }
 }

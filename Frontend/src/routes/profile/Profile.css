@@ -66,7 +66,7 @@
 }
 
 .role-badge {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 99px;
@@ -100,14 +100,14 @@
 }
 
 .detail-item .label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 600;
 }
 
 .detail-item .value {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-primary);
 }
