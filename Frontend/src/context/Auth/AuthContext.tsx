@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   type ReactNode,
+  useRef,
 } from "react";
 import type { AuthUser } from "../../types/types";
 import * as authService from "./AuthService";
@@ -91,28 +92,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ------------------------------
   // Refresh access token
   // ------------------------------
+  // Near your other state declarations
+  const isRefreshing = useRef(false);
+
   const refreshAccessToken = async () => {
-    // Fallback to storage if state is empty (e.g. during a race condition)
+    // Prevent simultaneous refresh calls (The "Race Condition" fix)
+    if (isRefreshing.current) return null;
+
     const currentRefresh =
       refreshTokenValue || sessionStorage.getItem("refreshToken");
-
     if (!currentRefresh) return null;
 
     try {
+      isRefreshing.current = true; // Lock
       const data = await authService.refreshToken(currentRefresh);
 
-      if (!data.accessToken || !data.refreshToken)
+      if (!data.accessToken || !data.refreshToken) {
         throw new Error("Invalid refresh token response");
+      }
 
       saveTokens(data.accessToken, data.refreshToken);
-
       const userData = await authService.fetchUser(data.accessToken);
       setUser(userData);
 
       return { token: data.accessToken, user: userData };
-    } catch (err) {
+    } catch (err: any) {
+      // If the server returns a 500 (Internal Server Error), force logout
+      // This handles the unique constraint crash on the backend
+      if (err.message?.includes("500") || err.response?.status === 500) {
+        logout();
+        return null;
+      }
+
       clearAuth();
       return null;
+    } finally {
+      isRefreshing.current = false; // Unlock
     }
   };
 
