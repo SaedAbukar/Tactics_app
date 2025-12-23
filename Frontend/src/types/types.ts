@@ -192,3 +192,12 @@ export interface PublicUserResponse {
   email: string;
   isPublic: boolean;
 }
+
+export type CollaboratorType = "USER" | "GROUP";
+
+export interface CollaboratorDTO {
+  id: number;
+  name: string;
+  type: CollaboratorType;
+  role: ShareRole; // Ensure ShareRole is also exported here
+}

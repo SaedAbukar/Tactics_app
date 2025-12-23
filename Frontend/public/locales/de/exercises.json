@@ -23,18 +23,27 @@
     "choose": "-- Aus Bibliothek wählen --"
   },
   "sharing": {
-    "title": "Zugriff teilen",
-    "session": "Sitzung",
+    "title": "Element teilen",
+    "session": "Einheit",
     "practice": "Übung",
-    "searchPlaceholder": "E-Mail suchen...",
-    "noMoreUsers": "Keine weiteren Benutzer gefunden.",
-    "noUsersFound": "Keine Benutzer gefunden.",
+    "searchPlaceholder": "Nutzer nach E-Mail suchen...",
+    "noMoreUsers": "Keine weiteren Nutzer gefunden",
+    "noUsersFound": "Keine Nutzer gefunden",
     "confirmTitle": "Freigabe bestätigen",
-    "confirmAction": "Jetzt teilen",
-    "confirmMessage": "{{role}}-Zugriff an {{email}} gewähren?",
+    "confirmAction": "Zugriff teilen",
+    "confirmMessage": "Sind Sie sicher, dass Sie {{email}} den Status {{role}} geben möchten?",
+    "alreadySharedTitle": "Zugriff bereits gewährt",
+    "alreadySharedMessage": "{{name}} ist bereits ein Mitarbeiter mit {{role}}-Zugriff.",
+    "currentCollaborators": "Aktueller Zugriff",
+    "noCollaborators": "Nur Sie haben Zugriff",
+    "addNew": "Neuen Mitarbeiter hinzufügen",
+    "user": "Benutzer",
+    "group": "Gruppe",
+    "revokeTitle": "Zugriff entziehen",
+    "revokeMessage": "Sind Sie sicher, dass Sie den Zugriff für {{email}} entfernen möchten?",
     "roles": {
-      "viewer": "BETRACHTER",
-      "editor": "EDITOR"
+      "viewer": "Betrachter",
+      "editor": "Editor"
     }
   }
 }

@@ -23,18 +23,27 @@
     "choose": "-- Elegir de la Biblioteca --"
   },
   "sharing": {
-    "title": "Compartir acceso",
+    "title": "Compartir elemento",
     "session": "Sesión",
     "practice": "Práctica",
-    "searchPlaceholder": "Buscar correo...",
-    "noMoreUsers": "No se encontraron más usuarios.",
-    "noUsersFound": "No se encontraron usuarios.",
+    "searchPlaceholder": "Buscar usuarios por email...",
+    "noMoreUsers": "No se encontraron más usuarios",
+    "noUsersFound": "No se encontraron usuarios",
     "confirmTitle": "Confirmar compartido",
-    "confirmAction": "Compartir ahora",
-    "confirmMessage": "¿Otorgar acceso de {{role}} a {{email}}?",
+    "confirmAction": "Compartir acceso",
+    "confirmMessage": "¿Estás seguro de que quieres dar acceso de {{role}} a {{email}}?",
+    "alreadySharedTitle": "Acceso ya concedido",
+    "alreadySharedMessage": "{{name}} ya es un colaborador con acceso de {{role}}.",
+    "currentCollaborators": "Acceso actual",
+    "noCollaborators": "Solo tú tienes acceso",
+    "addNew": "Añadir nuevo colaborador",
+    "user": "Usuario",
+    "group": "Grupo",
+    "revokeTitle": "Revocar acceso",
+    "revokeMessage": "¿Estás seguro de que quieres quitar el acceso a {{email}}?",
     "roles": {
-      "viewer": "LECTOR",
-      "editor": "EDITOR"
+      "viewer": "Lector",
+      "editor": "Editor"
     }
   }
 }

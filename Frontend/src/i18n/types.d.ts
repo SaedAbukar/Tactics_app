@@ -96,6 +96,15 @@ declare module "i18next" {
           confirmTitle: string;
           confirmAction: string;
           confirmMessage: string;
+          currentCollaborators: string;
+          noCollaborators: string;
+          addNew: string;
+          user: string;
+          group: string;
+          revokeTitle: string;
+          revokeMessage: string;
+          alreadySharedTitle: string;
+          alreadySharedMessage: string;
           roles: {
             viewer: string;
             editor: string;

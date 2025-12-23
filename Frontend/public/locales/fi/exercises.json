@@ -23,18 +23,27 @@
     "choose": "-- Valitse kirjastosta --"
   },
   "sharing": {
-    "title": "Jaa pääsy",
-    "session": "Harjoitus",
-    "practice": "Kokonaisuus",
-    "searchPlaceholder": "Etsi sähköpostilla...",
-    "noMoreUsers": "Ei enempää käyttäjiä.",
-    "noUsersFound": "Käyttäjiä ei löytynyt.",
-    "confirmTitle": "Vahvista jakaminen",
-    "confirmAction": "Jaa nyt",
-    "confirmMessage": "Myönnetäänkö {{role}}-oikeudet käyttäjälle {{email}}?",
+    "title": "Jaa kohde",
+    "session": "Istunto",
+    "practice": "Harjoitus",
+    "searchPlaceholder": "Hae käyttäjiä sähköpostilla...",
+    "noMoreUsers": "Ei enempää käyttäjiä",
+    "noUsersFound": "Käyttäjiä ei löytynyt",
+    "confirmTitle": "Vahvista jako",
+    "confirmAction": "Jaa oikeudet",
+    "confirmMessage": "Oletko varma, että haluat antaa {{role}}-oikeudet käyttäjälle {{email}}?",
+    "alreadySharedTitle": "Pääsy on jo myönnetty",
+    "alreadySharedMessage": "Käyttäjällä {{name}} on jo {{role}}-oikeudet tähän kohteeseen.",
+    "currentCollaborators": "Nykyiset oikeudet",
+    "noCollaborators": "Vain sinulla on pääsy",
+    "addNew": "Lisää uusi jakaminen",
+    "user": "Käyttäjä",
+    "group": "Ryhmä",
+    "revokeTitle": "Poista oikeudet",
+    "revokeMessage": "Oletko varma, että haluat poistaa käyttäjän {{email}} oikeudet?",
     "roles": {
-      "viewer": "KATSELIJA",
-      "editor": "MUOKKAAJA"
+      "viewer": "Katselija",
+      "editor": "Muokkaaja"
     }
   }
 }

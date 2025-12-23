@@ -6,6 +6,7 @@ import {
   type AllUserData, // Imported
   ShareRole,
   type UserProfileResponse,
+  type CollaboratorDTO,
 } from "../../../types/types";
 
 type RequestFn = <T>(url: string, options?: RequestInit) => Promise<T>;
@@ -60,6 +61,12 @@ export class UserDataApi {
   }
 
   /** Share a session with another user */
+
+  async fetchCollaborators(sessionId: number): Promise<CollaboratorDTO[]> {
+    return this.request<CollaboratorDTO[]>(
+      `/sessions/share/${sessionId}/collaborators`
+    );
+  }
   async shareSession(
     sessionId: number,
     targetId: number,
@@ -100,6 +107,13 @@ export class UserDataApi {
   }
 
   /** Share a practice with another user */
+  async fetchPracticeCollaborators(
+    practiceId: number
+  ): Promise<CollaboratorDTO[]> {
+    return this.request<CollaboratorDTO[]>(
+      `/practices/share/${practiceId}/collaborators`
+    );
+  }
   async sharePractice(
     practiceId: number,
     targetId: number,
@@ -146,6 +160,15 @@ export class UserDataApi {
   }
 
   /** Share a tactic with another user */
+
+  async fetchTacticCollaborators(
+    gameTacticId: number
+  ): Promise<CollaboratorDTO[]> {
+    return this.request<CollaboratorDTO[]>(
+      `/game-tactics/share/${gameTacticId}/collaborators`
+    );
+  }
+
   async shareTactic(
     gameTacticId: number,
     targetId: number,

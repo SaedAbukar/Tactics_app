@@ -23,18 +23,27 @@
     "choose": "-- Choose from Library --"
   },
   "sharing": {
-    "title": "Share Access",
+    "title": "Share Item",
     "session": "Session",
     "practice": "Practice",
-    "searchPlaceholder": "Search email...",
-    "noMoreUsers": "No more users found.",
-    "noUsersFound": "No users found.",
-    "confirmTitle": "Confirm Sharing",
-    "confirmAction": "Share Now",
-    "confirmMessage": "Grant {{role}} access to {{email}}?",
+    "searchPlaceholder": "Search users by email...",
+    "noMoreUsers": "No more users found",
+    "noUsersFound": "No users found",
+    "confirmTitle": "Confirm Share",
+    "confirmAction": "Share Access",
+    "confirmMessage": "Are you sure you want to give {{role}} access to {{email}}?",
+    "alreadySharedTitle": "Access already granted",
+    "alreadySharedMessage": "{{name}} is already a collaborator with {{role}} access.",
+    "currentCollaborators": "Current Access",
+    "noCollaborators": "Only you have access",
+    "addNew": "Add New Collaborator",
+    "user": "User",
+    "group": "Group",
+    "revokeTitle": "Revoke Access",
+    "revokeMessage": "Are you sure you want to remove access for {{email}}?",
     "roles": {
-      "viewer": "VIEWER",
-      "editor": "EDITOR"
+      "viewer": "Viewer",
+      "editor": "Editor"
     }
   }
 }

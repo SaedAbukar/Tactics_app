@@ -8,6 +8,7 @@ import { SessionPreview } from "./detail/SessionPreview";
 import { IncludedSessions } from "./detail/IncludedSessions";
 import { useState } from "react";
 import { ShareModal } from "./SearchModal";
+import { useExercises } from "../../../context/ExercisesProvider";
 
 interface DetailViewProps {
   item: Session | Practice | GameTactic;
@@ -17,6 +18,7 @@ interface DetailViewProps {
 
 export const DetailView = observer(
   ({ item, type, onBack }: DetailViewProps) => {
+    const { exercisesViewModel: eVm } = useExercises();
     const { t } = useTranslation(["exercises", "common"]);
     const [showShare, setShowShare] = useState(false);
 
@@ -27,16 +29,19 @@ export const DetailView = observer(
       ? "tactic"
       : "practice";
 
+    const handleOpenShare = () => {
+      // Trigger fetch in ViewModel BEFORE showing the modal
+      eVm.loadCollaborators(shareType, item.id);
+      setShowShare(true);
+    };
+
     return (
       <div className="detail-container">
         <div className="header-section">
           <button onClick={onBack} className="back-button">
             ← {t("common:back")}
           </button>
-          <button
-            className="btn-action secondary"
-            onClick={() => setShowShare(true)}
-          >
+          <button className="btn-action secondary" onClick={handleOpenShare}>
             {t("common:share")}
           </button>
         </div>

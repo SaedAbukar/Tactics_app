@@ -6,7 +6,8 @@ import type {
   ShareRole,
   AllUserData, // Moved here
   CategorizedItems,
-  UserProfileResponse, // Moved here
+  UserProfileResponse,
+  CollaboratorDTO, // Moved here
 } from "../../../types/types";
 
 export class ExercisesRepository {
@@ -14,6 +15,13 @@ export class ExercisesRepository {
 
   constructor(api: UserDataApi) {
     this.api = api;
+  }
+
+  async getCollaborators(type: string, id: number): Promise<CollaboratorDTO[]> {
+    if (type === "session") return this.api.fetchCollaborators(id);
+    if (type === "practice") return this.api.fetchPracticeCollaborators(id);
+    if (type === "tactic") return this.api.fetchTacticCollaborators(id);
+    return [];
   }
 
   async updatePublicStatus(isPublic: boolean): Promise<UserProfileResponse> {

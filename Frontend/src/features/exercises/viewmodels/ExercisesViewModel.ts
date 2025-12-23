@@ -8,6 +8,7 @@ import type {
   ShareRole,
   CategorizedItems,
   Step,
+  CollaboratorDTO,
 } from "../../../types/types";
 
 export class ExercisesViewModel {
@@ -29,6 +30,7 @@ export class ExercisesViewModel {
   };
 
   selectedItem: Session | Practice | GameTactic | null = null;
+  collaborators: CollaboratorDTO[] = [];
 
   isLoading = false;
   error: string | null = null;
@@ -248,57 +250,89 @@ export class ExercisesViewModel {
       this.setLoading(false);
     }
   }
+  // =========================================================================
+  //  SHARING ACTIONS (User Focused)
+  // =========================================================================
 
-  // =========================================================================
-  //  SHARING ACTIONS
-  // =========================================================================
+  async loadCollaborators(type: "session" | "practice" | "tactic", id: number) {
+    // We avoid setting global this.isLoading = true here to prevent
+    // triggering full-page skeletons/spinners in the parent view.
+    try {
+      const data = await this.repository.getCollaborators(type, id);
+      runInAction(() => {
+        this.collaborators = data;
+      });
+    } catch (err) {
+      this.handleError("Failed to fetch collaborators", err);
+    }
+  }
 
   async shareItem(
     type: "session" | "practice" | "tactic",
     id: number,
-    targetId: number,
+    targetUserId: number,
     role: ShareRole
   ) {
-    this.setLoading(true);
-    this.clearError();
-    try {
-      if (type === "session")
-        await this.repository.shareSession(id, targetId, role);
-      else if (type === "practice")
-        await this.repository.sharePractice(id, targetId, role);
-      else if (type === "tactic")
-        await this.repository.shareTactic(id, targetId, role);
+    runInAction(() => {
+      this.isLoading = true;
+      this.error = null;
+    });
 
-      // Refresh state to reflect the new sharing status in the dashboard
+    try {
+      // Routing to the specific Repository methods
+      if (type === "session") {
+        await this.repository.shareSession(id, targetUserId, role);
+      } else if (type === "practice") {
+        await this.repository.sharePractice(id, targetUserId, role);
+      } else if (type === "tactic") {
+        await this.repository.shareTactic(id, targetUserId, role);
+      }
+
+      // Refresh state to update shared lists on the dashboard
       await this.loadData();
+
+      runInAction(() => {
+        this.isLoading = false;
+      });
     } catch (err) {
-      this.handleError(`Failed to share ${type}.`, err);
-    } finally {
-      this.setLoading(false);
+      runInAction(() => {
+        this.isLoading = false;
+        this.handleError(`Failed to share ${type}.`, err);
+      });
     }
   }
 
-  async revokeShare(
-    type: "session" | "practice" | "tactic",
-    id: number,
-    targetId: number
+  async revokeUserAccess(
+    itemType: "session" | "practice" | "tactic",
+    itemId: number,
+    targetUserId: number
   ) {
-    this.setLoading(true);
-    this.clearError();
-    try {
-      if (type === "session")
-        await this.repository.revokeSessionShare(id, targetId);
-      else if (type === "practice")
-        await this.repository.revokePracticeShare(id, targetId);
-      else if (type === "tactic")
-        await this.repository.revokeTacticShare(id, targetId);
+    runInAction(() => {
+      this.isLoading = true;
+      this.error = null;
+    });
 
-      // Refresh state to remove the item from shared lists or update UI
+    try {
+      // Routing to the specific Repository revoke methods
+      if (itemType === "session") {
+        await this.repository.revokeSessionShare(itemId, targetUserId);
+      } else if (itemType === "practice") {
+        await this.repository.revokePracticeShare(itemId, targetUserId);
+      } else if (itemType === "tactic") {
+        await this.repository.revokeTacticShare(itemId, targetUserId);
+      }
+
+      // Re-fetch dashboard data because revoking changes shared visibility
       await this.loadData();
+
+      runInAction(() => {
+        this.isLoading = false;
+      });
     } catch (err) {
-      this.handleError(`Failed to revoke ${type} share.`, err);
-    } finally {
-      this.setLoading(false);
+      runInAction(() => {
+        this.isLoading = false;
+        this.handleError(`Failed to revoke access.`, err);
+      });
     }
   }
 
