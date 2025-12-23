@@ -3,6 +3,7 @@
   "add": "Add",
   "delete": "Delete",
   "cancel": "Cancel",
+  "share": "Share",
   "loading": {
     "initWorkspace": "Initializing Workspace...",
     "app": "Loading App..."

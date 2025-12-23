@@ -5,7 +5,8 @@ import type {
   GameTactic,
   ShareRole,
   AllUserData, // Moved here
-  CategorizedItems, // Moved here
+  CategorizedItems,
+  UserProfileResponse, // Moved here
 } from "../../../types/types";
 
 export class ExercisesRepository {
@@ -13,6 +14,10 @@ export class ExercisesRepository {
 
   constructor(api: UserDataApi) {
     this.api = api;
+  }
+
+  async updatePublicStatus(isPublic: boolean): Promise<UserProfileResponse> {
+    return this.api.updatePublicStatus(isPublic);
   }
 
   // =========================================================================

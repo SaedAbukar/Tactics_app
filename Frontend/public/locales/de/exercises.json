@@ -21,5 +21,20 @@
     "noSessions": "Noch keine Sitzungen verknüpft. Klicke auf \"Sitzung hinzufügen\".",
     "selectPrompt": "Wähle eine Sitzung zum Hinzufügen",
     "choose": "-- Aus Bibliothek wählen --"
+  },
+  "sharing": {
+    "title": "Zugriff teilen",
+    "session": "Sitzung",
+    "practice": "Übung",
+    "searchPlaceholder": "E-Mail suchen...",
+    "noMoreUsers": "Keine weiteren Benutzer gefunden.",
+    "noUsersFound": "Keine Benutzer gefunden.",
+    "confirmTitle": "Freigabe bestätigen",
+    "confirmAction": "Jetzt teilen",
+    "confirmMessage": "{{role}}-Zugriff an {{email}} gewähren?",
+    "roles": {
+      "viewer": "BETRACHTER",
+      "editor": "EDITOR"
+    }
   }
 }

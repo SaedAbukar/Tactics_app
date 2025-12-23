@@ -40,6 +40,32 @@ export class ExercisesViewModel {
     makeAutoObservable(this);
   }
 
+  async toggleProfileVisibility(isPublic: boolean): Promise<boolean> {
+    // 1. Initial state change
+    runInAction(() => {
+      this.isLoading = true;
+      this.error = null;
+    });
+
+    try {
+      // 2. Perform the API call
+      await this.repository.updatePublicStatus(isPublic);
+
+      // 3. Update state on success
+      runInAction(() => {
+        this.isLoading = false;
+      });
+      return true;
+    } catch (err) {
+      // 4. Update state on failure
+      runInAction(() => {
+        this.isLoading = false;
+        this.handleError("Failed to update profile visibility", err);
+      });
+      return false;
+    }
+  }
+
   // =========================================================================
   //  CORE DATA LOADING
   // =========================================================================
@@ -234,17 +260,20 @@ export class ExercisesViewModel {
     role: ShareRole
   ) {
     this.setLoading(true);
+    this.clearError();
     try {
       if (type === "session")
         await this.repository.shareSession(id, targetId, role);
-      if (type === "practice")
+      else if (type === "practice")
         await this.repository.sharePractice(id, targetId, role);
-      if (type === "tactic")
+      else if (type === "tactic")
         await this.repository.shareTactic(id, targetId, role);
 
+      // Refresh state to reflect the new sharing status in the dashboard
       await this.loadData();
     } catch (err) {
       this.handleError(`Failed to share ${type}.`, err);
+    } finally {
       this.setLoading(false);
     }
   }
@@ -255,17 +284,20 @@ export class ExercisesViewModel {
     targetId: number
   ) {
     this.setLoading(true);
+    this.clearError();
     try {
       if (type === "session")
         await this.repository.revokeSessionShare(id, targetId);
-      if (type === "practice")
+      else if (type === "practice")
         await this.repository.revokePracticeShare(id, targetId);
-      if (type === "tactic")
+      else if (type === "tactic")
         await this.repository.revokeTacticShare(id, targetId);
 
+      // Refresh state to remove the item from shared lists or update UI
       await this.loadData();
     } catch (err) {
       this.handleError(`Failed to revoke ${type} share.`, err);
+    } finally {
       this.setLoading(false);
     }
   }

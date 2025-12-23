@@ -21,5 +21,20 @@
     "noSessions": "Aucune session liée. Cliquez sur \"Ajouter Session\" pour commencer.",
     "selectPrompt": "Sélectionnez une session à ajouter",
     "choose": "-- Choisir dans la bibliothèque --"
+  },
+  "sharing": {
+    "title": "Partager l'accès",
+    "session": "Session",
+    "practice": "Pratique",
+    "searchPlaceholder": "Rechercher un e-mail...",
+    "noMoreUsers": "Plus d'utilisateurs trouvés.",
+    "noUsersFound": "Aucun utilisateur trouvé.",
+    "confirmTitle": "Confirmer le partage",
+    "confirmAction": "Partager maintenant",
+    "confirmMessage": "Accorder l'accès {{role}} à {{email}} ?",
+    "roles": {
+      "viewer": "SPECTATEUR",
+      "editor": "ÉDITEUR"
+    }
   }
 }

@@ -18,6 +18,7 @@ interface AuthContextType {
   signup: (details: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   refreshAccessToken: () => Promise<{ token: string; user: AuthUser } | null>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -163,6 +164,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => clearAuth();
 
+  const refreshUser = async () => {
+    const currentToken = token || sessionStorage.getItem("token");
+    if (!currentToken) return;
+
+    try {
+      const userData = await authService.fetchUser(currentToken);
+      setUser(userData);
+    } catch (err: any) {
+      // If the error is a 401 (Unauthorized), try to refresh the token
+      if (err.message?.includes("401")) {
+        console.log(
+          "Token expired during user refresh, attempting silent refresh..."
+        );
+        const result = await refreshAccessToken();
+
+        // If refresh worked, try fetching the user one more time with the NEW token
+        if (result) {
+          const freshUserData = await authService.fetchUser(result.token);
+          setUser(freshUserData);
+        }
+      } else {
+        console.error("Failed to refresh user profile:", err);
+      }
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -174,6 +201,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signup,
         logout,
         refreshAccessToken,
+        refreshUser,
       }}
     >
       {children}

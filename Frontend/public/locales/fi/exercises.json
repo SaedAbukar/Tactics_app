@@ -21,5 +21,20 @@
     "noSessions": "Ei liitettyjä istuntoja. Klikkaa \"Lisää istunto\" aloittaaksesi.",
     "selectPrompt": "Valitse lisättävä istunto",
     "choose": "-- Valitse kirjastosta --"
+  },
+  "sharing": {
+    "title": "Jaa pääsy",
+    "session": "Harjoitus",
+    "practice": "Kokonaisuus",
+    "searchPlaceholder": "Etsi sähköpostilla...",
+    "noMoreUsers": "Ei enempää käyttäjiä.",
+    "noUsersFound": "Käyttäjiä ei löytynyt.",
+    "confirmTitle": "Vahvista jakaminen",
+    "confirmAction": "Jaa nyt",
+    "confirmMessage": "Myönnetäänkö {{role}}-oikeudet käyttäjälle {{email}}?",
+    "roles": {
+      "viewer": "KATSELIJA",
+      "editor": "MUOKKAAJA"
+    }
   }
 }

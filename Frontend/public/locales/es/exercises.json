@@ -21,5 +21,20 @@
     "noSessions": "No hay sesiones vinculadas. Haz clic en \"Añadir Sesión\" para comenzar.",
     "selectPrompt": "Selecciona una sesión para añadir",
     "choose": "-- Elegir de la Biblioteca --"
+  },
+  "sharing": {
+    "title": "Compartir acceso",
+    "session": "Sesión",
+    "practice": "Práctica",
+    "searchPlaceholder": "Buscar correo...",
+    "noMoreUsers": "No se encontraron más usuarios.",
+    "noUsersFound": "No se encontraron usuarios.",
+    "confirmTitle": "Confirmar compartido",
+    "confirmAction": "Compartir ahora",
+    "confirmMessage": "¿Otorgar acceso de {{role}} a {{email}}?",
+    "roles": {
+      "viewer": "LECTOR",
+      "editor": "EDITOR"
+    }
   }
 }

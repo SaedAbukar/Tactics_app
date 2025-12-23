@@ -5,6 +5,7 @@ import {
   type CategorizedItems, // Imported
   type AllUserData, // Imported
   ShareRole,
+  type UserProfileResponse,
 } from "../../../types/types";
 
 type RequestFn = <T>(url: string, options?: RequestInit) => Promise<T>;
@@ -14,6 +15,14 @@ export class UserDataApi {
 
   constructor(request: RequestFn) {
     this.request = request;
+  }
+
+  async updatePublicStatus(isPublic: boolean): Promise<UserProfileResponse> {
+    return this.request<UserProfileResponse>("/api/users/me/public", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isPublic }), // Key matches DTO
+    });
   }
 
   // =========================================================================
@@ -63,7 +72,6 @@ export class UserDataApi {
     });
   }
 
-  /** Revoke access to a session */
   async revokeSessionShare(sessionId: number, targetId: number): Promise<void> {
     return this.deleteBody<void>("/sessions/share/user", {
       sessionId,
@@ -104,7 +112,6 @@ export class UserDataApi {
     });
   }
 
-  /** Revoke access to a practice */
   async revokePracticeShare(
     practiceId: number,
     targetId: number
@@ -151,7 +158,6 @@ export class UserDataApi {
     });
   }
 
-  /** Revoke access to a tactic */
   async revokeTacticShare(
     gameTacticId: number,
     targetId: number

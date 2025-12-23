@@ -22,6 +22,7 @@ export async function fetchUser(accessToken: string): Promise<AuthUser> {
     groups: data.groups,
     createdAt: data.createdAt,
     lastLogin: data.lastLogin,
+    isPublic: data.isPublic,
   };
 }
 

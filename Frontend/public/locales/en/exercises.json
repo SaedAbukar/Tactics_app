@@ -21,5 +21,20 @@
     "noSessions": "No sessions linked yet. Click \"Add Session\" to start building.",
     "selectPrompt": "Select a session to add",
     "choose": "-- Choose from Library --"
+  },
+  "sharing": {
+    "title": "Share Access",
+    "session": "Session",
+    "practice": "Practice",
+    "searchPlaceholder": "Search email...",
+    "noMoreUsers": "No more users found.",
+    "noUsersFound": "No users found.",
+    "confirmTitle": "Confirm Sharing",
+    "confirmAction": "Share Now",
+    "confirmMessage": "Grant {{role}} access to {{email}}?",
+    "roles": {
+      "viewer": "VIEWER",
+      "editor": "EDITOR"
+    }
   }
 }

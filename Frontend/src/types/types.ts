@@ -126,6 +126,7 @@ export type AuthUser = {
   id: number;
   email: string;
   role: "USER" | "ADMIN";
+  isPublic: boolean;
   name?: string;
   groups?: any[];
   createdAt?: string;
@@ -162,4 +163,32 @@ export interface AllUserData {
   sessions: CategorizedItems<Session>;
   practices: CategorizedItems<Practice>;
   tactics: CategorizedItems<GameTactic>;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  isPublic: boolean;
+}
+
+export interface UserSlice {
+  content: PublicUserResponse[];
+  last: boolean;
+  totalElements?: number;
+  totalPages?: number;
+  size?: number;
+  number?: number;
+}
+
+export interface UserProfileResponse {
+  id: number;
+  email: string;
+  isPublic: boolean;
+  message?: string;
+}
+
+export interface PublicUserResponse {
+  id: number;
+  email: string;
+  isPublic: boolean;
 }

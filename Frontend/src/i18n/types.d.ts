@@ -6,6 +6,7 @@ declare module "i18next" {
     resources: {
       common: {
         save: string;
+        share: string; // Added
         add: string;
         delete: string;
         cancel: string;
@@ -79,6 +80,22 @@ declare module "i18next" {
       exercises: {
         title: string;
         subtitle: string;
+        sharing: {
+          // Added
+          title: string;
+          session: string;
+          practice: string;
+          searchPlaceholder: string;
+          noMoreUsers: string;
+          noUsersFound: string;
+          confirmTitle: string;
+          confirmAction: string;
+          confirmMessage: string;
+          roles: {
+            viewer: string;
+            editor: string;
+          };
+        };
         tabs: {
           sessions: string;
           practices: string;

@@ -3,6 +3,7 @@
   "add": "Lisää",
   "delete": "Poista",
   "cancel": "Peruuta",
+  "share": "Jaa",
   "loading": {
     "initWorkspace": "Alustetaan työtilaa...",
     "app": "Ladataan sovellusta..."

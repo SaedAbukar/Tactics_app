@@ -1,16 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react"; // Added useState
 import { observer } from "mobx-react-lite";
-import { useTranslation } from "react-i18next"; // 1. Import hook
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/Auth/AuthContext";
 import { useExercises } from "../../context/ExercisesProvider";
+import { EditProfileModal } from "./components/EditProfileModal"; // Import your new modal
 import "./Profile.css";
 
 const Profile: React.FC = observer(() => {
   const { user, logout } = useAuth();
-  const { t, i18n } = useTranslation(["profile", "common"]); // 2. Init hook
+  const { t, i18n } = useTranslation(["profile", "common"]);
   const { exercisesViewModel } = useExercises();
 
-  // Load data when profile mounts
+  // 1. Local state to manage modal visibility
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   useEffect(() => {
     if (user) {
       exercisesViewModel.loadData();
@@ -29,7 +32,6 @@ const Profile: React.FC = observer(() => {
     return email.substring(0, 2).toUpperCase();
   };
 
-  // 3. Updated date formatter to use current i18n language
   const formatDate = (dateString?: string) => {
     if (!dateString) return t("na", { defaultValue: "N/A" });
     return new Date(dateString).toLocaleDateString(i18n.language, {
@@ -46,7 +48,6 @@ const Profile: React.FC = observer(() => {
   return (
     <div className="profile-container">
       <div className="profile-card">
-        {/* --- Header Section --- */}
         <div className="profile-header">
           <div className="avatar-circle">{getInitials(user.email)}</div>
           <span className={`role-badge ${user.role.toLowerCase()}`}>
@@ -54,7 +55,6 @@ const Profile: React.FC = observer(() => {
           </span>
         </div>
 
-        {/* --- Details Grid --- */}
         <div className="profile-details">
           <div className="detail-item">
             <span className="label">
@@ -70,7 +70,6 @@ const Profile: React.FC = observer(() => {
           </div>
         </div>
 
-        {/* --- Stats Section --- */}
         <div className="profile-stats">
           <div className="stat-box">
             {exercisesViewModel.isLoading ? (
@@ -104,16 +103,25 @@ const Profile: React.FC = observer(() => {
           </div>
         </div>
 
-        {/* --- Actions --- */}
         <div className="profile-actions">
-          {/* <button className="btn secondary">
+          {/* 2. Toggle modal state on click */}
+          <button
+            className="btn secondary"
+            onClick={() => setIsEditModalOpen(true)}
+          >
             {t("actions.edit", { defaultValue: "Edit Profile" })}
-          </button> */}
+          </button>
+
           <button onClick={logout} className="btn danger">
             {t("actions.logout", { defaultValue: "Logout" })}
           </button>
         </div>
       </div>
+
+      {/* 3. Conditionally render the Modal */}
+      {isEditModalOpen && (
+        <EditProfileModal onClose={() => setIsEditModalOpen(false)} />
+      )}
     </div>
   );
 });
