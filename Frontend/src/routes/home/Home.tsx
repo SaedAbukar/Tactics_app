@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/Auth/AuthContext";
+// 1. Import Lucide icons
+import { LayoutGrid, ClipboardPen, User } from "lucide-react";
 import "./Home.css";
 
 export default function Home() {
@@ -21,7 +23,6 @@ export default function Home() {
     }
   };
 
-  // --- Dynamic Copy Logic with Translations ---
   const heroTitle = user
     ? t("hero.welcome_back", {
         name: user.email?.split("@")[0] || "Coach",
@@ -86,21 +87,7 @@ export default function Home() {
             onClick={() => handleCardClick("/tacticalEditor")}
           >
             <div className="icon-wrapper">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="12" y1="3" x2="12" y2="21" />
-                <circle cx="12" cy="12" r="2" />
-              </svg>
+              <ClipboardPen size={32} strokeWidth={1.5} />
             </div>
             <h3>
               {t("cards.tactical_title", { defaultValue: "Tactical Board" })}
@@ -119,22 +106,7 @@ export default function Home() {
             onClick={() => handleCardClick("/exercises")}
           >
             <div className="icon-wrapper">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-                <path d="M9 14h6" />
-                <path d="M9 18h6" />
-                <path d="M9 10h6" />
-              </svg>
+              <LayoutGrid size={32} strokeWidth={1.5} />
             </div>
             <h3>
               {t("cards.session_title", { defaultValue: "Session Planner" })}
@@ -160,19 +132,7 @@ export default function Home() {
             onClick={() => handleCardClick("/profile")}
           >
             <div className="icon-wrapper">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
+              <User size={32} strokeWidth={1.5} />
             </div>
             <h3>
               {t("cards.profile_title", { defaultValue: "Coach Profile" })}

@@ -59,7 +59,9 @@
     "ok": "OK",
     "tabSessions": "Harjoitus",
     "tabPractices": "Harjoitteet",
-    "tabTactics": "Taktiikat"
+    "tabTactics": "Taktiikat",
+    "includes": "Sisältää:",
+    "readOnly": "Vain katsominen (Jaettu)"
   },
   "controls": {
     "objects": "",

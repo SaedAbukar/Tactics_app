@@ -11,7 +11,8 @@
 .header-section {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  /* Changed to center for better alignment with back button */
+  align-items: center;
   margin-bottom: 1rem;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -54,7 +55,7 @@
   border: none;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
   background-color: var(--bg-hover);
   color: var(--text-secondary);
@@ -256,8 +257,8 @@
   transform: translate(-50%, -50%);
   z-index: 1100;
   width: 90%;
-  max-width: 420px;
-  max-height: 85vh; /* Prevents whole screen height on desktop */
+  max-width: 440px;
+  max-height: 85vh;
   background-color: var(--bg-card);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border-color);
@@ -278,9 +279,104 @@
   margin-bottom: 0.15rem;
 }
 
-/* Specific logic for current collaborators section */
+/* --- CUSTOM STYLED DROPDOWN (Modification) --- */
+.custom-dropdown {
+  position: relative;
+  min-width: 130px;
+  flex: 0.55;
+}
+
+.dropdown-trigger {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 0.75rem;
+  min-height: 38px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.dropdown-trigger:hover,
+.dropdown-trigger.active {
+  border-color: var(--color-brand);
+  background-color: var(--bg-hover);
+}
+
+.trigger-label {
+  flex: 1;
+  text-align: left;
+}
+
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  overflow: hidden;
+  animation: fadeInDown 0.15s ease-out;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.65rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  transition: 0.15s;
+}
+
+.dropdown-item:hover {
+  background-color: var(--bg-hover);
+  color: var(--color-brand);
+}
+
+.dropdown-item.selected {
+  background-color: rgba(var(--color-brand-rgb, 59, 130, 246), 0.1);
+  color: var(--color-brand);
+  font-weight: 700;
+}
+
+.item-label {
+  flex: 1;
+}
+
+.check-mark {
+  margin-left: auto;
+  color: var(--color-brand);
+}
+
+.icon-muted {
+  opacity: 0.6;
+}
+
+/* --- Collaborator Section Additions --- */
 .collaborator-list-box {
-  max-height: 140px; /* Constrained as requested */
+  max-height: 140px;
   min-height: 60px;
   background-color: var(--bg-hover);
   border-radius: 8px;
@@ -304,10 +400,22 @@
   flex-direction: column;
 }
 
+.role-tag-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+}
+
 .role-tag {
   font-size: 0.65rem;
-  color: var(--text-muted);
   text-transform: capitalize;
+}
+
+.role-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .modal-divider {
@@ -318,7 +426,7 @@
 }
 
 .virtual-list-wrapper {
-  flex: 1; /* Allows it to take remaining space but respects max-height of modal */
+  flex: 1;
   height: 240px;
   overflow-y: auto;
   background-color: var(--bg-hover);
@@ -385,10 +493,19 @@
   background-color: var(--color-brand);
   color: white;
 }
+
+/* Updated share button to match back button size/style */
 .btn-action.secondary {
   background-color: transparent;
   color: var(--text-secondary);
+  padding: 2;
+  font-size: 0.8rem;
+  background-color: transparent;
   border: 1px solid var(--border-color);
+}
+
+.btn-action.secondary:hover {
+  color: var(--text-primary);
 }
 
 .btn-action.danger {
@@ -402,18 +519,13 @@
 }
 
 .session-select {
-  padding: 0.4rem;
+  padding: 0.4rem 0.75rem;
   border-radius: 6px;
   border: 1px solid var(--border-color);
   font-size: 0.8rem;
   background-color: var(--bg-card);
   color: var(--text-primary);
   flex: 1;
-}
-
-.role-select {
-  max-width: 100px;
-  cursor: pointer;
 }
 
 .btn-remove-absolute {
@@ -448,33 +560,44 @@
   }
 }
 
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* --- Responsive (Mobile / Tablet) --- */
 @media (max-width: 768px) {
   .detail-container {
     padding: 0 1rem;
   }
-
   .share-modal-fixed {
     width: 95%;
     max-width: 400px;
     padding: 1rem;
   }
-
   .virtual-list-wrapper {
     height: 200px;
   }
-
   .share-controls {
     flex-direction: row;
     gap: 6px;
   }
-
   .page-title {
     font-size: 1.5rem;
   }
-  .btn-action {
+  /* Adjusted global button scaling for mobile */
+  .btn-action:not(.secondary) {
     padding: 10px 16px;
     font-size: 1rem;
+  }
+  .btn-action.secondary {
+    font-size: 0.9rem;
   }
 }
 
@@ -482,7 +605,7 @@
   .share-controls {
     flex-direction: column;
   }
-  .role-select {
-    max-width: none;
+  .custom-dropdown {
+    width: 100%;
   }
 }

@@ -3,6 +3,9 @@ import { useTranslation } from "react-i18next";
 import type { Session, Practice, GameTactic } from "../../../types/types";
 import "../Exercises.css";
 
+// 1. Import the icon
+import { ArrowLeft, Share2 } from "lucide-react";
+
 import { DetailHeader } from "./detail/DetailHeader";
 import { SessionPreview } from "./detail/SessionPreview";
 import { IncludedSessions } from "./detail/IncludedSessions";
@@ -30,7 +33,6 @@ export const DetailView = observer(
       : "practice";
 
     const handleOpenShare = () => {
-      // Trigger fetch in ViewModel BEFORE showing the modal
       eVm.loadCollaborators(shareType, item.id);
       setShowShare(true);
     };
@@ -39,9 +41,13 @@ export const DetailView = observer(
       <div className="detail-container">
         <div className="header-section">
           <button onClick={onBack} className="back-button">
-            ← {t("common:back")}
+            <ArrowLeft size={16} />
+            {t("common:back")}
           </button>
+
+          {/* 2. Added the icon inside the button */}
           <button className="btn-action secondary" onClick={handleOpenShare}>
+            <Share2 size={16} />
             {t("common:share")}
           </button>
         </div>

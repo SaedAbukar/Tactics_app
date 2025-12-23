@@ -194,6 +194,8 @@ declare module "i18next" {
           tabSessions: string;
           tabPractices: string;
           tabTactics: string;
+          includes: string;
+          readOnly: string;
         };
         controls: {
           objects: string;

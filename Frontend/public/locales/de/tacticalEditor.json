@@ -59,7 +59,9 @@
     "ok": "OK",
     "tabSessions": "Sitzungen",
     "tabPractices": "Übungen",
-    "tabTactics": "Taktiken"
+    "tabTactics": "Taktiken",
+    "includes": "Beinhaltet:",
+    "readOnly": "Nur Anzeige"
   },
   "controls": {
     "objects": "Objekte",

@@ -1,5 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import {
+  Pencil,
+  Trash2,
+  Eye,
+  ChevronDown,
+  ChevronRight,
+  Play,
+} from "lucide-react"; // Import Lucide icons
 import type { Session, Practice, GameTactic } from "../../types/types";
 import { SessionForm } from "./SessionForm";
 
@@ -37,29 +45,29 @@ export const SessionList: React.FC<SessionListProps> = ({
   const { t } = useTranslation("tacticalEditor");
   const isExpanded = expandedCategory === category;
 
+  // Items are only editable if they belong to the 'personal' category
+  const isEditable = category === "personal";
+
   return (
     <div className="category-group">
-      {/* Category Header */}
       <button
         className={`category-header ${isExpanded ? "active" : ""}`}
         onClick={() => setExpandedCategory(isExpanded ? null : category)}
       >
-        <span className="arrow">{isExpanded ? "▼" : "▶"}</span>
+        <span className="arrow">
+          {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        </span>
         {title}
         <span className="badge">{items.length}</span>
       </button>
 
-      {/* Expanded List */}
       {isExpanded && (
         <div className="category-items">
           {items.length === 0 && (
-            <div className="empty-text">
-              {t("sessionSelector.empty", "No items")}
-            </div>
+            <div className="empty-text">{t("sessionSelector.empty")}</div>
           )}
 
           {items.map((item) => {
-            // 1. Render Edit Form if in editing mode
             if (editingId === item.id) {
               return (
                 <SessionForm
@@ -73,14 +81,15 @@ export const SessionList: React.FC<SessionListProps> = ({
               );
             }
 
-            // 2. Determine if item has attached sessions (Practice or Tactic)
             const attachedSessions = (item as Practice).sessions;
             const hasAttachments =
               attachedSessions && attachedSessions.length > 0;
 
             return (
-              <div key={item.id} className="list-item-card">
-                {/* Main Item Click Area */}
+              <div
+                key={item.id}
+                className={`list-item-card ${!isEditable ? "read-only" : ""}`}
+              >
                 <div className="item-main" onClick={() => onSelect(item)}>
                   <div className="item-header-row">
                     <div className="item-name">{item.name}</div>
@@ -95,51 +104,61 @@ export const SessionList: React.FC<SessionListProps> = ({
                   </div>
                 </div>
 
-                {/* 3. Sub-Sessions List (The "Chips") */}
                 {hasAttachments && (
                   <div className="sub-sessions-list">
                     <div className="sub-sessions-label">
-                      {t("sessionSelector.includes", "Includes:")}
+                      {t("sessionSelector.includes")}
                     </div>
                     <div className="sub-sessions-grid">
-                      {attachedSessions.map((subSession) => (
+                      {attachedSessions.map((sub) => (
                         <button
-                          key={subSession.id}
+                          key={sub.id}
                           className="sub-session-chip"
                           onClick={(e) => {
-                            e.stopPropagation(); // Don't trigger parent select
-                            onSelect(subSession); // Load this specific session
+                            e.stopPropagation();
+                            onSelect(sub);
                           }}
                         >
-                          <span>▶</span>
-                          {subSession.name}
+                          <Play size={10} fill="currentColor" /> {sub.name}
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Actions (Edit / Delete) */}
                 <div className="item-actions">
-                  <button
-                    className="icon-btn-mini"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEditingId(item.id);
-                      onSelect(item);
-                    }}
-                  >
-                    ✎
-                  </button>
-                  <button
-                    className="icon-btn-mini danger"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(item.id);
-                    }}
-                  >
-                    🗑
-                  </button>
+                  {isEditable ? (
+                    <>
+                      <button
+                        className="icon-btn-mini"
+                        title={t("common:edit" as any)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingId(item.id);
+                          onSelect(item);
+                        }}
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        className="icon-btn-mini danger"
+                        title={t("common:delete" as any)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(item.id);
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </>
+                  ) : (
+                    <span
+                      className="view-only-icon"
+                      title={t("sessionSelector.readOnly")}
+                    >
+                      <Eye size={16} />
+                    </span>
+                  )}
                 </div>
               </div>
             );

@@ -21,17 +21,13 @@ export const useSessionSelector = (
     vm.loadData();
   }, [vm]);
 
-  // --- ACTIONS ---
-
   const handleSave = async (formData: any) => {
     let payload = { ...formData };
-
     if (viewType === "sessions") {
-      if (boardVM.savedSteps.length > 0) {
-        payload.steps = JSON.parse(JSON.stringify(boardVM.savedSteps));
-      } else {
-        payload.steps = payload.steps || [];
-      }
+      payload.steps =
+        boardVM.savedSteps.length > 0
+          ? JSON.parse(JSON.stringify(boardVM.savedSteps))
+          : payload.steps || [];
     }
 
     let error = null;
@@ -42,24 +38,24 @@ export const useSessionSelector = (
         payload.steps
       );
     } else {
-      const typeLabel =
+      const label =
         viewType === "practices"
-          ? t("sessionSelector.practiceLabel", "Practice")
-          : t("sessionSelector.tacticLabel", "Tactic");
+          ? t("sessionSelector.practiceLabel")
+          : t("sessionSelector.tacticLabel");
       error = vm.validateCollectionInput(
         payload.name,
         payload.description,
         payload.sessions,
-        typeLabel
+        label
       );
     }
 
     if (error) {
       setModalConfig({
         isOpen: true,
-        title: t("sessionSelector.validationError", "Validation Error"),
+        title: t("sessionSelector.validationError"),
         message: error,
-        confirmText: t("sessionSelector.ok", "OK"),
+        confirmText: t("sessionSelector.ok"),
         onConfirm: () =>
           setModalConfig((prev: any) => ({ ...prev, isOpen: false })),
       });
@@ -76,29 +72,37 @@ export const useSessionSelector = (
         await vm.updatePractice(editingId, payload);
       else await vm.updateTactic(editingId, payload);
     }
-    console.log("SessionSelector: ", payload);
     setEditingId(null);
     setIsCreating(false);
     boardVM.clearPitch();
   };
 
   const handleDeleteCheck = (id: number) => {
+    const state =
+      viewType === "sessions"
+        ? vm.sessionsState
+        : viewType === "practices"
+        ? vm.practicesState
+        : vm.tacticsState;
+
+    // Check if the item belongs to personal category
+    const isPersonal = state.personal.some((i) => i.id === id);
+
+    if (!isPersonal) {
+      // Shared items cannot be deleted from this view
+      return;
+    }
+
     if (viewType === "sessions") {
       const dependencies: string[] = [];
-
       const allPractices = [
         ...vm.practicesState.personal,
         ...vm.practicesState.userShared,
         ...vm.practicesState.groupShared,
       ];
-      // Renamed 'p' to 'practice' for clarity, though 'p' was fine
-      allPractices.forEach((practice) => {
-        if (practice.sessions?.some((s) => s.id === id))
-          dependencies.push(
-            `${t("sessionSelector.practiceLabel", "Practice")}: ${
-              practice.name
-            }`
-          );
+      allPractices.forEach((p) => {
+        if (p.sessions?.some((s) => s.id === id))
+          dependencies.push(`${t("sessionSelector.practiceLabel")}: ${p.name}`);
       });
 
       const allTactics = [
@@ -106,27 +110,17 @@ export const useSessionSelector = (
         ...vm.tacticsState.userShared,
         ...vm.tacticsState.groupShared,
       ];
-
-      // FIX: Changed (t) to (tactic) to avoid shadowing the translation function 't'
-      allTactics.forEach((tactic) => {
-        if (tactic.sessions?.some((s) => s.id === id))
-          dependencies.push(
-            `${t("sessionSelector.tacticLabel", "Tactic")}: ${tactic.name}`
-          );
+      allTactics.forEach((tac) => {
+        if (tac.sessions?.some((s) => s.id === id))
+          dependencies.push(`${t("sessionSelector.tacticLabel")}: ${tac.name}`);
       });
 
       if (dependencies.length > 0) {
         setModalConfig({
           isOpen: true,
-          title: t(
-            "sessionSelector.cannotDeleteTitle",
-            "Cannot Delete Session"
-          ),
+          title: t("sessionSelector.cannotDeleteTitle"),
           message: t("sessionSelector.cannotDeleteMessage", {
             dependencies: dependencies.join(", "),
-            defaultValue: `This session is used by: ${dependencies.join(
-              ", "
-            )}. Please remove it first.`,
           }),
           onConfirm: undefined,
         });
@@ -136,13 +130,10 @@ export const useSessionSelector = (
 
     setModalConfig({
       isOpen: true,
-      title: t("sessionSelector.deleteTitle", "Delete Item"),
-      message: t(
-        "sessionSelector.deleteMessage",
-        "Are you sure? This cannot be undone."
-      ),
+      title: t("sessionSelector.deleteTitle"),
+      message: t("sessionSelector.deleteMessage"),
       isDanger: true,
-      confirmText: t("sessionSelector.deleteConfirm", "Delete"),
+      confirmText: t("sessionSelector.deleteConfirm"),
       onConfirm: async () => {
         if (viewType === "sessions") await vm.deleteSession(id);
         else if (viewType === "practices") await vm.deletePractice(id);
@@ -159,11 +150,9 @@ export const useSessionSelector = (
 
   const startCreating = (value: boolean) => {
     if (value) {
-      // Only clear pitch when OPENING the modal (true)
       boardVM.clearPitch();
       setEditingId(null);
     }
-    // Set the state to whatever was passed (true OR false)
     setIsCreating(value);
   };
 

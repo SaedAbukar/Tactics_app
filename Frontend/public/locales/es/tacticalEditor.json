@@ -59,7 +59,8 @@
     "ok": "OK",
     "tabSessions": "Sesiones",
     "tabPractices": "Prácticas",
-    "tabTactics": "Tácticas"
+    "tabTactics": "Tácticas",
+    "readOnly": "Solo visualización"
   },
   "controls": {
     "objects": "Objetos",
