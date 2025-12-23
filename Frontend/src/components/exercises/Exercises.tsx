@@ -10,6 +10,7 @@ import { TabButton } from "./components/TabButton";
 import { SectionColumn } from "./components/SectionColumn";
 import { DetailView } from "./components/DetailView";
 import "./Exercises.css";
+import { LoadingSpinner } from "../ui/LoadingSpinner";
 
 type TabType = "sessions" | "practices" | "tactics";
 
@@ -26,11 +27,7 @@ export const Exercises = observer(() => {
   }, [user, exercisesViewModel]);
 
   if (exercisesViewModel.isLoading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner" />
-      </div>
-    );
+    return <LoadingSpinner fullScreen={exercisesViewModel.isLoading} />;
   }
 
   if (exercisesViewModel.error) {

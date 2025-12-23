@@ -1,9 +1,14 @@
 {
   "save": "Tallenna",
+  "share": "Jaa",
   "add": "Lisää",
   "delete": "Poista",
   "cancel": "Peruuta",
-  "share": "Jaa",
+  "logout": "Kirjaudu ulos",
+  "back": "Takaisin",
+  "retry": "Yritä uudelleen",
+  "error": "Virhe",
+  "saveChanges": "Tallenna muutokset",
   "loading": {
     "initWorkspace": "Alustetaan työtilaa...",
     "app": "Ladataan sovellusta..."

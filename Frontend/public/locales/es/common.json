@@ -1,8 +1,14 @@
 {
   "save": "Guardar",
-  "add": "Agregar",
+  "share": "Compartir",
+  "add": "Añadir",
   "delete": "Eliminar",
   "cancel": "Cancelar",
+  "logout": "Cerrar sesión",
+  "back": "Volver",
+  "retry": "Reintentar",
+  "error": "Error",
+  "saveChanges": "Guardar cambios",
   "loading": {
     "initWorkspace": "Inicializando espacio de trabajo...",
     "app": "Cargando aplicación..."

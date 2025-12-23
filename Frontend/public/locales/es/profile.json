@@ -1,15 +1,19 @@
 {
   "memberSince": "Miembro desde",
-  "lastLogin": "Último acceso",
+  "lastLogin": "Último inicio de sesión",
   "stats": {
     "sessions": "Sesiones",
     "practices": "Prácticas",
     "tactics": "Tácticas"
   },
   "actions": {
-    "edit": "Editar Perfil",
-    "logout": "Cerrar Sesión"
+    "edit": "Editar perfil",
+    "logout": "Cerrar sesión"
+  },
+  "edit": {
+    "publicProfile": "Perfil público",
+    "publicDescription": "Cuando es público, otros usuarios pueden encontrarte por correo electrónico para compartir sesiones y tácticas."
   },
   "loading": "Cargando perfil...",
-  "na": "N/D"
+  "na": "N/A"
 }

@@ -1,8 +1,14 @@
 {
   "save": "Speichern",
+  "share": "Teilen",
   "add": "Hinzufügen",
   "delete": "Löschen",
   "cancel": "Abbrechen",
+  "logout": "Abmelden",
+  "back": "Zurück",
+  "retry": "Wiederholen",
+  "error": "Fehler",
+  "saveChanges": "Änderungen speichern",
   "loading": {
     "initWorkspace": "Arbeitsbereich wird initialisiert...",
     "app": "App wird geladen..."

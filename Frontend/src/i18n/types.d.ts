@@ -14,6 +14,7 @@ declare module "i18next" {
         back: string;
         retry: string;
         error: string;
+        saveChanges: string;
         loading: {
           initWorkspace: string;
           app: string;
@@ -73,8 +74,12 @@ declare module "i18next" {
           edit: string;
           logout: string;
         };
+        edit: {
+          publicProfile: string;
+          publicDescription: string;
+        };
         loading: string;
-        na: string; // For "N/A" dates
+        na: string;
       };
       footer: { copyright: string };
       exercises: {

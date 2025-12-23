@@ -3,12 +3,16 @@
   "lastLogin": "Dernière connexion",
   "stats": {
     "sessions": "Sessions",
-    "practices": "Exercices",
+    "practices": "Pratiques",
     "tactics": "Tactiques"
   },
   "actions": {
     "edit": "Modifier le profil",
-    "logout": "Déconnexion"
+    "logout": "Se déconnecter"
+  },
+  "edit": {
+    "publicProfile": "Profil public",
+    "publicDescription": "Lorsqu'il est public, d'autres utilisateurs peuvent vous trouver par e-mail pour partager des sessions et des tactiques."
   },
   "loading": "Chargement du profil...",
   "na": "N/A"

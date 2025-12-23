@@ -3,7 +3,6 @@ import { observer } from "mobx-react-lite";
 import { useExercises } from "../../../context/ExercisesProvider";
 import { useAuth } from "../../../context/Auth/AuthContext";
 import { useTranslation } from "react-i18next";
-import { LoadingSpinner } from "../../../components/ui/LoadingSpinner";
 
 interface EditProfileModalProps {
   onClose: () => void;
@@ -93,13 +92,17 @@ export const EditProfileModal = observer(
           {/* Footer Actions */}
           <div className="profile-actions modal-footer">
             <button
-              className="btn-action primary full-width-btn"
+              className="btn primary full-width-btn"
               onClick={handleSave}
               disabled={vm.isLoading}
               style={{ minHeight: "44px" }}
             >
               {vm.isLoading ? (
-                <LoadingSpinner fullScreen={false} />
+                <div className="dot-loader">
+                  <span />
+                  <span />
+                  <span />
+                </div>
               ) : (
                 t("common:saveChanges", "Save Changes")
               )}

@@ -1,9 +1,14 @@
 {
   "save": "Save",
+  "share": "Share",
   "add": "Add",
   "delete": "Delete",
   "cancel": "Cancel",
-  "share": "Share",
+  "logout": "Logout",
+  "back": "Back",
+  "retry": "Retry",
+  "error": "Error",
+  "saveChanges": "Save Changes",
   "loading": {
     "initWorkspace": "Initializing Workspace...",
     "app": "Loading App..."

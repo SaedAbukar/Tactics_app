@@ -1,15 +1,19 @@
 {
-  "memberSince": "Liittynyt",
-  "lastLogin": "Viimeksi paikalla",
+  "memberSince": "Jäsen alkaen",
+  "lastLogin": "Viimeksi kirjautunut",
   "stats": {
     "sessions": "Istunnot",
-    "practices": "Harjoitteet",
+    "practices": "Harjoitukset",
     "tactics": "Taktiikat"
   },
   "actions": {
     "edit": "Muokkaa profiilia",
     "logout": "Kirjaudu ulos"
   },
+  "edit": {
+    "publicProfile": "Julkinen profiili",
+    "publicDescription": "Kun profiilisi on julkinen, muut käyttäjät voivat löytää sinut sähköpostilla jakaakseen harjoituksia ja taktiikoita."
+  },
   "loading": "Ladataan profiilia...",
-  "na": "Ei saatavilla"
+  "na": "N/A"
 }

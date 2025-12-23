@@ -10,6 +10,10 @@
     "edit": "Edit Profile",
     "logout": "Logout"
   },
+  "edit": {
+    "publicProfile": "Public Profile",
+    "publicDescription": "When public, other users can find you by email to share sessions and tactics."
+  },
   "loading": "Loading profile...",
   "na": "N/A"
 }
