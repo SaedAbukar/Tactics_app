@@ -8,6 +8,9 @@
     "app": "Chargement de l'application..."
   },
   "errors": {
-    "initFailed": "Échec de l'initialisation"
-  }
+    "initFailed": "Échec de l'initialisation",
+    "pageNotFound": "Oups ! La page que vous recherchez n'existe pas.",
+    "404": "404 Introuvable"
+  },
+  "goHome": "Retour à l'accueil"
 }

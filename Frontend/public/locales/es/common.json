@@ -8,6 +8,9 @@
     "app": "Cargando aplicación..."
   },
   "errors": {
-    "initFailed": "Fallo en la inicialización"
-  }
+    "initFailed": "Fallo en la inicialización",
+    "pageNotFound": "¡Vaya! La página que buscas no existe.",
+    "404": "404 No Encontrado"
+  },
+  "goHome": "Volver al inicio"
 }

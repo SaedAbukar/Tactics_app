@@ -8,6 +8,9 @@
     "app": "Ladataan sovellusta..."
   },
   "errors": {
-    "initFailed": "Alustus epäonnistui"
-  }
+    "initFailed": "Alustus epäonnistui",
+    "pageNotFound": "Hups! Etsimääsi sivua ei ole olemassa.",
+    "404": "404 Ei löydy"
+  },
+  "goHome": "Palaa etusivulle"
 }

@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/protectedRoute/ProtectedRoute";
 import Profile from "./routes/profile/Profile";
 import AuthForm from "./components/authForm/AuthForm";
 import { Exercises } from "./components/exercises/Exercises";
+import NotFound from "./routes/notfound/NotFound";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
           </Route>
           <Route path="login" element={<AuthForm />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
