@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/Auth/AuthContext";
-import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // 1. Import useTranslation
 import "./AuthForm.css";
 
 const AuthForm: React.FC = () => {
@@ -10,9 +11,9 @@ const AuthForm: React.FC = () => {
   const [message, setMessage] = useState("");
   const [isLoginView, setIsLoginView] = useState(true);
 
-  const navigate = useNavigate(); // 2. Initialize hook
+  const navigate = useNavigate();
+  const { t } = useTranslation("auth"); // 2. Initialize hook
 
-  // 3. Redirect to home if user is logged in
   useEffect(() => {
     if (user) {
       navigate("/");
@@ -23,7 +24,6 @@ const AuthForm: React.FC = () => {
     e.preventDefault();
     try {
       await login({ email, password });
-      // Navigation will happen automatically via the useEffect above
     } catch (err) {
       console.error(err);
     }
@@ -33,7 +33,7 @@ const AuthForm: React.FC = () => {
     e.preventDefault();
     try {
       await signup({ email, password });
-      setMessage("Account created successfully! Please log in.");
+      setMessage(t("success_signup")); // Translated success message
       setIsLoginView(true);
       setEmail("");
       setPassword("");
@@ -43,7 +43,6 @@ const AuthForm: React.FC = () => {
     }
   };
 
-  // 4. If user exists, return null (or a spinner) while redirecting
   if (user) return null;
 
   return (
@@ -51,12 +50,10 @@ const AuthForm: React.FC = () => {
       <div className="auth-card">
         <div className="auth-header">
           <h1 className="auth-title">
-            {isLoginView ? "Sign In" : "Create Account"}
+            {isLoginView ? t("title_login") : t("title_signup")}
           </h1>
           <p className="auth-subtitle">
-            {isLoginView
-              ? "Welcome back to Tactics App"
-              : "Start organizing your training today"}
+            {isLoginView ? t("subtitle_login") : t("subtitle_signup")}
           </p>
         </div>
 
@@ -65,26 +62,26 @@ const AuthForm: React.FC = () => {
           className="auth-form"
         >
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{t("email_label")}</label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@example.com"
+              placeholder={t("email_placeholder")}
               className="auth-input"
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t("password_label")}</label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder={t("password_placeholder")}
               className="auth-input"
               required
             />
@@ -94,15 +91,17 @@ const AuthForm: React.FC = () => {
           {message && <div className="auth-message success">{message}</div>}
 
           <button type="submit" disabled={loading} className="auth-btn primary">
-            {loading ? "Please wait..." : isLoginView ? "Login" : "Sign Up"}
+            {loading
+              ? t("button_loading")
+              : isLoginView
+              ? t("button_login")
+              : t("button_signup")}
           </button>
         </form>
 
         <div className="auth-footer">
           <p>
-            {isLoginView
-              ? "Don't have an account?"
-              : "Already have an account?"}{" "}
+            {isLoginView ? t("footer_no_account") : t("footer_has_account")}{" "}
             <button
               type="button"
               className="link-btn"
@@ -111,7 +110,7 @@ const AuthForm: React.FC = () => {
                 setMessage("");
               }}
             >
-              {isLoginView ? "Sign up" : "Log in"}
+              {isLoginView ? t("link_signup") : t("link_login")}
             </button>
           </p>
         </div>

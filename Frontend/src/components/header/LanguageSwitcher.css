@@ -173,7 +173,7 @@
   }
 
   .lang-option {
-    padding: 10px 12px; /* Bigger touch target */
+    padding: 5px 6px; /* Bigger touch target */
     font-size: 1rem;
   }
 }

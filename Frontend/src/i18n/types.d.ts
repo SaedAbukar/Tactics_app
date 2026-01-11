@@ -23,6 +23,24 @@ declare module "i18next" {
           initFailed: string;
         };
       };
+      auth: {
+        title_login: string;
+        title_signup: string;
+        subtitle_login: string;
+        subtitle_signup: string;
+        email_label: string;
+        email_placeholder: string;
+        password_label: string;
+        password_placeholder: string;
+        button_loading: string;
+        button_login: string;
+        button_signup: string;
+        footer_no_account: string;
+        footer_has_account: string;
+        link_login: string;
+        link_signup: string;
+        success_signup: string;
+      };
       header: {
         appName: string;
         homeLink: string;
