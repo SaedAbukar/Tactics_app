@@ -7,15 +7,19 @@ import {
   ChevronDown,
   ChevronRight,
   Play,
-} from "lucide-react"; // Import Lucide icons
-import type { Session, Practice, GameTactic } from "../../types/types";
+} from "lucide-react";
+import type {
+  SessionSummary,
+  PracticeSummary,
+  GameTacticSummary,
+} from "../../types/types";
 import { SessionForm } from "./SessionForm";
 
 type Category = "personal" | "userShared" | "groupShared";
 
 interface SessionListProps {
   title: string;
-  items: (Session | Practice | GameTactic)[];
+  items: (SessionSummary | PracticeSummary | GameTacticSummary)[];
   category: Category;
   expandedCategory: Category | null;
   setExpandedCategory: (c: Category | null) => void;
@@ -25,7 +29,7 @@ interface SessionListProps {
   onSave: (data: any) => void;
   onDelete: (id: number) => void;
   viewType: string;
-  availableSessions: Session[];
+  availableSessions: SessionSummary[];
 }
 
 export const SessionList: React.FC<SessionListProps> = ({
@@ -81,7 +85,10 @@ export const SessionList: React.FC<SessionListProps> = ({
               );
             }
 
-            const attachedSessions = (item as Practice).sessions;
+            // Using "in" operator or type assertion to check for attached sessions
+            // PracticeSummary and GameTacticSummary have 'sessions'
+            const attachedSessions =
+              "sessions" in item ? (item as PracticeSummary).sessions : [];
             const hasAttachments =
               attachedSessions && attachedSessions.length > 0;
 
@@ -110,12 +117,15 @@ export const SessionList: React.FC<SessionListProps> = ({
                       {t("sessionSelector.includes")}
                     </div>
                     <div className="sub-sessions-grid">
-                      {attachedSessions.map((sub) => (
+                      {attachedSessions.map((sub: SessionSummary) => (
                         <button
                           key={sub.id}
                           className="sub-session-chip"
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.stopPropagation();
+                            // Select the sub-session (needs fetching logic from parent,
+                            // but parent handles generic item select)
+                            // We treat it as selecting a session item.
                             onSelect(sub);
                           }}
                         >

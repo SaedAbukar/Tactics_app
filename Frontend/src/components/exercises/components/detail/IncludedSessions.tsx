@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
 import { useExercises } from "../../../../context/ExercisesProvider";
-import type { Practice, GameTactic } from "../../../../types/types";
+import type { PracticeDetail, GameTacticDetail } from "../../../../types/types";
 
 interface IncludedSessionsProps {
-  item: Practice | GameTactic;
+  item: PracticeDetail | GameTacticDetail;
   type: "practices" | "tactics";
 }
 
@@ -17,43 +17,41 @@ export const IncludedSessions: React.FC<IncludedSessionsProps> = observer(
     const [isAdding, setIsAdding] = useState(false);
     const [selectedSessionId, setSelectedSessionId] = useState<string>("");
 
-    // Safe access to the current list
+    // 1. Current sessions inside the Practice/Tactic
+    // We cast to unknown first because the Detail type might strictly define this as SessionDetail[],
+    // but for the list logic we just need the ID and basic info.
     const currentSessions = item.sessions || [];
 
-    // Filter available sessions
+    // 2. Available sessions to add (from Personal Library)
     const personalSessions = exercisesViewModel.sessionsState.personal;
+
+    // Filter out sessions that are already attached
     const availableSessions = personalSessions.filter(
-      (s) => !currentSessions.some((existing) => existing.id === s.id)
+      (s) => !currentSessions.some((existing) => existing.id === s.id),
     );
 
     const handleAdd = async () => {
       if (!selectedSessionId) return;
 
       const sessionToAdd = personalSessions.find(
-        (s) => s.id === Number(selectedSessionId)
+        (s) => s.id === Number(selectedSessionId),
       );
 
       if (!sessionToAdd) return;
 
+      // Create the new list.
+      // Note: We are mixing SessionDetail (current) and SessionSummary (adding).
+      // This is fine for the update payload as long as they have IDs.
       const updatedSessions = [...currentSessions, sessionToAdd];
 
+      // Construct Payload
       const payload = {
         name: item.name,
         description: item.description,
-        sessions: updatedSessions,
+        isPremade: item.isPremade,
+        // Backend expects a list of objects with at least an ID to link them
+        sessions: updatedSessions.map((s) => ({ id: s.id })) as any,
       };
-
-      const error = exercisesViewModel.validateCollectionInput(
-        payload.name,
-        payload.description,
-        payload.sessions,
-        type === "practices" ? "Practice" : "Tactic"
-      );
-
-      if (error) {
-        console.error("Validation failed:", error);
-        return;
-      }
 
       try {
         if (type === "practices") {
@@ -70,13 +68,14 @@ export const IncludedSessions: React.FC<IncludedSessionsProps> = observer(
 
     const handleRemove = async (sessionIdToRemove: number) => {
       const updatedSessions = currentSessions.filter(
-        (s) => s.id !== sessionIdToRemove
+        (s) => s.id !== sessionIdToRemove,
       );
 
       const payload = {
         name: item.name,
         description: item.description,
-        sessions: updatedSessions,
+        isPremade: item.isPremade,
+        sessions: updatedSessions.map((s) => ({ id: s.id })) as any,
       };
 
       try {
@@ -165,7 +164,8 @@ export const IncludedSessions: React.FC<IncludedSessionsProps> = observer(
             <div
               key={s.id}
               className="item-card clickable-session"
-              onClick={() => exercisesViewModel.selectItem(s)}
+              // When clicking a nested session, we want to open THAT session's details
+              onClick={() => exercisesViewModel.fetchAndSelectSession(s.id)}
             >
               <strong className="card-title" style={{ display: "block" }}>
                 {s.name}
@@ -194,5 +194,5 @@ export const IncludedSessions: React.FC<IncludedSessionsProps> = observer(
         </div>
       </div>
     );
-  }
+  },
 );

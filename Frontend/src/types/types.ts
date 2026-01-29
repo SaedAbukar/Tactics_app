@@ -9,18 +9,20 @@ export type DragItem = {
   id: number;
 };
 
-export type Position = { x: number; y: number }; // x,y as percentages (0–1)
+// Backend sends integer coordinates, Frontend might convert to %
+export type Position = { x: number; y: number };
 
 export const ShareRole = {
   OWNER: "OWNER",
   VIEWER: "VIEWER",
   EDITOR: "EDITOR",
+  NONE: "NONE", // Helpful to have on frontend
 } as const;
 
 export type ShareRole = (typeof ShareRole)[keyof typeof ShareRole];
 
 // ------------------------------
-// Player / Ball / Goal / Cone / Team
+// Inner Entities (Steps, Players, etc.)
 // ------------------------------
 
 export type Player = {
@@ -30,6 +32,7 @@ export type Player = {
   y: number;
   color: string;
   teamName?: string;
+  teamId?: number; // Backend sends team ID often
 };
 
 export type Ball = {
@@ -61,26 +64,20 @@ export type Team = {
   color: string;
 };
 
-// ------------------------------
-// Formations
-// ------------------------------
-
 export type FormationPosition = {
+  id?: number;
   x: number;
   y: number;
   teamName?: string;
   teamColor?: string;
+  teamId?: number;
 };
 
 export type Formation = {
-  id?: number;
+  id: number;
   name: string;
   positions: FormationPosition[];
 };
-
-// ------------------------------
-// Step
-// ------------------------------
 
 export type Step = {
   players: Player[];
@@ -92,31 +89,106 @@ export type Step = {
 };
 
 // ------------------------------
-// Entities
+// 1. SESSION TYPES
 // ------------------------------
 
-export type Session = {
+// Light: Used in "My Sessions" / Tabs
+export type SessionSummary = {
   id: number;
   name: string;
   description: string;
-  steps: Step[];
+  ownerId: number;
+  stepCount: number;
+  role: ShareRole; // <--- Critical: Used for UI permissions (Show Edit/Delete?)
 };
 
-export type Practice = {
+// Heavy: Used in the Tactic Board (Canvas)
+export type SessionDetail = {
   id: number;
   name: string;
   description: string;
-  isPremade?: boolean;
-  sessions: Session[];
+  ownerId: number;
+  role: ShareRole;
+  steps: Step[]; // <--- Contains the heavy data
 };
 
-export type GameTactic = {
+// Request: Supports Linking (id only) or Creating (name required)
+export type SessionRequest = {
+  id?: number; // Present if linking existing
+  name?: string; // Required if creating new
+  description?: string;
+  steps?: Partial<Step>[]; // Simplify typing for request construction
+};
+
+// ------------------------------
+// 2. PRACTICE TYPES
+// ------------------------------
+
+// Light: Used in Tabs
+export type PracticeSummary = {
   id: number;
   name: string;
   description: string;
-  isPremade?: boolean;
-  sessions: Session[];
+  isPremade: boolean;
+  ownerId: number;
+  sessions: SessionSummary[]; // <--- UPDATED: Holds list of summaries now
+  role: ShareRole;
 };
+
+// Heavy: Used in Detail View
+export type PracticeDetail = {
+  id: number;
+  name: string;
+  description: string;
+  isPremade: boolean;
+  ownerId: number;
+  role: ShareRole;
+  sessions: SessionDetail[]; // Contains full sessions (with steps)
+};
+
+// ------------------------------
+// 3. GAME TACTIC TYPES
+// ------------------------------
+
+// Light: Used in Tabs
+export type GameTacticSummary = {
+  id: number;
+  name: string;
+  description: string;
+  isPremade: boolean;
+  ownerId: number;
+  sessions: SessionSummary[]; // <--- UPDATED: Holds list of summaries now
+  role: ShareRole;
+};
+
+// Heavy: Used in Detail View
+export type GameTacticDetail = {
+  id: number;
+  name: string;
+  description: string;
+  isPremade: boolean;
+  ownerId: number;
+  role: ShareRole;
+  sessions: SessionDetail[]; // Contains full sessions (with steps)
+};
+
+// ------------------------------
+// API Responses (Backend Contract)
+// ------------------------------
+
+// Generic Wrapper for the Tabbed View
+export interface TabbedResponse<T> {
+  personalItems: T[];
+  userSharedItems: T[];
+  groupSharedItems: T[];
+}
+
+// The "All Data" blob if you fetch everything at once (Optional)
+export interface AllUserData {
+  sessions: TabbedResponse<SessionSummary>;
+  practices: TabbedResponse<PracticeSummary>;
+  tactics: TabbedResponse<GameTacticSummary>;
+}
 
 // ------------------------------
 // Auth / Users
@@ -133,39 +205,14 @@ export type AuthUser = {
   lastLogin?: string;
 };
 
-export type JwtPayload = {
-  exp: number;
-  [key: string]: any;
-};
-
-// ------------------------------
-// Frontend State (ViewModel)
-// ------------------------------
-
-export type ItemsState<T> = {
-  personal: T[];
-  userShared: T[];
-  groupShared: T[];
-};
-
-// ------------------------------
-// API Responses (Backend Contract)
-// ------------------------------
-
-// Corresponds to the shape returned by your backend endpoints
-export interface CategorizedItems<T> {
-  personalItems: T[];
-  userSharedItems: T[];
-  groupSharedItems: T[];
+export interface UserProfileResponse {
+  id: number;
+  email: string;
+  isPublic: boolean;
+  message?: string;
 }
 
-export interface AllUserData {
-  sessions: CategorizedItems<Session>;
-  practices: CategorizedItems<Practice>;
-  tactics: CategorizedItems<GameTactic>;
-}
-
-export interface User {
+export interface PublicUserResponse {
   id: number;
   email: string;
   isPublic: boolean;
@@ -180,18 +227,9 @@ export interface UserSlice {
   number?: number;
 }
 
-export interface UserProfileResponse {
-  id: number;
-  email: string;
-  isPublic: boolean;
-  message?: string;
-}
-
-export interface PublicUserResponse {
-  id: number;
-  email: string;
-  isPublic: boolean;
-}
+// ------------------------------
+// Sharing & Collaboration
+// ------------------------------
 
 export type CollaboratorType = "USER" | "GROUP";
 
@@ -199,5 +237,16 @@ export interface CollaboratorDTO {
   id: number;
   name: string;
   type: CollaboratorType;
-  role: ShareRole; // Ensure ShareRole is also exported here
+  role: ShareRole;
 }
+
+export type ShareRequest = {
+  targetId: number; // userId or groupId
+  role: ShareRole;
+};
+
+export type ItemsState<T> = {
+  personal: T[];
+  userShared: T[];
+  groupShared: T[];
+};

@@ -1,13 +1,18 @@
 import type { UserDataApi } from "../api/UserDataApi";
 import type {
-  Session,
-  Practice,
-  GameTactic,
   ShareRole,
-  AllUserData, // Moved here
-  CategorizedItems,
+  AllUserData,
   UserProfileResponse,
-  CollaboratorDTO, // Moved here
+  CollaboratorDTO,
+  // New Types
+  TabbedResponse,
+  SessionSummary,
+  SessionDetail,
+  SessionRequest,
+  PracticeSummary,
+  PracticeDetail,
+  GameTacticSummary,
+  GameTacticDetail,
 } from "../../../types/types";
 
 export class ExercisesRepository {
@@ -17,6 +22,18 @@ export class ExercisesRepository {
     this.api = api;
   }
 
+  // =========================================================================
+  //  USER & DASHBOARD
+  // =========================================================================
+
+  async getDashboardData(): Promise<AllUserData> {
+    return this.api.fetchAllUserData();
+  }
+
+  async updatePublicStatus(isPublic: boolean): Promise<UserProfileResponse> {
+    return this.api.updatePublicStatus(isPublic);
+  }
+
   async getCollaborators(type: string, id: number): Promise<CollaboratorDTO[]> {
     if (type === "session") return this.api.fetchCollaborators(id);
     if (type === "practice") return this.api.fetchPracticeCollaborators(id);
@@ -24,31 +41,28 @@ export class ExercisesRepository {
     return [];
   }
 
-  async updatePublicStatus(isPublic: boolean): Promise<UserProfileResponse> {
-    return this.api.updatePublicStatus(isPublic);
-  }
-
-  // =========================================================================
-  //  DASHBOARD DATA
-  // =========================================================================
-
-  async getDashboardData(): Promise<AllUserData> {
-    return this.api.fetchAllUserData();
-  }
-
   // =========================================================================
   //  SESSIONS
   // =========================================================================
 
-  async fetchSessions(): Promise<CategorizedItems<Session>> {
+  // Returns lightweight summaries for the list view
+  async fetchSessions(): Promise<TabbedResponse<SessionSummary>> {
     return this.api.fetchSessions();
   }
 
-  async createSession(data: Partial<Session>): Promise<Session> {
+  // Returns full details for the board view (New method usually needed by UI)
+  async getSessionById(id: number): Promise<SessionDetail> {
+    return this.api.fetchSessionById(id);
+  }
+
+  async createSession(data: SessionRequest): Promise<SessionDetail> {
     return this.api.createSession(data);
   }
 
-  async updateSession(id: number, data: Partial<Session>): Promise<Session> {
+  async updateSession(
+    id: number,
+    data: SessionRequest,
+  ): Promise<SessionDetail> {
     return this.api.updateSession(id, data);
   }
 
@@ -59,7 +73,7 @@ export class ExercisesRepository {
   async shareSession(
     sessionId: number,
     targetId: number,
-    role: ShareRole
+    role: ShareRole,
   ): Promise<void> {
     return this.api.shareSession(sessionId, targetId, role);
   }
@@ -72,15 +86,22 @@ export class ExercisesRepository {
   //  PRACTICES
   // =========================================================================
 
-  async fetchPractices(): Promise<CategorizedItems<Practice>> {
+  async fetchPractices(): Promise<TabbedResponse<PracticeSummary>> {
     return this.api.fetchPractices();
   }
 
-  async createPractice(data: Partial<Practice>): Promise<Practice> {
+  async getPracticeById(id: number): Promise<PracticeDetail> {
+    return this.api.fetchPracticeById(id);
+  }
+
+  async createPractice(data: Partial<PracticeDetail>): Promise<PracticeDetail> {
     return this.api.createPractice(data);
   }
 
-  async updatePractice(id: number, data: Partial<Practice>): Promise<Practice> {
+  async updatePractice(
+    id: number,
+    data: Partial<PracticeDetail>,
+  ): Promise<PracticeDetail> {
     return this.api.updatePractice(id, data);
   }
 
@@ -91,14 +112,14 @@ export class ExercisesRepository {
   async sharePractice(
     practiceId: number,
     targetId: number,
-    role: ShareRole
+    role: ShareRole,
   ): Promise<void> {
     return this.api.sharePractice(practiceId, targetId, role);
   }
 
   async revokePracticeShare(
     practiceId: number,
-    targetId: number
+    targetId: number,
   ): Promise<void> {
     return this.api.revokePracticeShare(practiceId, targetId);
   }
@@ -107,18 +128,24 @@ export class ExercisesRepository {
   //  GAME TACTICS
   // =========================================================================
 
-  async fetchTactics(): Promise<CategorizedItems<GameTactic>> {
+  async fetchTactics(): Promise<TabbedResponse<GameTacticSummary>> {
     return this.api.fetchTactics();
   }
 
-  async createTactic(data: Partial<GameTactic>): Promise<GameTactic> {
+  async getTacticById(id: number): Promise<GameTacticDetail> {
+    return this.api.fetchTacticById(id);
+  }
+
+  async createTactic(
+    data: Partial<GameTacticDetail>,
+  ): Promise<GameTacticDetail> {
     return this.api.createTactic(data);
   }
 
   async updateTactic(
     id: number,
-    data: Partial<GameTactic>
-  ): Promise<GameTactic> {
+    data: Partial<GameTacticDetail>,
+  ): Promise<GameTacticDetail> {
     return this.api.updateTactic(id, data);
   }
 
@@ -129,14 +156,14 @@ export class ExercisesRepository {
   async shareTactic(
     gameTacticId: number,
     targetId: number,
-    role: ShareRole
+    role: ShareRole,
   ): Promise<void> {
     return this.api.shareTactic(gameTacticId, targetId, role);
   }
 
   async revokeTacticShare(
     gameTacticId: number,
-    targetId: number
+    targetId: number,
   ): Promise<void> {
     return this.api.revokeTacticShare(gameTacticId, targetId);
   }

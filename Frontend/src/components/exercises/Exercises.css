@@ -136,7 +136,9 @@
   box-shadow: 0 1px 2px var(--shadow-color);
   border: 1px solid var(--border-color);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   position: relative;
 }
 
@@ -477,6 +479,8 @@
 
 /* --- Buttons & Inputs --- */
 .btn-action {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
   border: none;
   border-radius: 6px;
   padding: 4px 8px;
@@ -594,7 +598,9 @@
   /* Adjusted global button scaling for mobile */
   .btn-action:not(.secondary) {
     padding: 10px 16px;
-    font-size: 1rem;
+    font-size: 0.65rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
   }
   .btn-action.secondary {
     font-size: 0.9rem;

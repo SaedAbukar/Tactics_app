@@ -1,12 +1,16 @@
 import {
-  type Session,
-  type Practice,
-  type GameTactic,
-  type CategorizedItems, // Imported
-  type AllUserData, // Imported
-  ShareRole,
+  type SessionSummary,
+  type SessionDetail,
+  type PracticeSummary,
+  type PracticeDetail,
+  type GameTacticSummary,
+  type GameTacticDetail,
+  type TabbedResponse,
+  type AllUserData,
   type UserProfileResponse,
   type CollaboratorDTO,
+  type SessionRequest,
+  ShareRole,
 } from "../../../types/types";
 
 type RequestFn = <T>(url: string, options?: RequestInit) => Promise<T>;
@@ -22,12 +26,12 @@ export class UserDataApi {
     return this.request<UserProfileResponse>("/api/users/me/public", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isPublic }), // Key matches DTO
+      body: JSON.stringify({ isPublic }),
     });
   }
 
   // =========================================================================
-  //  BULK FETCH
+  //  BULK FETCH (TABS)
   // =========================================================================
 
   async fetchAllUserData(): Promise<AllUserData> {
@@ -44,16 +48,27 @@ export class UserDataApi {
   //  SESSIONS (CRUD + SHARING)
   // =========================================================================
 
-  async fetchSessions(): Promise<CategorizedItems<Session>> {
-    return this.request<CategorizedItems<Session>>("/sessions");
+  // 1. Fetch List -> Returns Lightweight Summaries
+  async fetchSessions(): Promise<TabbedResponse<SessionSummary>> {
+    return this.request<TabbedResponse<SessionSummary>>("/sessions");
   }
 
-  async createSession(data: Partial<Session>): Promise<Session> {
-    return this.post<Session>("/sessions", data);
+  // 2. Fetch Single -> Returns Full Detail
+  async fetchSessionById(id: number): Promise<SessionDetail> {
+    return this.request<SessionDetail>(`/sessions/${id}`);
   }
 
-  async updateSession(id: number, data: Partial<Session>): Promise<Session> {
-    return this.put<Session>(`/sessions/${id}`, data);
+  // 3. Create -> Returns Full Detail
+  async createSession(data: SessionRequest): Promise<SessionDetail> {
+    return this.post<SessionDetail>("/sessions", data);
+  }
+
+  // 4. Update -> Returns Full Detail
+  async updateSession(
+    id: number,
+    data: SessionRequest,
+  ): Promise<SessionDetail> {
+    return this.put<SessionDetail>(`/sessions/${id}`, data);
   }
 
   async deleteSession(id: number): Promise<void> {
@@ -61,16 +76,16 @@ export class UserDataApi {
   }
 
   /** Share a session with another user */
-
   async fetchCollaborators(sessionId: number): Promise<CollaboratorDTO[]> {
     return this.request<CollaboratorDTO[]>(
-      `/sessions/share/${sessionId}/collaborators`
+      `/sessions/share/${sessionId}/collaborators`,
     );
   }
+
   async shareSession(
     sessionId: number,
     targetId: number,
-    role: ShareRole
+    role: ShareRole,
   ): Promise<void> {
     return this.post<void>("/sessions/share/user", {
       sessionId,
@@ -90,16 +105,23 @@ export class UserDataApi {
   //  PRACTICES (CRUD + SHARING)
   // =========================================================================
 
-  async fetchPractices(): Promise<CategorizedItems<Practice>> {
-    return this.request<CategorizedItems<Practice>>("/practices");
+  async fetchPractices(): Promise<TabbedResponse<PracticeSummary>> {
+    return this.request<TabbedResponse<PracticeSummary>>("/practices");
   }
 
-  async createPractice(data: Partial<Practice>): Promise<Practice> {
-    return this.post<Practice>("/practices", data);
+  async fetchPracticeById(id: number): Promise<PracticeDetail> {
+    return this.request<PracticeDetail>(`/practices/${id}`);
   }
 
-  async updatePractice(id: number, data: Partial<Practice>): Promise<Practice> {
-    return this.put<Practice>(`/practices/${id}`, data);
+  async createPractice(data: Partial<PracticeDetail>): Promise<PracticeDetail> {
+    return this.post<PracticeDetail>("/practices", data);
+  }
+
+  async updatePractice(
+    id: number,
+    data: Partial<PracticeDetail>,
+  ): Promise<PracticeDetail> {
+    return this.put<PracticeDetail>(`/practices/${id}`, data);
   }
 
   async deletePractice(id: number): Promise<void> {
@@ -108,16 +130,17 @@ export class UserDataApi {
 
   /** Share a practice with another user */
   async fetchPracticeCollaborators(
-    practiceId: number
+    practiceId: number,
   ): Promise<CollaboratorDTO[]> {
     return this.request<CollaboratorDTO[]>(
-      `/practices/share/${practiceId}/collaborators`
+      `/practices/share/${practiceId}/collaborators`,
     );
   }
+
   async sharePractice(
     practiceId: number,
     targetId: number,
-    role: ShareRole
+    role: ShareRole,
   ): Promise<void> {
     return this.post<void>("/practices/share/user", {
       practiceId,
@@ -128,7 +151,7 @@ export class UserDataApi {
 
   async revokePracticeShare(
     practiceId: number,
-    targetId: number
+    targetId: number,
   ): Promise<void> {
     return this.deleteBody<void>("/practices/share/user", {
       practiceId,
@@ -140,19 +163,25 @@ export class UserDataApi {
   //  GAME TACTICS (CRUD + SHARING)
   // =========================================================================
 
-  async fetchTactics(): Promise<CategorizedItems<GameTactic>> {
-    return this.request<CategorizedItems<GameTactic>>("/game-tactics");
+  async fetchTactics(): Promise<TabbedResponse<GameTacticSummary>> {
+    return this.request<TabbedResponse<GameTacticSummary>>("/game-tactics");
   }
 
-  async createTactic(data: Partial<GameTactic>): Promise<GameTactic> {
-    return this.post<GameTactic>("/game-tactics", data);
+  async fetchTacticById(id: number): Promise<GameTacticDetail> {
+    return this.request<GameTacticDetail>(`/game-tactics/${id}`);
+  }
+
+  async createTactic(
+    data: Partial<GameTacticDetail>,
+  ): Promise<GameTacticDetail> {
+    return this.post<GameTacticDetail>("/game-tactics", data);
   }
 
   async updateTactic(
     id: number,
-    data: Partial<GameTactic>
-  ): Promise<GameTactic> {
-    return this.put<GameTactic>(`/game-tactics/${id}`, data);
+    data: Partial<GameTacticDetail>,
+  ): Promise<GameTacticDetail> {
+    return this.put<GameTacticDetail>(`/game-tactics/${id}`, data);
   }
 
   async deleteTactic(id: number): Promise<void> {
@@ -160,19 +189,18 @@ export class UserDataApi {
   }
 
   /** Share a tactic with another user */
-
   async fetchTacticCollaborators(
-    gameTacticId: number
+    gameTacticId: number,
   ): Promise<CollaboratorDTO[]> {
     return this.request<CollaboratorDTO[]>(
-      `/game-tactics/share/${gameTacticId}/collaborators`
+      `/game-tactics/share/${gameTacticId}/collaborators`,
     );
   }
 
   async shareTactic(
     gameTacticId: number,
     targetId: number,
-    role: ShareRole
+    role: ShareRole,
   ): Promise<void> {
     return this.post<void>("/game-tactics/share/user", {
       gameTacticId,
@@ -183,7 +211,7 @@ export class UserDataApi {
 
   async revokeTacticShare(
     gameTacticId: number,
-    targetId: number
+    targetId: number,
   ): Promise<void> {
     return this.deleteBody<void>("/game-tactics/share/user", {
       gameTacticId,

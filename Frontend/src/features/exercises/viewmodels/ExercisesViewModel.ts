@@ -1,35 +1,48 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type { ExercisesRepository } from "../repositories/ExercisesRepository";
 import type {
-  Session,
-  Practice,
-  GameTactic,
+  // Summary Types (For Lists)
+  SessionSummary,
+  PracticeSummary,
+  GameTacticSummary,
+  // Detail Types (For Selection/Editor)
+  SessionDetail,
+  PracticeDetail,
+  GameTacticDetail,
+  // Request Types
+  SessionRequest,
+  // Shared
   ItemsState,
   ShareRole,
-  CategorizedItems,
-  Step,
+  TabbedResponse,
   CollaboratorDTO,
+  Step, // For validation
 } from "../../../types/types";
 
 export class ExercisesViewModel {
-  // Observables
-  sessionsState: ItemsState<Session> = {
+  // =========================================================================
+  //  OBSERVABLES
+  // =========================================================================
+
+  // Lists stores Summaries (Lightweight)
+  sessionsState: ItemsState<SessionSummary> = {
     personal: [],
     userShared: [],
     groupShared: [],
   };
-  practicesState: ItemsState<Practice> = {
+  practicesState: ItemsState<PracticeSummary> = {
     personal: [],
     userShared: [],
     groupShared: [],
   };
-  tacticsState: ItemsState<GameTactic> = {
+  tacticsState: ItemsState<GameTacticSummary> = {
     personal: [],
     userShared: [],
     groupShared: [],
   };
 
-  selectedItem: Session | Practice | GameTactic | null = null;
+  // Selection stores Details (Heavyweight)
+  selectedItem: SessionDetail | PracticeDetail | GameTacticDetail | null = null;
   collaborators: CollaboratorDTO[] = [];
 
   isLoading = false;
@@ -42,24 +55,23 @@ export class ExercisesViewModel {
     makeAutoObservable(this);
   }
 
+  // =========================================================================
+  //  USER & PROFILE
+  // =========================================================================
+
   async toggleProfileVisibility(isPublic: boolean): Promise<boolean> {
-    // 1. Initial state change
     runInAction(() => {
       this.isLoading = true;
       this.error = null;
     });
 
     try {
-      // 2. Perform the API call
       await this.repository.updatePublicStatus(isPublic);
-
-      // 3. Update state on success
       runInAction(() => {
         this.isLoading = false;
       });
       return true;
     } catch (err) {
-      // 4. Update state on failure
       runInAction(() => {
         this.isLoading = false;
         this.handleError("Failed to update profile visibility", err);
@@ -69,7 +81,7 @@ export class ExercisesViewModel {
   }
 
   // =========================================================================
-  //  CORE DATA LOADING
+  //  CORE DATA LOADING (DASHBOARD)
   // =========================================================================
 
   async loadData() {
@@ -80,8 +92,6 @@ export class ExercisesViewModel {
       const data = await this.repository.getDashboardData();
 
       runInAction(() => {
-        // We use a helper to explicitly OVERWRITE the arrays.
-        // This ensures the list is "cleared" of old data and replaced by new data.
         this.resetAndPopulateState(this.sessionsState, data.sessions);
         this.resetAndPopulateState(this.practicesState, data.practices);
         this.resetAndPopulateState(this.tacticsState, data.tactics);
@@ -97,10 +107,55 @@ export class ExercisesViewModel {
   //  SELECTION ACTIONS
   // =========================================================================
 
-  selectItem(item: Session | Practice | GameTactic) {
+  selectItem(item: SessionDetail | PracticeDetail | GameTacticDetail) {
     runInAction(() => {
       this.selectedItem = item;
     });
+  }
+
+  // 1. Fetch Session Detail
+  async fetchAndSelectSession(id: number) {
+    this.setLoading(true);
+    try {
+      const detail = await this.repository.getSessionById(id);
+      runInAction(() => {
+        this.selectedItem = detail;
+      });
+    } catch (err) {
+      this.handleError("Failed to load session details", err);
+    } finally {
+      this.setLoading(false);
+    }
+  }
+
+  // 2. Fetch Practice Detail (ADDED THIS)
+  async fetchAndSelectPractice(id: number) {
+    this.setLoading(true);
+    try {
+      const detail = await this.repository.getPracticeById(id);
+      runInAction(() => {
+        this.selectedItem = detail;
+      });
+    } catch (err) {
+      this.handleError("Failed to load practice details", err);
+    } finally {
+      this.setLoading(false);
+    }
+  }
+
+  // 3. Fetch Tactic Detail (ADDED THIS)
+  async fetchAndSelectTactic(id: number) {
+    this.setLoading(true);
+    try {
+      const detail = await this.repository.getTacticById(id);
+      runInAction(() => {
+        this.selectedItem = detail;
+      });
+    } catch (err) {
+      this.handleError("Failed to load tactic details", err);
+    } finally {
+      this.setLoading(false);
+    }
   }
 
   clearSelection() {
@@ -128,24 +183,28 @@ export class ExercisesViewModel {
     }
   }
 
-  async createSession(data: Partial<Session>) {
+  async createSession(data: SessionRequest) {
     this.setLoading(true);
     try {
-      await this.repository.createSession(data);
+      const created = await this.repository.createSession(data);
       await this.loadData();
+      return created;
     } catch (err) {
       this.handleError("Failed to create session.", err);
       this.setLoading(false);
     }
-    console.log("ExerciseVM: ", data);
   }
 
-  async updateSession(id: number, data: Partial<Session>) {
+  async updateSession(id: number, data: SessionRequest) {
     this.setLoading(true);
     try {
       const updated = await this.repository.updateSession(id, data);
       runInAction(() => {
-        this.updateInState(this.sessionsState, updated);
+        this.updateInState(
+          this.sessionsState,
+          updated as unknown as SessionSummary,
+        );
+
         if (this.selectedItem?.id === id) {
           this.selectedItem = updated;
         }
@@ -176,7 +235,7 @@ export class ExercisesViewModel {
     }
   }
 
-  async createPractice(data: Partial<Practice>) {
+  async createPractice(data: Partial<PracticeDetail>) {
     this.setLoading(true);
     try {
       await this.repository.createPractice(data);
@@ -187,12 +246,15 @@ export class ExercisesViewModel {
     }
   }
 
-  async updatePractice(id: number, data: Partial<Practice>) {
+  async updatePractice(id: number, data: Partial<PracticeDetail>) {
     this.setLoading(true);
     try {
       const updated = await this.repository.updatePractice(id, data);
       runInAction(() => {
-        this.updateInState(this.practicesState, updated);
+        this.updateInState(
+          this.practicesState,
+          updated as unknown as PracticeSummary,
+        );
         if (this.selectedItem?.id === id) {
           this.selectedItem = updated;
         }
@@ -223,7 +285,7 @@ export class ExercisesViewModel {
     }
   }
 
-  async createTactic(data: Partial<GameTactic>) {
+  async createTactic(data: Partial<GameTacticDetail>) {
     this.setLoading(true);
     try {
       await this.repository.createTactic(data);
@@ -234,12 +296,15 @@ export class ExercisesViewModel {
     }
   }
 
-  async updateTactic(id: number, data: Partial<GameTactic>) {
+  async updateTactic(id: number, data: Partial<GameTacticDetail>) {
     this.setLoading(true);
     try {
       const updated = await this.repository.updateTactic(id, data);
       runInAction(() => {
-        this.updateInState(this.tacticsState, updated);
+        this.updateInState(
+          this.tacticsState,
+          updated as unknown as GameTacticSummary,
+        );
         if (this.selectedItem?.id === id) {
           this.selectedItem = updated;
         }
@@ -250,13 +315,12 @@ export class ExercisesViewModel {
       this.setLoading(false);
     }
   }
+
   // =========================================================================
-  //  SHARING ACTIONS (User Focused)
+  //  SHARING ACTIONS
   // =========================================================================
 
   async loadCollaborators(type: "session" | "practice" | "tactic", id: number) {
-    // We avoid setting global this.isLoading = true here to prevent
-    // triggering full-page skeletons/spinners in the parent view.
     try {
       const data = await this.repository.getCollaborators(type, id);
       runInAction(() => {
@@ -271,15 +335,10 @@ export class ExercisesViewModel {
     type: "session" | "practice" | "tactic",
     id: number,
     targetUserId: number,
-    role: ShareRole
+    role: ShareRole,
   ) {
-    runInAction(() => {
-      this.isLoading = true;
-      this.error = null;
-    });
-
+    this.setLoading(true);
     try {
-      // Routing to the specific Repository methods
       if (type === "session") {
         await this.repository.shareSession(id, targetUserId, role);
       } else if (type === "practice") {
@@ -288,51 +347,33 @@ export class ExercisesViewModel {
         await this.repository.shareTactic(id, targetUserId, role);
       }
 
-      // Refresh state to update shared lists on the dashboard
       await this.loadData();
-
-      runInAction(() => {
-        this.isLoading = false;
-      });
     } catch (err) {
-      runInAction(() => {
-        this.isLoading = false;
-        this.handleError(`Failed to share ${type}.`, err);
-      });
+      this.handleError(`Failed to share ${type}.`, err);
+    } finally {
+      this.setLoading(false);
     }
   }
 
   async revokeUserAccess(
-    itemType: "session" | "practice" | "tactic",
-    itemId: number,
-    targetUserId: number
+    type: "session" | "practice" | "tactic",
+    id: number,
+    targetUserId: number,
   ) {
-    runInAction(() => {
-      this.isLoading = true;
-      this.error = null;
-    });
-
+    this.setLoading(true);
     try {
-      // Routing to the specific Repository revoke methods
-      if (itemType === "session") {
-        await this.repository.revokeSessionShare(itemId, targetUserId);
-      } else if (itemType === "practice") {
-        await this.repository.revokePracticeShare(itemId, targetUserId);
-      } else if (itemType === "tactic") {
-        await this.repository.revokeTacticShare(itemId, targetUserId);
+      if (type === "session") {
+        await this.repository.revokeSessionShare(id, targetUserId);
+      } else if (type === "practice") {
+        await this.repository.revokePracticeShare(id, targetUserId);
+      } else if (type === "tactic") {
+        await this.repository.revokeTacticShare(id, targetUserId);
       }
-
-      // Re-fetch dashboard data because revoking changes shared visibility
       await this.loadData();
-
-      runInAction(() => {
-        this.isLoading = false;
-      });
     } catch (err) {
-      runInAction(() => {
-        this.isLoading = false;
-        this.handleError(`Failed to revoke access.`, err);
-      });
+      this.handleError(`Failed to revoke access.`, err);
+    } finally {
+      this.setLoading(false);
     }
   }
 
@@ -365,13 +406,9 @@ export class ExercisesViewModel {
     }
   }
 
-  /**
-   * REPLACES the contents of the state arrays with fresh data from the API.
-   * This guarantees no duplication occurs on re-fetch.
-   */
   private resetAndPopulateState<T>(
     state: ItemsState<T>,
-    data: CategorizedItems<T>
+    data: TabbedResponse<T>,
   ) {
     state.personal = data.personalItems || [];
     state.userShared = data.userSharedItems || [];
@@ -380,16 +417,20 @@ export class ExercisesViewModel {
 
   private removeFromState<T extends { id: number }>(
     state: ItemsState<T>,
-    id: number
+    id: number,
   ) {
-    state.personal = state.personal.filter((i) => i.id !== id);
-    state.userShared = state.userShared.filter((i) => i.id !== id);
-    state.groupShared = state.groupShared.filter((i) => i.id !== id);
+    state.personal = state.personal.filter((i: { id: number }) => i.id !== id);
+    state.userShared = state.userShared.filter(
+      (i: { id: number }) => i.id !== id,
+    );
+    state.groupShared = state.groupShared.filter(
+      (i: { id: number }) => i.id !== id,
+    );
   }
 
   private updateInState<T extends { id: number }>(
     state: ItemsState<T>,
-    updatedItem: T
+    updatedItem: T,
   ) {
     const updateList = (list: T[]) =>
       list.map((item) => (item.id === updatedItem.id ? updatedItem : item));
@@ -404,9 +445,9 @@ export class ExercisesViewModel {
   // =========================================================================
 
   validateSessionInput(
-    name: string,
-    description: string,
-    steps: Step[]
+    name: string | undefined,
+    description: string | undefined,
+    steps: Partial<Step>[] | undefined,
   ): string | null {
     if (!name?.trim()) return "Session name is required.";
     if (!description?.trim()) return "Session description is required.";
@@ -420,7 +461,7 @@ export class ExercisesViewModel {
         (step.players && step.players.length > 0) ||
         (step.balls && step.balls.length > 0) ||
         (step.goals && step.goals.length > 0) ||
-        (step.cones && step.cones.length > 0)
+        (step.cones && step.cones.length > 0),
     );
 
     if (!hasContent) {
@@ -431,10 +472,10 @@ export class ExercisesViewModel {
   }
 
   validateCollectionInput(
-    name: string,
-    description: string,
-    sessions: Session[],
-    type: string
+    name: string | undefined,
+    description: string | undefined,
+    sessions: any[] | undefined,
+    type: string,
   ): string | null {
     if (!name?.trim()) return `${type} name is required.`;
     if (!description?.trim()) return `${type} description is required.`;

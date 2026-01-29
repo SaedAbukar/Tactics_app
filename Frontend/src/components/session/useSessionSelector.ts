@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useExercises } from "../../context/ExercisesProvider";
-import type { Step } from "../../types/types";
+import type {
+  Step,
+  SessionSummary,
+  PracticeSummary,
+  GameTacticSummary,
+  SessionDetail,
+} from "../../types/types";
 
 type ViewType = "sessions" | "practices" | "game tactics";
 
 export const useSessionSelector = (
   viewType: ViewType,
-  onSelectSession: (steps: Step[]) => void
+  onSelectSession: (steps: Step[]) => void,
 ) => {
   const { exercisesViewModel: vm, tacticalBoardViewModel: boardVM } =
     useExercises();
@@ -23,11 +29,18 @@ export const useSessionSelector = (
 
   const handleSave = async (formData: any) => {
     let payload = { ...formData };
+
+    // If saving a session, include the current board steps
     if (viewType === "sessions") {
       payload.steps =
         boardVM.savedSteps.length > 0
           ? JSON.parse(JSON.stringify(boardVM.savedSteps))
           : payload.steps || [];
+    } else {
+      // If saving a Practice/Tactic, ensure sessions are mapped to { id } for the backend
+      if (payload.sessions && Array.isArray(payload.sessions)) {
+        payload.sessions = payload.sessions.map((s: any) => ({ id: s.id }));
+      }
     }
 
     let error = null;
@@ -35,7 +48,7 @@ export const useSessionSelector = (
       error = vm.validateSessionInput(
         payload.name,
         payload.description,
-        payload.steps
+        payload.steps,
       );
     } else {
       const label =
@@ -46,7 +59,7 @@ export const useSessionSelector = (
         payload.name,
         payload.description,
         payload.sessions,
-        label
+        label,
       );
     }
 
@@ -82,14 +95,13 @@ export const useSessionSelector = (
       viewType === "sessions"
         ? vm.sessionsState
         : viewType === "practices"
-        ? vm.practicesState
-        : vm.tacticsState;
+          ? vm.practicesState
+          : vm.tacticsState;
 
     // Check if the item belongs to personal category
-    const isPersonal = state.personal.some((i) => i.id === id);
+    const isPersonal = state.personal.some((i: any) => i.id === id);
 
     if (!isPersonal) {
-      // Shared items cannot be deleted from this view
       return;
     }
 
@@ -100,7 +112,9 @@ export const useSessionSelector = (
         ...vm.practicesState.userShared,
         ...vm.practicesState.groupShared,
       ];
+
       allPractices.forEach((p) => {
+        // Check sessions list in PracticeSummary
         if (p.sessions?.some((s) => s.id === id))
           dependencies.push(`${t("sessionSelector.practiceLabel")}: ${p.name}`);
       });
@@ -111,6 +125,7 @@ export const useSessionSelector = (
         ...vm.tacticsState.groupShared,
       ];
       allTactics.forEach((tac) => {
+        // Check sessions list in GameTacticSummary
         if (tac.sessions?.some((s) => s.id === id))
           dependencies.push(`${t("sessionSelector.tacticLabel")}: ${tac.name}`);
       });
@@ -143,9 +158,42 @@ export const useSessionSelector = (
     });
   };
 
-  const handleSelect = (item: any) => {
-    if ("steps" in item) onSelectSession(item.steps);
-    else if (item.sessions?.length > 0) onSelectSession(item.sessions[0].steps);
+  // ------------------------------------------------------------------
+  //  UPDATED: Handle Select (Always fetches Session Detail)
+  // ------------------------------------------------------------------
+  const handleSelect = async (
+    item: SessionSummary | PracticeSummary | GameTacticSummary,
+  ) => {
+    let sessionIdToFetch = item.id;
+
+    // Logic for Practices/Tactics Tabs:
+    // If the user clicked the main Practice/Tactic card (which has a 'sessions' array),
+    // we default to fetching the FIRST session inside it.
+    // (If they clicked a sub-session button, 'item' is already a SessionSummary, so 'sessions' won't exist or we treat it as direct).
+    if (viewType !== "sessions" && "sessions" in item) {
+      const collectionItem = item as PracticeSummary | GameTacticSummary;
+      if (
+        collectionItem.sessions &&
+        Array.isArray(collectionItem.sessions) &&
+        collectionItem.sessions.length > 0
+      ) {
+        sessionIdToFetch = collectionItem.sessions[0].id;
+      } else {
+        // Empty practice/tactic - nothing to load onto board
+        return;
+      }
+    }
+
+    // 1. Always fetch Session Detail (contains steps)
+    await vm.fetchAndSelectSession(sessionIdToFetch);
+
+    // 2. Extract steps from the loaded SessionDetail
+    const detail = vm.selectedItem as SessionDetail;
+
+    // 3. Update the board
+    if (detail && detail.steps) {
+      onSelectSession(detail.steps);
+    }
   };
 
   const startCreating = (value: boolean) => {

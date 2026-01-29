@@ -5,7 +5,7 @@ import { Modal } from "../ui/Modal";
 import { SessionForm } from "./SessionForm";
 import { SessionList } from "./SessionList";
 import { useSessionSelector } from "./useSessionSelector";
-import type { Step } from "../../types/types";
+import type { Step, SessionSummary } from "../../types/types";
 import "./SessionSelector.css";
 
 type ViewType = "sessions" | "practices" | "game tactics";
@@ -35,7 +35,7 @@ export const ApiSessionSelector: React.FC<Props> = observer(
     } = useSessionSelector(viewType, onSelectSession);
 
     const [expandedCategory, setExpandedCategory] = useState<Category | null>(
-      "personal"
+      "personal",
     );
 
     const getCurrentState = () => {
@@ -44,7 +44,8 @@ export const ApiSessionSelector: React.FC<Props> = observer(
       return vm.tacticsState;
     };
 
-    const getAvailableSessions = () => [
+    // Returns all available session summaries for attaching to practices/tactics
+    const getAvailableSessions = (): SessionSummary[] => [
       ...vm.sessionsState.personal,
       ...vm.sessionsState.userShared,
       ...vm.sessionsState.groupShared,
@@ -87,7 +88,7 @@ export const ApiSessionSelector: React.FC<Props> = observer(
               >
                 {getTabLabel(tab)}
               </button>
-            )
+            ),
           )}
         </div>
 
@@ -168,5 +169,5 @@ export const ApiSessionSelector: React.FC<Props> = observer(
         </div>
       </div>
     );
-  }
+  },
 );

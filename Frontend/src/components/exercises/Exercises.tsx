@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useTranslation } from "react-i18next"; // 1. Import
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/Auth/AuthContext";
 import { useExercises } from "../../context/ExercisesProvider";
 import { type ItemsState } from "../../types/types";
 
-// Imports from new component files
 import { TabButton } from "./components/TabButton";
 import { SectionColumn } from "./components/SectionColumn";
 import { DetailView } from "./components/DetailView";
@@ -16,7 +15,7 @@ type TabType = "sessions" | "practices" | "tactics";
 
 export const Exercises = observer(() => {
   const { user } = useAuth();
-  const { t } = useTranslation(["exercises", "common"]); // 2. Init
+  const { t } = useTranslation(["exercises", "common"]);
   const { exercisesViewModel } = useExercises();
   const [activeTab, setActiveTab] = useState<TabType>("sessions");
 
@@ -25,6 +24,19 @@ export const Exercises = observer(() => {
       exercisesViewModel.loadData();
     }
   }, [user, exercisesViewModel]);
+
+  // --------------------------------------------------------
+  // ✅ FIX: Dynamic Handler for Clicks
+  // --------------------------------------------------------
+  const handleItemClick = async (item: any) => {
+    if (activeTab === "sessions") {
+      await exercisesViewModel.fetchAndSelectSession(item.id);
+    } else if (activeTab === "practices") {
+      await exercisesViewModel.fetchAndSelectPractice(item.id);
+    } else if (activeTab === "tactics") {
+      await exercisesViewModel.fetchAndSelectTactic(item.id);
+    }
+  };
 
   if (exercisesViewModel.isLoading) {
     return <LoadingSpinner fullScreen={exercisesViewModel.isLoading} />;
@@ -80,7 +92,7 @@ export const Exercises = observer(() => {
           <p className="page-subtitle">
             {t(
               "subtitle",
-              "Manage your personal and shared training resources."
+              "Manage your personal and shared training resources.",
             )}
           </p>
         </div>
@@ -111,19 +123,19 @@ export const Exercises = observer(() => {
           title={t("columns.personal", "Personal")}
           items={currentData.personal}
           color="var(--color-green)"
-          onItemClick={(item) => exercisesViewModel.selectItem(item)}
+          onItemClick={handleItemClick} // ✅ Use the dynamic handler
         />
         <SectionColumn
           title={t("columns.shared", "Shared with Me")}
           items={currentData.userShared}
           color="var(--color-amber)"
-          onItemClick={(item) => exercisesViewModel.selectItem(item)}
+          onItemClick={handleItemClick} // ✅ Use the dynamic handler
         />
         <SectionColumn
           title={t("columns.group", "Group Library")}
           items={currentData.groupShared}
           color="var(--color-indigo)"
-          onItemClick={(item) => exercisesViewModel.selectItem(item)}
+          onItemClick={handleItemClick} // ✅ Use the dynamic handler
         />
       </div>
     </div>

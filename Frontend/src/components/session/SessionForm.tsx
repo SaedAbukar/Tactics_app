@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import type { Session, Practice, GameTactic } from "../../types/types";
+import type {
+  SessionSummary,
+  PracticeSummary,
+  GameTacticSummary,
+} from "../../types/types";
 
 interface SessionFormProps {
-  initialData: Partial<Session | Practice | GameTactic>;
+  // We use Partial Summary for editing logic
+  initialData: Partial<SessionSummary | PracticeSummary | GameTacticSummary>;
   viewType: "sessions" | "practices" | "game tactics";
-  availableSessions: Session[];
+  availableSessions: SessionSummary[];
   onSave: (data: any) => void;
   onCancel: () => void;
 }
@@ -25,8 +30,9 @@ export const SessionForm: React.FC<SessionFormProps> = ({
   }, [initialData.id]);
 
   const attachSession = (sessionId: number) => {
-    const current = (form as Practice).sessions || [];
-    // Double check to prevent duplicates logic
+    // Cast to PracticeSummary to access 'sessions'
+    const current = (form as PracticeSummary).sessions || [];
+    // Prevent duplicates
     if (current.find((s) => s.id === sessionId)) return;
 
     const toAdd = availableSessions.find((s) => s.id === sessionId);
@@ -36,7 +42,7 @@ export const SessionForm: React.FC<SessionFormProps> = ({
   };
 
   const detachSession = (sessionId: number) => {
-    const current = (form as Practice).sessions || [];
+    const current = (form as PracticeSummary).sessions || [];
     setForm({
       ...form,
       sessions: current.filter((s) => s.id !== sessionId),
@@ -44,11 +50,12 @@ export const SessionForm: React.FC<SessionFormProps> = ({
   };
 
   // Helper: Get sessions currently attached
-  const currentSessions = (form as Practice).sessions || [];
+  // Note: SessionSummary doesn't have 'sessions', only Practice/Tactic do.
+  const currentSessions = (form as PracticeSummary).sessions || [];
 
   // Logic: Filter available sessions to exclude those already attached
   const selectableSessions = availableSessions.filter(
-    (s) => !currentSessions.some((attached) => attached.id === s.id)
+    (s) => !currentSessions.some((attached) => attached.id === s.id),
   );
 
   return (
@@ -113,11 +120,11 @@ export const SessionForm: React.FC<SessionFormProps> = ({
               {availableSessions.length === 0
                 ? t(
                     "sessionSelector.noSessionsAvailable",
-                    "No sessions in library"
+                    "No sessions in library",
                   )
                 : t(
                     "sessionSelector.allSessionsAttached",
-                    "All available sessions attached"
+                    "All available sessions attached",
                   )}
             </div>
           )}

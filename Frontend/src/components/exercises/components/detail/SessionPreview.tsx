@@ -3,10 +3,10 @@ import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
 import { useExercises } from "../../../../context/ExercisesProvider";
 import { Pitch } from "../../../pitch/Pitch";
-import type { Session } from "../../../../types/types";
+import type { SessionDetail } from "../../../../types/types";
 
 interface SessionPreviewProps {
-  session: Session;
+  session: SessionDetail;
 }
 
 export const SessionPreview: React.FC<SessionPreviewProps> = observer(
@@ -14,17 +14,23 @@ export const SessionPreview: React.FC<SessionPreviewProps> = observer(
     const { t } = useTranslation("exercises");
     const { tacticalBoardViewModel } = useExercises();
     const loopRef = useRef<number | null>(null);
+
+    // session.steps is guaranteed in SessionDetail
     const steps = session.steps || [];
 
     useEffect(() => {
+      // 1. Reset and Load
+      tacticalBoardViewModel.stopAnimation();
+
       if (steps.length > 0) {
-        tacticalBoardViewModel.stopAnimation();
+        // Deep copy steps to avoid mutating the original session object during playback
         tacticalBoardViewModel.updateSavedSteps(
-          JSON.parse(JSON.stringify(steps))
+          JSON.parse(JSON.stringify(steps)),
         );
         tacticalBoardViewModel.loadStep(0);
         tacticalBoardViewModel.play();
 
+        // 2. Loop Logic
         loopRef.current = window.setInterval(() => {
           const currentIndex = tacticalBoardViewModel.currentStepIndex ?? 0;
           const isAtEnd = currentIndex >= steps.length - 1;
@@ -36,11 +42,12 @@ export const SessionPreview: React.FC<SessionPreviewProps> = observer(
         }, 200);
       }
 
+      // Cleanup
       return () => {
         if (loopRef.current) clearInterval(loopRef.current);
         tacticalBoardViewModel.stopAnimation();
       };
-    }, [session, tacticalBoardViewModel, steps]);
+    }, [session.id, tacticalBoardViewModel, steps]); // Depend on ID to trigger reload if session changes
 
     return (
       <div className="session-preview">
@@ -55,5 +62,5 @@ export const SessionPreview: React.FC<SessionPreviewProps> = observer(
         </div>
       </div>
     );
-  }
+  },
 );
