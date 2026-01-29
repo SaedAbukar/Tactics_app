@@ -205,6 +205,17 @@ export type AuthUser = {
   lastLogin?: string;
 };
 
+export type JwtPayload = {
+  exp: number;
+  [key: string]: any;
+};
+
+export interface User {
+  id: number;
+  email: string;
+  isPublic: boolean;
+}
+
 export interface UserProfileResponse {
   id: number;
   email: string;
