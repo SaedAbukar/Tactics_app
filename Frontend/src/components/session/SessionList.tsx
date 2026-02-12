@@ -8,10 +8,11 @@ import {
   ChevronRight,
   Play,
 } from "lucide-react";
-import type {
-  SessionSummary,
-  PracticeSummary,
-  GameTacticSummary,
+import {
+  ShareRole, // Import the ShareRole constant
+  type SessionSummary,
+  type PracticeSummary,
+  type GameTacticSummary,
 } from "../../types/types";
 import { SessionForm } from "./SessionForm";
 
@@ -49,9 +50,6 @@ export const SessionList: React.FC<SessionListProps> = ({
   const { t } = useTranslation("tacticalEditor");
   const isExpanded = expandedCategory === category;
 
-  // Items are only editable if they belong to the 'personal' category
-  const isEditable = category === "personal";
-
   return (
     <div className="category-group">
       <button
@@ -72,6 +70,11 @@ export const SessionList: React.FC<SessionListProps> = ({
           )}
 
           {items.map((item) => {
+            // LOGIC CHANGE: Check permissions per item
+            const canEdit =
+              item.role === ShareRole.OWNER || item.role === ShareRole.EDITOR;
+            const isOwner = item.role === ShareRole.OWNER;
+
             if (editingId === item.id) {
               return (
                 <SessionForm
@@ -85,8 +88,6 @@ export const SessionList: React.FC<SessionListProps> = ({
               );
             }
 
-            // Using "in" operator or type assertion to check for attached sessions
-            // PracticeSummary and GameTacticSummary have 'sessions'
             const attachedSessions =
               "sessions" in item ? (item as PracticeSummary).sessions : [];
             const hasAttachments =
@@ -95,7 +96,7 @@ export const SessionList: React.FC<SessionListProps> = ({
             return (
               <div
                 key={item.id}
-                className={`list-item-card ${!isEditable ? "read-only" : ""}`}
+                className={`list-item-card ${!canEdit ? "read-only" : ""}`}
               >
                 <div className="item-main" onClick={() => onSelect(item)}>
                   <div className="item-header-row">
@@ -123,9 +124,6 @@ export const SessionList: React.FC<SessionListProps> = ({
                           className="sub-session-chip"
                           onClick={async (e) => {
                             e.stopPropagation();
-                            // Select the sub-session (needs fetching logic from parent,
-                            // but parent handles generic item select)
-                            // We treat it as selecting a session item.
                             onSelect(sub);
                           }}
                         >
@@ -137,31 +135,37 @@ export const SessionList: React.FC<SessionListProps> = ({
                 )}
 
                 <div className="item-actions">
-                  {isEditable ? (
-                    <>
-                      <button
-                        className="icon-btn-mini"
-                        title={t("common:edit" as any)}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingId(item.id);
-                          onSelect(item);
-                        }}
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        className="icon-btn-mini danger"
-                        title={t("common:delete" as any)}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(item.id);
-                        }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </>
-                  ) : (
+                  {/* Show Edit button for both Owner and Editor */}
+                  {canEdit && (
+                    <button
+                      className="icon-btn-mini"
+                      title={t("common:edit" as any)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingId(item.id);
+                        onSelect(item);
+                      }}
+                    >
+                      <Pencil size={14} />
+                    </button>
+                  )}
+
+                  {/* Show Delete button ONLY for Owner */}
+                  {isOwner && (
+                    <button
+                      className="icon-btn-mini danger"
+                      title={t("common:delete" as any)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(item.id);
+                      }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+
+                  {/* Show View Only icon for Viewers */}
+                  {!canEdit && (
                     <span
                       className="view-only-icon"
                       title={t("sessionSelector.readOnly")}
