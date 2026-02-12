@@ -4,10 +4,12 @@ import { useTranslation } from "react-i18next";
 import { ArrowLeft, Share2 } from "lucide-react";
 
 import { useExercises } from "../../../context/ExercisesProvider";
-import type {
-  SessionDetail,
-  PracticeDetail,
-  GameTacticDetail,
+// Ensure ShareRole (constant) is imported alongside types
+import {
+  ShareRole,
+  type SessionDetail,
+  type PracticeDetail,
+  type GameTacticDetail,
 } from "../../../types/types";
 
 import { DetailHeader } from "./detail/DetailHeader";
@@ -28,10 +30,10 @@ export const DetailView = observer(
     const { t } = useTranslation(["exercises", "common"]);
     const [showShare, setShowShare] = useState(false);
 
-    // Type Guards
+    const isOwner = item.role === ShareRole.OWNER;
+
     const isSession = "steps" in item;
 
-    // Determine share type string for the API
     const shareType: "session" | "practice" | "tactic" = isSession
       ? "session"
       : type === "tactics"
@@ -45,17 +47,18 @@ export const DetailView = observer(
 
     return (
       <div className="detail-container">
-        {/* Top Bar */}
         <div className="header-section">
           <button onClick={onBack} className="back-button">
             <ArrowLeft size={16} />
             {t("common:back")}
           </button>
 
-          <button className="btn-action secondary" onClick={handleOpenShare}>
-            <Share2 size={16} />
-            {t("common:share")}
-          </button>
+          {isOwner && (
+            <button className="btn-action secondary" onClick={handleOpenShare}>
+              <Share2 size={16} />
+              {t("common:share")}
+            </button>
+          )}
         </div>
 
         <div className="detail-card">
@@ -71,14 +74,11 @@ export const DetailView = observer(
           <div className="detail-body">
             <p className="description-text">{item.description}</p>
 
-            {/* 1. Show Preview ONLY if it is a Session */}
             {isSession && <SessionPreview session={item as SessionDetail} />}
 
-            {/* 2. Show Included Sessions if it is Practice or Tactic */}
-            {/* We check "sessions" property to confirm it's a collection type */}
             {"sessions" in item && (
               <IncludedSessions
-                item={item as PracticeDetail}
+                item={item as PracticeDetail | GameTacticDetail}
                 type={type as "practices" | "tactics"}
               />
             )}
