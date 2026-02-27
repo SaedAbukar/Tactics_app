@@ -21,6 +21,7 @@ export const Exercises = observer(() => {
 
   useEffect(() => {
     if (user) {
+      exercisesViewModel.clearSelection();
       exercisesViewModel.loadData();
     }
   }, [user, exercisesViewModel]);
