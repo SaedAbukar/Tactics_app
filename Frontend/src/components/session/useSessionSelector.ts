@@ -157,19 +157,15 @@ export const useSessionSelector = (
       },
     });
   };
-
   // ------------------------------------------------------------------
-  //  UPDATED: Handle Select (Always fetches Session Detail)
+  //  UPDATED: Handle Select (Accepts isEdit flag)
   // ------------------------------------------------------------------
   const handleSelect = async (
     item: SessionSummary | PracticeSummary | GameTacticSummary,
+    isEdit: boolean = false, // <-- Added flag
   ) => {
     let sessionIdToFetch = item.id;
 
-    // Logic for Practices/Tactics Tabs:
-    // If the user clicked the main Practice/Tactic card (which has a 'sessions' array),
-    // we default to fetching the FIRST session inside it.
-    // (If they clicked a sub-session button, 'item' is already a SessionSummary, so 'sessions' won't exist or we treat it as direct).
     if (viewType !== "sessions" && "sessions" in item) {
       const collectionItem = item as PracticeSummary | GameTacticSummary;
       if (
@@ -179,20 +175,34 @@ export const useSessionSelector = (
       ) {
         sessionIdToFetch = collectionItem.sessions[0].id;
       } else {
-        // Empty practice/tactic - nothing to load onto board
-        return;
+        // If editing an empty practice, we don't exit early because we still want the form!
+        if (!isEdit) return;
+        sessionIdToFetch = 0; // Skip fetch for empty practice
       }
     }
 
-    // 1. Always fetch Session Detail (contains steps)
-    await vm.fetchAndSelectSession(sessionIdToFetch);
+    if (sessionIdToFetch) {
+      // 1. Always fetch Session Detail (contains steps)
+      await vm.fetchAndSelectSession(sessionIdToFetch);
 
-    // 2. Extract steps from the loaded SessionDetail
-    const detail = vm.selectedItem as SessionDetail;
+      // 2. Extract steps from the loaded SessionDetail
+      const detail = vm.selectedItem as SessionDetail;
 
-    // 3. Update the board
-    if (detail && detail.steps) {
-      onSelectSession(detail.steps);
+      if (detail && detail.steps) {
+        if (isEdit) {
+          // 3a. EDIT MODE: Load board in the background, DON'T call onSelectSession (keeps modal open)
+          boardVM.updateSavedSteps(detail.steps);
+          if (detail.steps.length > 0) {
+            boardVM.loadStep(0);
+          }
+        } else {
+          // 3b. VIEW MODE: Call parent callback (closes modal on mobile)
+          onSelectSession(detail.steps);
+        }
+      }
+    } else if (isEdit) {
+      // Clear board if editing an empty practice/tactic
+      boardVM.clearPitch();
     }
   };
 

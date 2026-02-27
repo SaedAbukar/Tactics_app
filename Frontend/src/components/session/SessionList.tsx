@@ -26,7 +26,7 @@ interface SessionListProps {
   setExpandedCategory: (c: Category | null) => void;
   editingId: number | null;
   setEditingId: (id: number | null) => void;
-  onSelect: (item: any) => void;
+  onSelect: (item: any, isEdit?: boolean) => void;
   onSave: (data: any) => void;
   onDelete: (id: number) => void;
   viewType: string;
@@ -143,7 +143,7 @@ export const SessionList: React.FC<SessionListProps> = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingId(item.id);
-                        onSelect(item);
+                        onSelect(item, true);
                       }}
                     >
                       <Pencil size={14} />
