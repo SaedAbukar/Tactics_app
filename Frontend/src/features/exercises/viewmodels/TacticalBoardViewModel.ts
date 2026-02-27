@@ -39,6 +39,7 @@ export class TacticalBoardViewModel {
 
   // Dragging State (kept in VM to coordinate with Pitch)
   dragItem: DragItem | null = null;
+  selectedItem: DragItem | null = null;
 
   // Private animation refs
   private animFrameId: number | null = null;
@@ -109,14 +110,19 @@ export class TacticalBoardViewModel {
 
   startDrag(item: DragItem) {
     this.dragItem = item;
+    this.selectedItem = item; // ✅ Keep it selected even after mouseUp
   }
 
-  moveDrag(x: number, y: number) {
+  clearSelection() {
+    this.selectedItem = null;
+  }
+
+  // ✅ Add snapAngle parameter with a default value of false
+  moveDrag(x: number, y: number, snapAngle: boolean = false) {
     if (!this.dragItem) return;
 
     const { type, id } = this.dragItem;
 
-    // We update directly. MobX handles the reactivity.
     if (type === "player") {
       const p = this.players.find((i) => i.id === id);
       if (p) {
@@ -140,6 +146,24 @@ export class TacticalBoardViewModel {
       if (g) {
         g.x = x - g.width / 2;
         g.y = y - g.depth / 2;
+      }
+    } else if (type === "goal-rotate") {
+      // ✅ Handle Rotation with Snapping
+      const g = this.goals.find((i) => i.id === id);
+      if (g) {
+        const dx = x - g.x;
+        const dy = y - g.y;
+
+        // Calculate raw angle
+        let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        if (angle < 0) angle += 360; // Normalize to 0-359
+
+        // Snap to nearest 45 degrees if Shift is held
+        if (snapAngle) {
+          angle = Math.round(angle / 45) * 45;
+        }
+
+        g.rotation = Math.round(angle) % 360;
       }
     }
   }

@@ -2,7 +2,7 @@
 // Core Types
 // ------------------------------
 
-export type EntityType = "player" | "ball" | "goal" | "cone";
+export type EntityType = "player" | "ball" | "goal" | "cone" | "goal-rotate";
 
 export type DragItem = {
   type: EntityType;
@@ -49,6 +49,7 @@ export type Goal = {
   width: number;
   depth: number;
   color?: string;
+  rotation?: number;
 };
 
 export type Cone = {
